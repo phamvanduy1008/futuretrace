@@ -1,7 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getCurrentUser, logout } from '../services/authService';
 
 const SharedHeader: React.FC = () => {
   const navigate = useNavigate();
@@ -11,13 +11,13 @@ const SharedHeader: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [searchValue, setSearchValue] = useState("");
+  const user = getCurrentUser();
 
   useEffect(() => {
-    const authStatus = localStorage.getItem('futuretrace_auth') === 'true';
-    setIsLoggedIn(authStatus);
+    const token = localStorage.getItem('token');
+    setIsLoggedIn(!!token);
     setIsMobileMenuOpen(false);
     
-    // Đồng bộ giá trị input với URL nếu đang ở trang cộng đồng
     if (location.pathname === '/community') {
       setSearchValue(searchParams.get('q') || "");
     } else {
@@ -26,7 +26,7 @@ const SharedHeader: React.FC = () => {
   }, [location, searchParams]);
 
   const handleLogout = () => {
-    localStorage.removeItem('futuretrace_auth');
+    logout();
     setIsLoggedIn(false);
     setIsMobileMenuOpen(false);
     navigate('/');
@@ -36,12 +36,16 @@ const SharedHeader: React.FC = () => {
     const value = e.target.value;
     setSearchValue(value);
     
-    // Nếu người dùng đang gõ, tự động chuyển hướng/cập nhật URL trang cộng đồng
     if (value.trim()) {
       navigate(`/community?q=${encodeURIComponent(value)}`, { replace: location.pathname === '/community' });
     } else if (location.pathname === '/community') {
       navigate('/community', { replace: true });
     }
+  };
+
+  const getUserInitials = () => {
+    if (!user?.name) return 'ID';
+    return user.name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
   };
 
   const navItems = [
@@ -133,7 +137,7 @@ const SharedHeader: React.FC = () => {
                   onMouseLeave={() => setIsProfileOpen(false)}
                 >
                   <div className="w-8 h-8 rounded-full bg-white border-2 border-slate-800 flex items-center justify-center text-slate-950 font-black text-[10px] cursor-pointer hover:ring-2 hover:ring-blue-600/50 transition-all">
-                    JD
+                    {getUserInitials()}
                   </div>
                   
                   <AnimatePresence>
@@ -147,7 +151,7 @@ const SharedHeader: React.FC = () => {
                       >
                         <div className="px-4 py-3 border-b border-slate-800 mb-1">
                           <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Tài khoản ID</p>
-                          <p className="text-sm font-black text-white truncate">jane.doe@research.vn</p>
+                          <p className="text-sm font-black text-white truncate">{user?.email || "guest@research.vn"}</p>
                         </div>
                         
                         {profileMenuItems.map((item, index) => (

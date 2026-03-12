@@ -3,39 +3,70 @@ import React, { useState, useEffect } from 'react';
 import SharedHeader from '../components/SharedHeader';
 import SharedFooter from '../components/SharedFooter';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getProgress, saveProgress, deleteProgressItem } from '../data/mockDatabase';
 import { ProgressItem } from '../types';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { apiFetch } from '../services/apiClient';
 
 const ProgressPage: React.FC = () => {
   const [progressList, setProgressList] = useState<ProgressItem[]>([]);
   const [selectedIdx, setSelectedIdx] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const list = getProgress();
-    setProgressList(list);
-    
-    const id = searchParams.get('id');
-    if (id) {
-      const idx = list.findIndex(p => p.id === id);
-      if (idx >= 0) {
-        setSelectedIdx(idx);
+  const fetchProgress = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const res = await apiFetch('/premium/progress');
+      if (!res.ok) {
+        throw new Error('Không thể lấy danh sách tiến trình. Vui lòng thử lại sau.');
       }
+      const data = await res.json();
+      setProgressList(data);
+      
+      const id = searchParams.get('id');
+      if (id && data.length > 0) {
+        const idx = data.findIndex((p: ProgressItem) => p.id === id);
+        if (idx >= 0) {
+          setSelectedIdx(idx);
+        }
+      }
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || 'Đã có lỗi kết nối đến máy chủ.');
+    } finally {
+      setIsLoading(false);
     }
-  }, [searchParams]);
+  };
+
+  useEffect(() => {
+    fetchProgress();
+  }, [searchParams, navigate]);
 
   const selectedProgress = progressList[selectedIdx];
 
-  const handleDelete = (e: React.MouseEvent, id: string) => {
+  const handleDelete = async (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
     if (window.confirm('Bạn có chắc chắn muốn xóa tiến trình này?')) {
-      deleteProgressItem(id);
-      const updatedList = getProgress();
-      setProgressList(updatedList);
-      if (selectedIdx >= updatedList.length) {
-        setSelectedIdx(Math.max(0, updatedList.length - 1));
+      try {
+        const res = await apiFetch(`/premium/progress/${id}`, {
+          method: 'DELETE'
+        });
+        
+        if (!res.ok) {
+          throw new Error('Không thể xóa tiến trình');
+        }
+
+        const updatedList = progressList.filter(p => p.id !== id);
+        setProgressList(updatedList);
+        if (selectedIdx >= updatedList.length) {
+          setSelectedIdx(Math.max(0, updatedList.length - 1));
+        }
+      } catch (err) {
+        console.error('Lỗi khi xóa tiến trình:', err);
+        alert('Đã xảy ra lỗi khi xóa tiến trình. Vui lòng thử lại sau.');
       }
     }
   };
@@ -47,6 +78,36 @@ const ProgressPage: React.FC = () => {
     if (idx === firstUncompleted) return 'Đang tiến hành';
     return 'Chưa bắt đầu';
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#f8fafc] flex flex-col font-sans">
+        <SharedHeader />
+        <main className="flex-1 flex flex-col items-center justify-center p-6 text-center">
+          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-6"></div>
+          <p className="text-slate-500 font-medium tracking-widest uppercase text-sm">Đang tải dữ liệu tiến trình...</p>
+        </main>
+        <SharedFooter />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#f8fafc] flex flex-col font-sans">
+        <SharedHeader />
+        <main className="flex-1 flex flex-col items-center justify-center p-6 text-center">
+          <div className="w-24 h-24 bg-rose-100 rounded-3xl flex items-center justify-center mb-8">
+            <span className="material-symbols-outlined text-rose-500 text-5xl">warning</span>
+          </div>
+          <h2 className="text-3xl font-black text-slate-900 mb-4 uppercase italic">Lỗi kết nối</h2>
+          <p className="text-slate-500 max-w-md mb-10 font-medium">{error}</p>
+          <button onClick={fetchProgress} className="px-10 py-4 bg-blue-600 text-white rounded-2xl font-black uppercase tracking-widest text-[11px] shadow-xl shadow-blue-500/20">Thử lại</button>
+        </main>
+        <SharedFooter />
+      </div>
+    );
+  }
 
   if (progressList.length === 0) {
     return (

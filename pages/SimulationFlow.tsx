@@ -94,47 +94,6 @@ const SimulationFlow: React.FC = () => {
 
   const handleSaveToHistory = () => {
     if (!results) return;
-
-    const finalFolderName = folderName.trim() || `Nhóm kịch bản: ${data.decision}`;
-    
-    // Create a folder containing all 3 scenarios
-    const folderId = `FLD-${Math.floor(Math.random() * 9000) + 1000}`;
-    const dateStr = new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
-    
-    const scenariosInFolder = results.scenarios.map((s) => ({
-      id: `FT-${Math.floor(Math.random() * 9000) + 1000}`,
-      title: s.title,
-      category: "SỰ NGHIỆP",
-      author: "Jane Doe",
-      isAnonymous: false,
-      date: dateStr,
-      desc: s.description,
-      reliability: 95,
-      color: s.type === 'Risk' ? 'bg-rose-500' : (s.type === 'Positive' ? 'bg-emerald-500' : 'bg-blue-500'),
-      type: s.type,
-      metrics: { career: s.careerGrowth, happiness: s.happiness, roi: s.roi },
-      deepAnalysis: s.deepAnalysis
-    }));
-
-    const folderItem = {
-      id: folderId,
-      title: finalFolderName,
-      category: "MÔ PHỎNG",
-      author: "Jane Doe",
-      isAnonymous: false,
-      date: dateStr,
-      desc: `Bao gồm 3 kịch bản mô phỏng cho quyết định: ${data.decision}`,
-      reliability: 95,
-      isFolder: true,
-      scenarios: scenariosInFolder,
-      metrics: { 
-        career: Math.round(scenariosInFolder.reduce((acc, s) => acc + s.metrics.career, 0) / 3),
-        happiness: Math.round(scenariosInFolder.reduce((acc, s) => acc + s.metrics.happiness, 0) / 3),
-        roi: Math.round(scenariosInFolder.reduce((acc, s) => acc + s.metrics.roi, 0) / 3)
-      }
-    };
-
-    saveToHistory(folderItem, false);
     setIsSaved(true);
     setIsSaveModalOpen(false);
   };

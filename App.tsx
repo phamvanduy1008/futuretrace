@@ -13,23 +13,63 @@ import ScenarioDetailPage from './pages/ScenarioDetailPage';
 import PremiumPage from './pages/PremiumPage';
 import PremiumAnalysisPage from './pages/PremiumAnalysisPage';
 import ComparisonMatrixPage from './pages/ComparisonMatrixPage';
+import { getUserProfile, logout } from './services/authService';
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
-    return localStorage.getItem('futuretrace_auth') === 'true';
+    return !!localStorage.getItem('token');
   });
+  const [isInitializing, setIsInitializing] = useState(true);
 
   useEffect(() => {
-    const handleStorageChange = () => {
-      setIsAuthenticated(localStorage.getItem('futuretrace_auth') === 'true');
+    const initAuth = async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          // Verify token by fetching profile
+          await getUserProfile();
+          setIsAuthenticated(true);
+        } catch (err) {
+          console.error("Session invalid or expired", err);
+          logout();
+          setIsAuthenticated(false);
+        }
+      } else {
+        setIsAuthenticated(false);
+      }
+      setIsInitializing(false);
     };
+
+    initAuth();
+
+    const handleStorageChange = () => {
+      setIsAuthenticated(!!localStorage.getItem('token'));
+    };
+
+    const handleUnauthorized = () => {
+      logout();
+      setIsAuthenticated(false);
+    };
+
     window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    window.addEventListener('auth-unauthorized', handleUnauthorized);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('auth-unauthorized', handleUnauthorized);
+    };
   }, []);
 
   const handleLogin = () => {
     setIsAuthenticated(true);
   };
+
+  if (isInitializing) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
     <HashRouter>

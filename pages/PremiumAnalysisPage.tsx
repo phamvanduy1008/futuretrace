@@ -21,43 +21,32 @@ const PremiumAnalysisPage: React.FC = () => {
   const [isConfirmPivotModalOpen, setIsConfirmPivotModalOpen] = useState(false);
   const [feedback, setFeedback] = useState('');
   const [isPivoting, setIsPivoting] = useState(false);
+  const [progressId, setProgressId] = useState<string | null>(null);
 
   const { scenario, context, timeframe, existingProgress } = (location.state as any) || {};
 
   useEffect(() => {
-    if (!scenario) {
-      navigate('/dashboard');
-      return;
-    }
-
     const fetchReport = async () => {
-      // Check if we already have progress for this scenario
-      const saved = getProgressByScenarioId(scenario.id, scenario.title);
-      if (saved) {
-        setReport(saved.report);
-        setCurrentMilestoneIndex(saved.completedMilestones.length);
+      // If we already have the progress from state (e.g. Navigated from Progress Page)
+      // Use it immediately for an "instant" experience
+      if (existingProgress) {
+        setReport(existingProgress.report);
+        setProgressId(existingProgress.id);
+        setCurrentMilestoneIndex(existingProgress.completedMilestones?.length || 0);
         setLoading(false);
         return;
       }
 
+      setLoading(true);
+      setError(null);
       try {
-        const data = await generatePremiumAnalysis(scenario.title, scenario.description, context, timeframe);
-        setReport(data);
+        // Backend now checks for existing record by scenario.id
+        // Scenario.id must be the real MongoDB _id or the one from the simulation
+        const data = await generatePremiumAnalysis(scenario.title, scenario.description, scenario.id, context, timeframe);
         
-        // Auto save to progress
-        const newProgress: ProgressItem = {
-          id: `PR-${Date.now()}`,
-          scenarioId: scenario.id,
-          title: scenario.title,
-          category: scenario.category || 'SỰ NGHIỆP',
-          date: new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase(),
-          report: data,
-          context: context,
-          scenario: scenario,
-          completedMilestones: [],
-          timeframe: timeframe
-        };
-        saveProgress(newProgress);
+        setReport(data.report);
+        setProgressId(data.id);
+        setCurrentMilestoneIndex(data.completedMilestones?.length || 0);
       } catch (e: any) {
         setError(e.message);
       } finally {
@@ -65,8 +54,10 @@ const PremiumAnalysisPage: React.FC = () => {
       }
     };
 
-    fetchReport();
-  }, [scenario, navigate, context, timeframe]);
+    if (scenario) {
+      fetchReport();
+    }
+  }, [scenario, navigate, context, timeframe, existingProgress]);
 
   const getMilestoneStatus = (index: number) => {
     if (index < currentMilestoneIndex) return 'Đã hoàn thành';
@@ -80,26 +71,41 @@ const PremiumAnalysisPage: React.FC = () => {
     }
   };
 
+  const updateBackendProgress = async (newIndex: number, newReport?: any) => {
+    if (!progressId) return;
+    try {
+      const token = localStorage.getItem("token");
+      const apiBase = (import.meta as any).env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+      await fetch(`${apiBase}/premium/progress/${progressId}`, {
+        method: "PUT",
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}` 
+        },
+        body: JSON.stringify({
+          completedMilestones: Array.from({ length: newIndex }, (_, i) => i),
+          report: newReport || undefined
+        })
+      });
+    } catch (err) {
+      console.error("Error updating progress on backend:", err);
+    }
+  };
+
   const submitFeedback = () => {
     setIsFeedbackModalOpen(false);
     setIsConfirmPivotModalOpen(true);
   };
 
-  const handleNoFeedback = () => {
+  const handleNoFeedback = async () => {
     setIsFeedbackModalOpen(false);
     const newIndex = currentMilestoneIndex + 1;
     setCurrentMilestoneIndex(newIndex);
     setSelectedMilestone(null);
     setSelectedMilestoneIndex(null);
 
-    // Update progress
-    if (report && scenario) {
-      const saved = getProgressByScenarioId(scenario.id, scenario.title);
-      if (saved) {
-        saved.completedMilestones = Array.from({ length: newIndex }, (_, i) => i);
-        saveProgress(saved);
-      }
-    }
+    // Update progress on backend
+    await updateBackendProgress(newIndex);
   };
 
   const handleConfirmPivot = async (agree: boolean) => {
@@ -115,13 +121,8 @@ const PremiumAnalysisPage: React.FC = () => {
         setCurrentMilestoneIndex(newIndex);
         setFeedback('');
 
-        // Update progress
-        const saved = getProgressByScenarioId(scenario.id, scenario.title);
-        if (saved) {
-          saved.report = newReport;
-          saved.completedMilestones = Array.from({ length: newIndex }, (_, i) => i);
-          saveProgress(saved);
-        }
+        // Update progress on backend
+        await updateBackendProgress(newIndex, newReport);
       } catch (e: any) {
         alert("Lỗi khi điều chỉnh lộ trình: " + e.message);
       } finally {
@@ -130,15 +131,7 @@ const PremiumAnalysisPage: React.FC = () => {
     } else {
       const newIndex = currentMilestoneIndex + 1;
       setCurrentMilestoneIndex(newIndex);
-      
-      // Update progress
-      if (scenario) {
-        const saved = getProgressByScenarioId(scenario.id, scenario.title);
-        if (saved) {
-          saved.completedMilestones = Array.from({ length: newIndex }, (_, i) => i);
-          saveProgress(saved);
-        }
-      }
+      await updateBackendProgress(newIndex);
     }
     
     setSelectedMilestone(null);
