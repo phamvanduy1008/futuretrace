@@ -1,0 +1,642 @@
+
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { SimulationStep, SimulationData, PredictionResult, ScenarioResult } from '../types';
+import { generateSimulation } from '../services/geminiService';
+import { saveToHistory } from '../data/mockDatabase';
+import SharedHeader from '../components/SharedHeader';
+import SharedFooter from '../components/SharedFooter';
+
+const SimulationFlow: React.FC = () => {
+  const navigate = useNavigate();
+  const [step, setStep] = useState<SimulationStep>(SimulationStep.DESCRIPTION);
+  const [data, setData] = useState<SimulationData>({
+    decision: "",
+    stress: 3,
+    personalFinance: 3,
+    risk: 4,
+    academicPerformance: 3,
+    otherFactors: "",
+    tier: 'free'
+  });
+  const [loadingProgress, setLoadingProgress] = useState(0);
+  const [results, setResults] = useState<PredictionResult | null>(null);
+  const [error, setError] = useState<{ message: string; type: 'AUTH' | 'NETWORK' | 'LOCAL_CONFIG' | 'GENERAL' } | null>(null);
+  const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+  const [folderName, setFolderName] = useState("");
+  const [isSaved, setIsSaved] = useState(false);
+  const [selectedScenario, setSelectedScenario] = useState<ScenarioResult | null>(null);
+
+  const handleNextStep = async () => {
+    if (step === SimulationStep.DESCRIPTION) {
+      if (!data.decision.trim()) return;
+      setStep(SimulationStep.CONTEXT);
+    } else if (step === SimulationStep.CONTEXT) {
+      setError(null);
+      setStep(SimulationStep.PROCESSING);
+      startSimulation();
+    }
+  };
+
+  const handleSelectKey = async () => {
+    if ((window as any).aistudio?.openSelectKey) {
+      try {
+        await (window as any).aistudio.openSelectKey();
+        setError(null);
+      } catch (e) {
+        console.error("Failed to open key selector", e);
+      }
+    } else {
+      setError({
+        type: 'LOCAL_CONFIG',
+        message: "Bạn đang chạy ứng dụng ở môi trường Local. Vui lòng cấu hình API_KEY để tiếp tục."
+      });
+    }
+  };
+
+  const startSimulation = async () => {
+    setLoadingProgress(0);
+    let progress = 0;
+    const interval = setInterval(() => {
+      progress += Math.random() * 8;
+      if (progress >= 95) {
+        progress = 95;
+        clearInterval(interval);
+      }
+      setLoadingProgress(Math.floor(progress));
+    }, 250);
+
+    try {
+      const result = await generateSimulation(data);
+      // Assign IDs to scenarios if they don't have them
+      const scenariosWithIds = result.scenarios.map((s, idx) => ({
+        ...s,
+        id: s.id || `SC-${Date.now()}-${idx}`
+      }));
+      const finalResult = { ...result, scenarios: scenariosWithIds };
+      
+      setResults(finalResult);
+      setLoadingProgress(100);
+      setTimeout(() => setStep(SimulationStep.RESULTS), 800);
+    } catch (e: any) {
+      clearInterval(interval);
+      setError({ message: e.message, type: 'GENERAL' });
+      setStep(SimulationStep.CONTEXT);
+    } finally {
+      clearInterval(interval);
+    }
+  };
+
+  const handleDeepAnalysis = (scenario: ScenarioResult) => {
+    navigate(`/detail/${scenario.type.toLowerCase()}`, { state: { scenario, context: data } });
+  };
+
+  const handleSaveToHistory = () => {
+    if (!results) return;
+
+    const finalFolderName = folderName.trim() || `Nhóm kịch bản: ${data.decision}`;
+    
+    // Create a folder containing all 3 scenarios
+    const folderId = `FLD-${Math.floor(Math.random() * 9000) + 1000}`;
+    const dateStr = new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
+    
+    const scenariosInFolder = results.scenarios.map((s) => ({
+      id: `FT-${Math.floor(Math.random() * 9000) + 1000}`,
+      title: s.title,
+      category: "SỰ NGHIỆP",
+      author: "Jane Doe",
+      isAnonymous: false,
+      date: dateStr,
+      desc: s.description,
+      reliability: 95,
+      color: s.type === 'Risk' ? 'bg-rose-500' : (s.type === 'Positive' ? 'bg-emerald-500' : 'bg-blue-500'),
+      type: s.type,
+      metrics: { career: s.careerGrowth, happiness: s.happiness, roi: s.roi },
+      deepAnalysis: s.deepAnalysis
+    }));
+
+    const folderItem = {
+      id: folderId,
+      title: finalFolderName,
+      category: "MÔ PHỎNG",
+      author: "Jane Doe",
+      isAnonymous: false,
+      date: dateStr,
+      desc: `Bao gồm 3 kịch bản mô phỏng cho quyết định: ${data.decision}`,
+      reliability: 95,
+      isFolder: true,
+      scenarios: scenariosInFolder,
+      metrics: { 
+        career: Math.round(scenariosInFolder.reduce((acc, s) => acc + s.metrics.career, 0) / 3),
+        happiness: Math.round(scenariosInFolder.reduce((acc, s) => acc + s.metrics.happiness, 0) / 3),
+        roi: Math.round(scenariosInFolder.reduce((acc, s) => acc + s.metrics.roi, 0) / 3)
+      }
+    };
+
+    saveToHistory(folderItem, false);
+    setIsSaved(true);
+    setIsSaveModalOpen(false);
+  };
+
+  const pageVariants = {
+    initial: { opacity: 0, y: 20 },
+    animate: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: -20 }
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, scale: 0.9, y: 30 },
+    visible: (i: number) => ({
+      opacity: 1,
+      scale: 1,
+      y: 0,
+      transition: { delay: i * 0.15, type: 'spring' as const, stiffness: 80, damping: 15 }
+    })
+  };
+
+  if (step === SimulationStep.DESCRIPTION) {
+    return (
+      <div className="flex flex-col min-h-screen">
+        <SharedHeader />
+        <motion.div 
+          initial="initial" animate="animate" variants={pageVariants}
+          className="flex-1 max-w-4xl mx-auto px-6 py-20 w-full"
+        >
+          <div className="flex flex-col items-center mb-16 text-center">
+            <motion.div 
+              initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+              className="px-6 py-2 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-[0.3em] mb-8 border border-blue-100"
+            >
+              Temporal Simulation v4.2
+            </motion.div>
+            <h1 className="text-5xl sm:text-7xl font-black mb-6 font-display tracking-tighter text-slate-900 leading-none">
+              <span className="block mb-4">Nhập biến số</span>
+              <span className="text-blue-600">đầu vào.</span>
+            </h1>
+            <p className="text-slate-500 text-xl max-w-2xl mx-auto leading-relaxed font-medium">
+              Trí tuệ nhân tạo sẽ quét các từ khóa trong mô tả của bạn để xây dựng cây quyết định tương lai.
+            </p>
+          </div>
+          <div className="space-y-12">
+            <div className="relative group">
+              <div className="absolute -inset-2 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-[2.5rem] blur-xl opacity-10 group-focus-within:opacity-20 transition duration-1000"></div>
+              <textarea 
+                className="relative w-full h-[400px] p-12 bg-white/70 backdrop-blur-xl border border-slate-200 rounded-[2.5rem] text-xl leading-relaxed focus:ring-4 focus:ring-blue-50 focus:border-blue-600 outline-none resize-none transition-all shadow-2xl shadow-slate-100/50 font-medium"
+                placeholder="Ví dụ: Em đang phân vân giữa việc chọn học ngành Công nghệ thông tin tại Bách Khoa hay đi du học Đức..."
+                maxLength={1000}
+                value={data.decision}
+                onChange={(e) => setData({...data, decision: e.target.value})}
+              />
+              <div className="absolute bottom-10 right-12 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] bg-slate-50 px-3 py-1 rounded-md border border-slate-100">
+                {data.decision.length} / 1000 ký tự
+              </div>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-8 pt-4">
+              <div className="flex flex-wrap gap-3 justify-center sm:justify-start">
+                {["Chọn ngành IT", "Du học", "Học đại học"].map((hint) => (
+                  <button 
+                    key={hint}
+                    onClick={() => setData({...data, decision: `Dự án: ${hint} - Em đang lên kế hoạch cho việc...`})}
+                    className="px-6 py-3 text-[10px] font-black uppercase tracking-widest bg-white border border-slate-200 text-slate-500 hover:border-blue-600 hover:text-blue-600 hover:bg-blue-50/30 transition-all rounded-2xl shadow-sm"
+                  >
+                    + {hint}
+                  </button>
+                ))}
+              </div>
+              <button 
+                onClick={handleNextStep}
+                disabled={!data.decision.trim()}
+                className="w-full sm:w-auto bg-slate-900 hover:bg-blue-600 disabled:bg-slate-100 disabled:text-slate-400 text-white font-black py-6 px-14 rounded-2xl shadow-2xl shadow-slate-200 transition-all flex items-center justify-center gap-4 text-xs uppercase tracking-[0.2em]"
+              >
+                Tiếp tục quy trình <span className="material-symbols-outlined font-bold">arrow_forward</span>
+              </button>
+            </div>
+          </div>
+        </motion.div>
+        <SharedFooter />
+      </div>
+    );
+  }
+
+  if (step === SimulationStep.CONTEXT) {
+    return (
+      <div className="flex flex-col min-h-screen">
+        <SharedHeader />
+        <motion.div 
+          initial="initial" animate="animate" variants={pageVariants}
+          className="flex-1 max-w-4xl mx-auto px-6 py-20 w-full"
+        >
+          {error && (
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
+              className="mb-12 p-8 bg-white border-2 border-rose-100 rounded-[2.5rem] shadow-[0_20px_50px_rgba(244,63,94,0.1)] overflow-hidden relative"
+            >
+              <div className="absolute top-0 right-0 p-8 opacity-5">
+                <span className="material-symbols-outlined text-8xl text-rose-600">error</span>
+              </div>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 relative z-10">
+                <div className="w-16 h-16 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-600 shrink-0">
+                  <span className="material-symbols-outlined text-3xl font-bold">warning</span>
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-sm font-black text-rose-900 uppercase tracking-widest mb-1">Cảnh báo hệ thống</h3>
+                  <p className="text-sm text-slate-600 font-medium leading-relaxed">{error.message}</p>
+                </div>
+                <div className="flex flex-col gap-3 w-full sm:w-auto">
+                   <button 
+                    onClick={handleSelectKey}
+                    className="bg-rose-600 text-white px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-rose-700 transition-all shadow-lg shadow-rose-100 flex items-center justify-center gap-2"
+                  >
+                    Cấu hình Key
+                  </button>
+                  <button 
+                    onClick={() => { setError(null); setStep(SimulationStep.PROCESSING); startSimulation(); }}
+                    className="bg-slate-900 text-white px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 transition-all flex items-center justify-center gap-2"
+                  >
+                    Thử lại
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          <div className="mb-20 text-center">
+             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-600 text-[10px] font-black uppercase tracking-[0.3em] mb-8">
+               Context Standardization
+             </div>
+            <h1 className="text-5xl sm:text-7xl font-black tracking-tighter mb-6 font-display text-slate-900 leading-none">
+              <span className="block mb-4">Cấu hình</span>
+              <span className="text-emerald-600">Biến số.</span>
+            </h1>
+            <p className="text-slate-500 text-xl max-w-2xl mx-auto font-medium">
+              Thiết lập các tham số môi trường để AI giả lập chính xác hơn.
+            </p>
+          </div>
+          
+          <div className="space-y-16 max-w-2xl mx-auto bg-white/70 backdrop-blur-xl p-10 sm:p-16 rounded-[3rem] border border-slate-100 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.12)]">
+            {[
+              { id: 'stress', label: 'Áp lực hiện tại', icon: 'psychology_alt', labels: ['Thấp', 'Nhẹ', 'Điều độ', 'Cao', 'Cực hạn'], color: 'accent-blue-600' },
+              { id: 'personalFinance', label: 'Tình hình tài chính cá nhân', icon: 'account_balance_wallet', labels: ['Rất yếu', 'Khó khăn', 'Ổn định', 'Dư dả', 'Thịnh vượng'], color: 'accent-emerald-600' },
+              { id: 'academicPerformance', label: 'Học lực / Năng lực chuyên môn', icon: 'school', labels: ['Yếu', 'Trung bình', 'Khá', 'Giỏi', 'Xuất sắc'], color: 'accent-amber-600' },
+              { id: 'risk', label: 'Chỉ số rủi ro', icon: 'bolt', labels: ['Cẩn trọng', 'Bảo thủ', 'Điều độ', 'Mạo hiểm', 'Quyết liệt'], color: 'accent-indigo-600' }
+            ].map((slider) => (
+              <div key={slider.id} className="space-y-8">
+                <div className="flex justify-between items-center">
+                  <label className="flex items-center gap-5 font-black text-[11px] uppercase tracking-[0.2em] text-slate-800">
+                    <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-blue-600 border border-slate-100 shadow-sm">
+                      <span className="material-symbols-outlined text-2xl">{slider.icon}</span>
+                    </div>
+                    {slider.label}
+                  </label>
+                  <motion.div 
+                    key={(data as any)[slider.id]}
+                    initial={{ y: 5, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
+                    className="text-[10px] font-black text-white px-5 py-2 bg-slate-900 rounded-xl uppercase tracking-widest shadow-lg shadow-slate-200"
+                  >
+                    {slider.labels[(data as any)[slider.id] - 1]}
+                  </motion.div>
+                </div>
+                <input 
+                  type="range" min="1" max="5" step="1" 
+                  className={`w-full h-2 bg-slate-100 rounded-full appearance-none cursor-pointer ${slider.color}`}
+                  value={(data as any)[slider.id]}
+                  onChange={(e) => setData({...data, [slider.id]: parseInt(e.target.value)})}
+                />
+              </div>
+            ))}
+
+            <div className="space-y-6 pt-4">
+              <label className="flex items-center gap-5 font-black text-[11px] uppercase tracking-[0.2em] text-slate-800">
+                <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-blue-600 border border-slate-100 shadow-sm">
+                  <span className="material-symbols-outlined text-2xl">more_horiz</span>
+                </div>
+                Yếu tố khác (Khách quan/Chủ quan)
+              </label>
+              <textarea 
+                className="w-full h-32 p-6 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-medium outline-none focus:ring-2 focus:ring-blue-100 focus:bg-white transition-all resize-none"
+                placeholder="Nhập thêm các yếu tố khác ảnh hưởng đến quyết định của bạn..."
+                value={data.otherFactors}
+                onChange={(e) => setData({...data, otherFactors: e.target.value})}
+              />
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-6 mt-16 pt-8 border-t border-slate-100">
+              <button onClick={() => setStep(SimulationStep.DESCRIPTION)} className="flex-1 px-8 py-6 border border-slate-200 text-slate-400 font-black rounded-2xl hover:bg-slate-50 transition-all uppercase tracking-[0.2em] text-[10px]">
+                Quay lại
+              </button>
+              <button onClick={handleNextStep} className="flex-[2] bg-slate-900 text-white px-8 py-6 font-black rounded-2xl hover:bg-blue-600 transition-all shadow-2xl shadow-slate-200 flex items-center justify-center gap-4 text-[10px] uppercase tracking-[0.2em]">
+                Bắt đầu dự đoán <span className="material-symbols-outlined text-xl">play_arrow</span>
+              </button>
+            </div>
+          </div>
+        </motion.div>
+        <SharedFooter />
+      </div>
+    );
+  }
+
+  if (step === SimulationStep.PROCESSING) {
+    return (
+      <div className="min-h-screen bg-slate-900 flex flex-col font-sans overflow-hidden scan-effect">
+        <main className="flex-1 flex flex-col items-center justify-center px-6 relative">
+          <div className="absolute inset-0 opacity-20">
+             <div className="w-full h-full" style={{ backgroundImage: 'radial-gradient(#2563eb 1px, transparent 1px)', backgroundSize: '60px 60px' }}></div>
+          </div>
+          
+          <motion.div 
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="relative z-10"
+          >
+            <div className="relative w-80 h-80 mb-20 flex items-center justify-center">
+              <svg 
+                viewBox="0 0 288 288"
+                className="absolute inset-0 w-full h-full -rotate-90 drop-shadow-[0_0_30px_rgba(37,99,235,0.4)]"
+              >
+                <circle cx="144" cy="144" r="120" stroke="rgba(255,255,255,0.05)" strokeWidth="4" fill="none" />
+                <motion.circle 
+                  cx="144" cy="144" r="120" stroke="#2563eb" strokeWidth="8" fill="none"
+                  pathLength="100"
+                  strokeDasharray="100"
+                  animate={{ strokeDashoffset: 100 - loadingProgress }}
+                  transition={{ type: "tween" as const, ease: "linear" }}
+                  strokeLinecap="round"
+                />
+              </svg>
+              <div className="text-center relative z-20">
+                <span className="text-8xl font-black tracking-tighter text-white font-display block">
+                  {loadingProgress}
+                  <span className="text-3xl ml-1 text-blue-500">%</span>
+                </span>
+                <p className="text-[11px] font-black text-blue-400 uppercase tracking-[0.5em] mt-6">Đang Phân tích</p>
+              </div>
+            </div>
+          </motion.div>
+
+          <div className="text-center space-y-12 z-10">
+            <h2 className="text-3xl font-black text-white tracking-[0.3em] uppercase font-display max-w-xl mx-auto leading-relaxed">Tiến độ dự đoán</h2>
+            <div className="flex flex-col gap-6 mt-4 max-w-sm mx-auto text-left">
+              {[
+                { label: 'Phân tích từ khóa mô tả', done: loadingProgress > 30 },
+                { label: 'Mô phỏng 10,000 kịch bản', done: loadingProgress > 60 },
+                { label: 'Tính toán ROI & Emotional Index', done: loadingProgress > 85 }
+              ].map((task, i) => (
+                <div key={i} className={`flex items-center gap-6 transition-all duration-700 ${task.done ? 'opacity-100 text-emerald-400 translate-x-4' : 'opacity-20 text-white'}`}>
+                  <span className={`material-symbols-outlined text-2xl ${task.done ? 'scale-125' : ''}`}>
+                    {task.done ? 'check_circle' : 'hourglass_top'}
+                  </span>
+                  <span className="text-xs font-black uppercase tracking-[0.2em]">{task.label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (step === SimulationStep.RESULTS && results) {
+    return (
+      <div className="flex flex-col min-h-screen">
+        <SharedHeader />
+        
+        <header className="py-24 px-6 bg-white border-b border-slate-100 relative overflow-hidden">
+          <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
+             <span className="material-symbols-outlined text-[300px] text-slate-900">verified</span>
+          </div>
+          <div className="max-w-6xl mx-auto flex flex-col items-center text-center">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
+              className="px-6 py-2 bg-slate-900 text-white rounded-full text-[10px] font-black uppercase tracking-[0.4em] mb-12 shadow-2xl shadow-slate-200"
+            >
+              Phân tích hoàn tất • Report FT-{Math.floor(Math.random()*9000)+1000}
+            </motion.div>
+            <h1 className="text-5xl md:text-8xl font-black tracking-tighter mb-12 font-display text-slate-900 leading-[0.95] max-w-5xl">
+              {results.isEnterprise ? (
+                <span className="text-rose-600">Thông báo</span>
+              ) : (
+                <>Phân tích: <span className="text-blue-600">"{data.decision.slice(0, 30)}..."</span></>
+              )}
+            </h1>
+            <p className="text-2xl text-slate-500 max-w-3xl mx-auto leading-relaxed font-medium">
+              {results.summary}
+            </p>
+            {(results.summary.includes('Premium') || results.isEnterprise) && (
+              <motion.button 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                onClick={() => navigate('/premium')}
+                className="mt-12 px-10 py-5 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-black rounded-2xl hover:scale-105 transition-all shadow-2xl shadow-amber-200 uppercase tracking-[0.2em] text-xs flex items-center gap-4"
+              >
+                <span className="material-symbols-outlined font-bold">workspace_premium</span> Nâng cấp lên bản dành cho doanh nghiệp
+              </motion.button>
+            )}
+          </div>
+        </header>
+
+        <main className="max-w-7xl mx-auto px-6 py-24 w-full">
+          {!results.isEnterprise && (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
+                <AnimatePresence>
+                  {results.scenarios.map((scenario, idx) => (
+                    <motion.div 
+                      key={idx}
+                      custom={idx}
+                      variants={cardVariants}
+                      initial="hidden"
+                      animate="visible"
+                      className={`flex flex-col bg-white border border-slate-200 rounded-[3rem] overflow-hidden group hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] transition-all duration-700 relative ${
+                        scenario.type === 'Positive' ? 'ring-4 ring-emerald-50' : 
+                        scenario.type === 'Risk' ? 'ring-4 ring-rose-50' : ''
+                      }`}
+                    >
+                      <div className={`p-10 border-b border-slate-50 ${
+                        scenario.type === 'Positive' ? 'bg-emerald-50/30' : 
+                        scenario.type === 'Neutral' ? 'bg-blue-50/30' : 
+                        'bg-rose-50/30'
+                      }`}>
+                        <div className="flex justify-between items-center mb-8">
+                          <span className={`px-5 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border ${
+                            scenario.type === 'Positive' ? 'bg-white text-emerald-600 border-emerald-100 shadow-sm' :
+                            scenario.type === 'Neutral' ? 'bg-white text-blue-600 border-blue-100 shadow-sm' :
+                            'bg-white text-rose-600 border-rose-100 shadow-sm'
+                          }`}>
+                            {scenario.type === 'Positive' ? 'Tối ưu' : scenario.type === 'Neutral' ? 'Cân bằng' : 'Rủi ro cao'}
+                          </span>
+                          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center bg-white shadow-sm ${
+                            scenario.type === 'Positive' ? 'text-emerald-500' : 
+                            scenario.type === 'Neutral' ? 'text-blue-500' : 
+                            'text-rose-500'
+                          }`}>
+                            <span className="material-symbols-outlined text-2xl font-bold">
+                              {scenario.type === 'Positive' ? 'trending_up' : scenario.type === 'Neutral' ? 'equalizer' : 'warning'}
+                            </span>
+                          </div>
+                        </div>
+                        <h3 className="text-2xl font-black mb-4 group-hover:text-blue-600 transition-colors font-display tracking-tight leading-tight uppercase">{scenario.title}</h3>
+                        <p className="text-sm text-slate-500 leading-relaxed min-h-[5rem] font-medium italic">"{scenario.description}"</p>
+                      </div>
+                      
+                      <div className="p-10 space-y-12 flex-grow">
+                        {[
+                          { label: 'Tăng trưởng sự nghiệp', val: scenario.careerGrowth, color: 'bg-blue-600' },
+                          { label: 'Chỉ số Hạnh phúc', val: scenario.happiness, color: 'bg-emerald-500' },
+                          { label: 'ROI dự kiến (5 năm)', val: scenario.roi, color: 'bg-indigo-600' }
+                        ].map((metric, mi) => (
+                          <div key={mi} className="space-y-4">
+                            <div className="flex justify-between items-end">
+                              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{metric.label}</p>
+                              <p className="text-xl font-black text-slate-900">+{metric.val}%</p>
+                            </div>
+                            <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                              <motion.div 
+                                initial={{ width: 0 }}
+                                animate={{ width: `${metric.val}%` }}
+                                transition={{ duration: 1.5, delay: 0.8 + (idx * 0.2) + (mi * 0.1) }}
+                                className={`h-full ${metric.color}`}
+                              ></motion.div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      
+                      <div className="px-10 pb-10">
+                        <button 
+                          onClick={() => handleDeepAnalysis(scenario)}
+                          className="w-full py-5 bg-slate-900 hover:bg-blue-600 text-white text-[10px] font-black uppercase tracking-[0.3em] transition-all rounded-2xl shadow-xl shadow-slate-200 flex items-center justify-center gap-4 group-hover:gap-6"
+                        >
+                          Phân tích sâu <span className="material-symbols-outlined text-lg">science</span>
+                        </button>
+                      </div>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
+
+              <motion.div 
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="p-16 bg-slate-950 rounded-[4rem] relative overflow-hidden mb-24 shadow-2xl"
+              >
+                <div className="absolute top-0 right-0 p-16 opacity-5 pointer-events-none">
+                   <span className="material-symbols-outlined text-[250px] text-white">timeline</span>
+                </div>
+                <div className="flex flex-col items-center mb-20 text-center">
+                  <span className="text-[10px] font-black text-blue-400 uppercase tracking-[0.5em] mb-6">Strategic Milestones</span>
+                  <h3 className="text-4xl font-black text-white font-display uppercase tracking-tight">Timeline lộ trình tích hợp</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-10 relative z-10">
+                  {[
+                    { label: 'Khởi điểm', text: results.timeline.start, time: 'Hiện tại', icon: 'flag' },
+                    { label: 'Thích ứng', text: results.timeline.sixMonths, time: '6 Tháng', icon: 'sync_alt' },
+                    { label: 'Cân bằng', text: results.timeline.oneYear, time: '12 Tháng', icon: 'balance' },
+                    { label: 'Đột phá', text: results.timeline.threeYears, time: '36 Tháng', icon: 'rocket_launch' }
+                  ].map((item, i) => (
+                    <div key={i} className="flex flex-col gap-8 p-10 rounded-[2.5rem] bg-white/5 border border-white/10 hover:bg-white/10 transition-all group">
+                      <div className="flex items-center gap-5">
+                        <div className="w-13 h-13 rounded-full bg-blue-600/20 border border-blue-600/50 flex items-center justify-center text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition-all shadow-xl">
+                          <span className="material-symbols-outlined">{item.icon}</span>
+                        </div>
+                        <div className="flex flex-col">
+                           <span className="text-[9px] font-black uppercase tracking-[0.3em] text-blue-400">{item.label}</span>
+                           <span className="text-xl font-black text-white font-display">{item.time}</span>
+                        </div>
+                      </div>
+                      <p className="text-sm text-slate-300 leading-relaxed font-medium">{item.text}</p>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            </>
+          )}
+          
+          <div className="flex flex-col sm:flex-row justify-center gap-8">
+             <button onClick={() => navigate('/dashboard')} className="px-16 py-6 bg-white border border-slate-200 text-slate-900 font-black text-[11px] uppercase tracking-[0.2em] hover:bg-slate-50 rounded-2xl transition-all shadow-sm">
+               Quay lại Dashboard
+             </button>
+             {!results.isEnterprise && (
+               <>
+                 <button 
+                   onClick={() => !isSaved && setIsSaveModalOpen(true)}
+                   disabled={isSaved}
+                   className={`px-16 py-6 ${isSaved ? 'bg-emerald-500' : 'bg-blue-600 hover:bg-blue-700'} text-white font-black text-[11px] uppercase tracking-[0.2em] rounded-2xl transition-all shadow-2xl shadow-blue-200 flex items-center gap-5`}
+                 >
+                   <span className="material-symbols-outlined text-xl">{isSaved ? 'check_circle' : 'save'}</span> 
+                   {isSaved ? 'Đã lưu vào lịch sử' : 'Lưu vào lịch sử'}
+                 </button>
+                 <button className="px-16 py-6 bg-slate-900 text-white font-black text-[11px] uppercase tracking-[0.2em] hover:bg-slate-800 rounded-2xl transition-all shadow-2xl shadow-slate-200 flex items-center gap-5">
+                   <span className="material-symbols-outlined text-xl">download</span> Xuất chiến lược (.PDF)
+                 </button>
+               </>
+             )}
+          </div>
+        </main>
+        <SharedFooter />
+
+        <AnimatePresence>
+          {isSaveModalOpen && (
+            <div className="fixed inset-0 z-[200] flex items-center justify-center p-6">
+              <motion.div 
+                initial={{ opacity: 0 }} 
+                animate={{ opacity: 1 }} 
+                exit={{ opacity: 0 }} 
+                onClick={() => setIsSaveModalOpen(false)} 
+                className="absolute inset-0 bg-slate-900/80 backdrop-blur-md" 
+              />
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.9, y: 30 }} 
+                animate={{ opacity: 1, scale: 1, y: 0 }} 
+                exit={{ opacity: 0, scale: 0.9, y: 30 }} 
+                className="relative w-full max-w-[480px] bg-white rounded-[3rem] p-10 sm:p-14 shadow-[0_100px_150px_-50px_rgba(0,0,0,0.5)] border border-slate-100 overflow-hidden"
+              >
+                <div className="text-center mb-10">
+                  <div className="w-20 h-20 bg-blue-50 text-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-inner border border-blue-100">
+                    <span className="material-symbols-outlined text-4xl">create_new_folder</span>
+                  </div>
+                  <h3 className="text-3xl font-black text-slate-900 font-display uppercase tracking-tighter mb-4">Lưu kịch bản</h3>
+                  <p className="text-slate-500 text-sm font-medium leading-relaxed mb-8">
+                    Nhập tên cho nhóm kịch bản này để dễ dàng tìm kiếm trong lịch sử.
+                  </p>
+                  
+                  <div className="relative">
+                    <input 
+                      type="text"
+                      value={folderName}
+                      onChange={(e) => setFolderName(e.target.value)}
+                      placeholder={`Nhóm kịch bản: ${data.decision.slice(0, 20)}...`}
+                      className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-medium outline-none focus:ring-2 focus:ring-blue-100 focus:bg-white transition-all"
+                      autoFocus
+                    />
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-4">
+                  <button 
+                    onClick={handleSaveToHistory}
+                    className="w-full py-6 bg-blue-600 text-white font-black text-[12px] uppercase tracking-[0.4em] rounded-2xl hover:bg-blue-700 shadow-2xl shadow-blue-100 transition-all flex items-center justify-center gap-4"
+                  >
+                    LƯU NGAY <span className="material-symbols-outlined text-xl">save</span>
+                  </button>
+                  <button 
+                    onClick={() => setIsSaveModalOpen(false)}
+                    className="w-full py-6 bg-white border border-slate-200 text-slate-400 font-black text-[10px] uppercase tracking-widest rounded-2xl hover:bg-slate-50 transition-all"
+                  >
+                    Hủy bỏ
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+      </div>
+    );
+  }
+
+  return null;
+};
+
+export default SimulationFlow;

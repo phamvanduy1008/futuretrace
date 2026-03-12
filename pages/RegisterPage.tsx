@@ -1,0 +1,93 @@
+
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import SharedHeader from '../components/SharedHeader';
+import SharedFooter from '../components/SharedFooter';
+
+const RegisterPage: React.FC = () => {
+  const navigate = useNavigate();
+
+  return (
+    <div className="min-h-screen bg-white flex flex-col">
+      <SharedHeader />
+
+      <main className="flex-1 flex items-center justify-center py-16 sm:py-24 px-4">
+        <div className="w-full max-w-[560px]">
+          <div className="mb-12 text-center">
+            <div className="w-16 h-16 bg-blue-600 text-white rounded-3xl flex items-center justify-center mb-6 mx-auto shadow-xl shadow-blue-200">
+              <span className="material-symbols-outlined text-4xl font-bold">person_add</span>
+            </div>
+            <h1 className="text-3xl font-black mb-3 font-display tracking-tight text-slate-900">Khởi tạo ID nghiên cứu</h1>
+            <p className="text-slate-500 font-medium">Bắt đầu hành trình định lượng các quỹ đạo tương lai.</p>
+          </div>
+
+          <div className="bg-white border border-slate-200 rounded-[3rem] p-8 sm:p-14 shadow-[0_40px_80px_-15px_rgba(0,0,0,0.18)]">
+            <form className="space-y-10" onSubmit={(e) => { e.preventDefault(); navigate('/login'); }}>
+              <div className="flex flex-col gap-2.5">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Địa chỉ Email Công việc / Học tập</label>
+                <input 
+                  required
+                  className="w-full rounded-2xl border border-slate-100 bg-slate-50 h-14 px-6 text-base focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-50 outline-none transition-all font-medium" 
+                  placeholder="name@university.edu.vn" 
+                  type="email" 
+                />
+              </div>
+              
+              <div className="flex flex-col gap-2.5">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Mật khẩu bảo mật</label>
+                <input 
+                  required
+                  className="w-full rounded-2xl border border-slate-100 bg-slate-50 h-14 px-6 text-base focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-50 outline-none transition-all font-medium" 
+                  placeholder="Ít nhất 12 ký tự phức tạp" 
+                  type="password" 
+                />
+              </div>
+
+              <div>
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-6 ml-1">Xác định vai trò phân tích</label>
+                <div className="grid grid-cols-2 gap-5">
+                  <label className="relative cursor-pointer group">
+                    <input className="peer sr-only" name="role" type="radio" value="student" defaultChecked />
+                    <div className="flex flex-col items-center justify-center p-10 border-2 border-slate-50 rounded-3xl transition-all peer-checked:border-blue-600 peer-checked:bg-blue-50/50 hover:border-slate-200 bg-white">
+                      <span className="material-symbols-outlined text-4xl mb-4 text-slate-300 group-hover:text-blue-600 transition-colors">school</span>
+                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 peer-checked:text-blue-600">Học thuật</span>
+                    </div>
+                  </label>
+                  <label className="relative cursor-pointer group">
+                    <input className="peer sr-only" name="role" type="radio" value="worker" />
+                    <div className="flex flex-col items-center justify-center p-10 border-2 border-slate-50 rounded-3xl transition-all peer-checked:border-blue-600 peer-checked:bg-blue-50/50 hover:border-slate-200 bg-white">
+                      <span className="material-symbols-outlined text-4xl mb-4 text-slate-300 group-hover:text-blue-600 transition-colors">work</span>
+                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 peer-checked:text-blue-600">Chuyên gia</span>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4 p-6 bg-slate-50 rounded-2xl border border-slate-100">
+                <div className="flex h-6 items-center">
+                  <input required className="h-5 w-5 rounded-lg border-slate-200 text-blue-600 focus:ring-blue-600 cursor-pointer" id="disclaimer" type="checkbox" />
+                </div>
+                <div className="text-xs">
+                  <label className="font-black text-slate-900 leading-none cursor-pointer" htmlFor="disclaimer">Tôi xác nhận quyền sở hữu dữ liệu</label>
+                  <p className="text-slate-500 text-[10px] mt-2 font-medium leading-relaxed uppercase tracking-wider">Hệ thống AI xử lý dữ liệu dựa trên các tham số giả lập và không chịu trách nhiệm cho các quyết định thực tế.</p>
+                </div>
+              </div>
+
+              <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black h-16 rounded-2xl transition-all shadow-2xl shadow-blue-100 uppercase text-[11px] tracking-[0.2em]">
+                Tạo tài khoản ID ngay
+              </button>
+
+              <p className="text-center text-[10px] font-black text-slate-400 uppercase tracking-widest pt-6 border-t border-slate-50">
+                ĐÃ CÓ ID NGHIÊN CỨU? <button type="button" onClick={() => navigate('/login')} className="text-blue-600 hover:underline">ĐĂNG NHẬP NGAY</button>
+              </p>
+            </form>
+          </div>
+        </div>
+      </main>
+
+      <SharedFooter />
+    </div>
+  );
+};
+
+export default RegisterPage;
