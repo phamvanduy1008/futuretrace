@@ -1,12 +1,11 @@
-
 export enum SimulationStep {
   DESCRIPTION = 1,
   CONTEXT = 2,
   PROCESSING = 3,
-  RESULTS = 4
+  RESULTS = 4,
 }
 
-export type UserTier = 'free' | 'premium';
+export type UserTier = "free" | "premium";
 
 export interface User {
   id: string;
@@ -43,10 +42,21 @@ export interface ScenarioResult {
   careerGrowth: number;
   happiness: number;
   roi: number;
-  type: 'Positive' | 'Neutral' | 'Risk';
+  type: "Positive" | "Neutral" | "Risk";
   deepAnalysis?: {
-    swot: { label: string; value: string; color: string; type: 'S' | 'W' | 'O' | 'T' }[];
-    resources: { label: string; value: number; unit: string; icon: string; ghostLabel?: string }[];
+    swot: {
+      label: string;
+      value: string;
+      color: string;
+      type: "S" | "W" | "O" | "T";
+    }[];
+    resources: {
+      label: string;
+      value: number;
+      unit: string;
+      icon: string;
+      ghostLabel?: string;
+    }[];
     sprint90: { phase: string; tasks: string[] }[];
     criticalAdvice: string;
     riskMitigation?: string;
@@ -55,14 +65,19 @@ export interface ScenarioResult {
 
 export interface PremiumAnalysisReport {
   detailedNarrative: string;
-  milestones: { 
-    month: string; 
-    event: string; 
-    impact: string; 
+  milestones: {
+    month: string;
+    event: string;
+    impact: string;
     probability: number;
     details: string; // Thêm trường thông tin chi tiết hướng dẫn
   }[];
-  influencingFactors: { category: string; factor: string; influence: 'High' | 'Medium' | 'Low'; description: string }[];
+  influencingFactors: {
+    category: string;
+    factor: string;
+    influence: "High" | "Medium" | "Low";
+    description: string;
+  }[];
   strategicPivotPoints: { condition: string; action: string }[];
   longTermProjection: string;
 }

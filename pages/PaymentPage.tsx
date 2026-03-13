@@ -29,7 +29,7 @@ const PaymentPage: React.FC = () => {
   useEffect(() => {
     let interval: NodeJS.Timeout;
     let attempts = 0;
-    const maxAttempts = 10;
+    const maxAttempts = 20;
 
     if (showQRModal && orderId) {
       interval = setInterval(async () => {
@@ -42,7 +42,7 @@ const PaymentPage: React.FC = () => {
         }
 
         try {
-          const res = await fetch(`${API_BASE_URL}/payment/check-status`, {
+          const res = await fetch(`${API_BASE_URL}/api/payment/check-status`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ orderId })
@@ -62,7 +62,7 @@ const PaymentPage: React.FC = () => {
         } catch (e) {
           console.error('Lỗi khi kiểm tra trạng thái:', e);
         }
-      }, 60000);
+      }, 30000);
     }
     return () => clearInterval(interval);
   }, [showQRModal, orderId, navigate, setError]);

@@ -31,7 +31,7 @@ const ProgressPage: React.FC = () => {
       }
       const data = await res.json();
       setProgressList(data);
-      
+
       const id = searchParams.get('id');
       if (id && data.length > 0) {
         const idx = data.findIndex((p: ProgressItem) => p.id === id);
@@ -56,7 +56,7 @@ const ProgressPage: React.FC = () => {
   const handleToggleMilestone = async (pIdx: number, mIdx: number) => {
     const item = progressList[pIdx];
     let newCompleted = [...item.completedMilestones];
-    
+
     if (newCompleted.includes(mIdx)) {
       newCompleted = newCompleted.filter(i => i !== mIdx);
     } else {
@@ -106,12 +106,12 @@ const ProgressPage: React.FC = () => {
       }
 
       const { report: newReport } = await res.json();
-      
+
       // Update local state
       const newList = [...progressList];
       newList[selectedIdx] = { ...item, report: newReport };
       setProgressList(newList);
-      
+
       setIsPivotModalOpen(false);
       setPivotFeedback('');
       alert('Lộ trình của bạn đã được điều chỉnh thành công dựa trên phản hồi mới!');
@@ -130,7 +130,7 @@ const ProgressPage: React.FC = () => {
         const res = await apiFetch(`/premium/progress/${id}`, {
           method: 'DELETE'
         });
-        
+
         if (!res.ok) {
           throw new Error('Không thể xóa tiến trình');
         }
@@ -157,7 +157,7 @@ const ProgressPage: React.FC = () => {
 
   if (isLoading) {
     return (
-    <AnimatedBackground className="min-h-screen bg-[#f8fafc] flex flex-col font-sans">
+      <AnimatedBackground className="min-h-screen bg-[#f8fafc] flex flex-col font-sans">
         <SharedHeader />
         <main className="flex-1 flex flex-col items-center justify-center p-6 text-center">
           <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-6"></div>
@@ -187,7 +187,7 @@ const ProgressPage: React.FC = () => {
 
   if (progressList.length === 0) {
     return (
-      <AnimatedBackground className="min-h-screen bg-[#f8fafc] flex flex-col font-sans">
+      <AnimatedBackground className=" bg-[#f8fafc] flex flex-col font-sans">
         <SharedHeader />
         <main className="flex-1 flex flex-col items-center justify-center p-6 text-center">
           <div className="w-24 h-24 bg-slate-100 rounded-3xl flex items-center justify-center mb-8">
@@ -205,7 +205,7 @@ const ProgressPage: React.FC = () => {
   return (
     <AnimatedBackground className="min-h-screen bg-[#f8fafc] flex flex-col font-sans">
       <SharedHeader />
-      <main className="flex-1 max-w-[1440px] mx-auto w-full px-4 sm:px-8 py-12 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 mb-16">
+      <main className="flex-1 max-w-[1440px] h-[1200px] mx-auto w-full px-4 sm:px-8 py-12 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 mb-16">
         <div className="lg:col-span-8 flex flex-col gap-10">
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
             <div className="flex items-center gap-2 text-[9px] font-black text-blue-600 uppercase tracking-widest mb-4">
@@ -219,26 +219,24 @@ const ProgressPage: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {progressList.map((item, i) => (
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
-                key={item.id} 
+                key={item.id}
                 onClick={() => setSelectedIdx(i)}
-                className={`group p-8 sm:p-10 flex flex-col gap-8 cursor-pointer transition-all rounded-[2.5rem] border bg-white ${
-                  selectedIdx === i 
-                    ? 'border-blue-600 ring-2 ring-blue-600/10 shadow-[0_40px_80px_-15px_rgba(37,99,235,0.15)]' 
-                    : 'border-slate-100 hover:border-slate-200 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.05)] hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.08)]'
-                }`}
+                className={`group p-8 sm:p-10 flex flex-col gap-8 cursor-pointer transition-all rounded-[2.5rem] border bg-white ${selectedIdx === i
+                  ? 'border-blue-600 ring-2 ring-blue-600/10 shadow-[0_40px_80px_-15px_rgba(37,99,235,0.15)]'
+                  : 'border-slate-100 hover:border-slate-200 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.05)] hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.08)]'
+                  }`}
               >
                 <div className="flex justify-between items-start">
-                  <div className={`w-14 h-14 flex items-center justify-center rounded-2xl border transition-all ${
-                    selectedIdx === i ? 'bg-blue-600 text-white border-blue-600 scale-110 shadow-lg shadow-blue-500/20' : 'bg-slate-50 text-slate-400 border-slate-100'
-                  }`}>
+                  <div className={`w-14 h-14 flex items-center justify-center rounded-2xl border transition-all ${selectedIdx === i ? 'bg-blue-600 text-white border-blue-600 scale-110 shadow-lg shadow-blue-500/20' : 'bg-slate-50 text-slate-400 border-slate-100'
+                    }`}>
                     <IconMapper name="trending_up" className=" text-2xl" />
                   </div>
                   <div className="flex items-center gap-2">
-                    <button 
+                    <button
                       onClick={(e) => handleDelete(e, item.id)}
                       className="w-10 h-10 rounded-xl bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white transition-all flex items-center justify-center shadow-sm"
                       title="Xóa tiến trình"
@@ -256,18 +254,18 @@ const ProgressPage: React.FC = () => {
                   <p className="text-sm text-slate-600 leading-relaxed line-clamp-2 font-medium italic opacity-80">"{item.scenario.description}"</p>
                 </div>
                 <div className="space-y-4 pt-4 border-t border-slate-50">
-                   <div className="flex justify-between text-[10px] font-black uppercase text-slate-400">
-                     <span>TIẾN ĐỘ HOÀN THÀNH</span>
-                     <span className="text-blue-600">{Math.round((item.completedMilestones.length / item.report.milestones.length) * 100)}%</span>
-                   </div>
-                   <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden shadow-inner">
-                     <motion.div 
-                        initial={{ width: 0 }} 
-                        animate={{ width: `${(item.completedMilestones.length / item.report.milestones.length) * 100}%` }} 
-                        className="h-full bg-blue-600 shadow-sm" 
-                        transition={{ duration: 0.8 }}
-                     />
-                   </div>
+                  <div className="flex justify-between text-[10px] font-black uppercase text-slate-400">
+                    <span>TIẾN ĐỘ HOÀN THÀNH</span>
+                    <span className="text-blue-600">{Math.round((item.completedMilestones.length / item.report.milestones.length) * 100)}%</span>
+                  </div>
+                  <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden shadow-inner">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${(item.completedMilestones.length / item.report.milestones.length) * 100}%` }}
+                      className="h-full bg-blue-600 shadow-sm"
+                      transition={{ duration: 0.8 }}
+                    />
+                  </div>
                 </div>
               </motion.div>
             ))}
@@ -330,89 +328,124 @@ const ProgressPage: React.FC = () => {
                       </div>
                    </div>
 
-                   <button 
-                    onClick={() => navigate('/premium-analysis', { state: { 
-                      scenario: selectedProgress.scenario, 
-                      context: selectedProgress.context, 
+                <button
+                  onClick={() => navigate('/premium-analysis', {
+                    state: {
+                      scenario: selectedProgress.scenario,
+                      context: selectedProgress.context,
                       timeframe: selectedProgress.timeframe,
                       existingProgress: selectedProgress
-                    }})}
-                    className="w-full py-6 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-blue-600 shadow-2xl shadow-slate-200 transition-all flex items-center justify-center gap-4 hover:gap-6 group"
-                   >
-                      VÀO CHI TIẾT LỘ TRÌNH <IconMapper name="arrow_forward" className=" text-xl group-hover:scale-125 transition-transform" />
-                   </button>
-                </div>
-             </motion.div>
-           </AnimatePresence>
+                    }
+                  })}
+                  className="w-full py-6 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-blue-600 shadow-2xl shadow-slate-200 transition-all flex items-center justify-center gap-4 hover:gap-6 group"
+                >
+                  VÀO CHI TIẾT LỘ TRÌNH <IconMapper name="arrow_forward" className=" text-xl group-hover:scale-125 transition-transform" />
+                </button>
+              </div>
+            </motion.div>
+          </AnimatePresence>
         </aside>
       </main>
 
       {/* Pivot Modal */}
-      <AnimatePresence>
-        {isPivotModalOpen && (
-          <div className="fixed inset-0 z-[250] flex items-center justify-center p-6">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => !isPivoting && setIsPivotModalOpen(false)} className="absolute inset-0 bg-slate-950/80 backdrop-blur-md" />
-            <motion.div initial={{ opacity: 0, scale: 0.95, y: 30 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 30 }} className="relative w-full max-w-xl bg-white rounded-[3rem] shadow-2xl border border-slate-100 overflow-hidden">
-              {/* Header with Gradient Strip */}
-              <div className="h-2 bg-gradient-to-r from-amber-400 via-orange-500 to-amber-600"></div>
-              
-              <div className="p-10 sm:p-12">
-                <div className="flex items-start gap-6 mb-10">
-                  <div className="w-16 h-16 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center shrink-0 shadow-inner border border-amber-100">
-                    <IconMapper name="psychology" className=" text-3xl" />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tighter mb-2 italic">Điều chỉnh lộ trình</h3>
-                    <p className="text-slate-500 text-sm font-medium leading-relaxed">AI sẽ tái cấu trúc tương lai dựa trên phản hồi của bạn.</p>
-                  </div>
-                </div>
+   {/* Pivot Modal */}
+<AnimatePresence>
+  {isPivotModalOpen && (
+    <div className="fixed inset-0 z-[250] flex items-center justify-center p-6">
+      
+      {/* Overlay */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={() => !isPivoting && setIsPivotModalOpen(false)}
+        className="absolute inset-0 bg-slate-950/80 backdrop-blur-md"
+      />
 
-                {/* Info Box */}
-                <div className="bg-blue-50/50 border border-blue-100 rounded-2xl p-6 mb-8 flex gap-4">
-                  <IconMapper name="info" className=" text-blue-500 text-xl shrink-0 mt-0.5" />
-                  <p className="text-[11px] text-blue-700 font-medium leading-relaxed italic">
-                    Hệ thống sẽ giữ lại các cột mốc đã hoàn thành và thiết kế lại kịch bản từ thời điểm hiện tại trở đi dựa trên ý kiến mới của bạn.
-                  </p>
-                </div>
-                
-                <textarea 
-                  className="w-full h-40 p-6 bg-slate-50 border border-slate-200 rounded-3xl text-sm focus:ring-4 focus:ring-blue-50 focus:border-blue-600 outline-none resize-none transition-all mb-8 font-medium italic shadow-inner"
-                  placeholder="Ví dụ: Tôi thấy bước tiếp theo quá mạo hiểm, tôi muốn chuyển hướng sang ổn định tài chính trước..."
-                  value={pivotFeedback}
-                  onChange={(e) => setPivotFeedback(e.target.value)}
-                  disabled={isPivoting}
-                />
+      {/* Modal */}
+      <motion.div
+        onClick={(e) => e.stopPropagation()}
+        initial={{ opacity: 0, scale: 0.95, y: 30 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 30 }}
+        className="relative w-full max-w-xl bg-white rounded-[3rem] shadow-2xl border border-slate-100 overflow-hidden"
+      >
+        
+        {/* Header Gradient */}
+        <div className="h-2 bg-gradient-to-r from-amber-400 via-orange-500 to-amber-600"></div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <button 
-                    onClick={() => setIsPivotModalOpen(false)}
-                    disabled={isPivoting}
-                    className="order-2 sm:order-1 py-5 bg-white border border-slate-200 text-slate-400 font-black text-[10px] uppercase tracking-widest rounded-2xl hover:bg-slate-50 transition-all font-display"
-                  >
-                    Không, giữ nguyên
-                  </button>
-                  <button 
-                    onClick={handlePivot}
-                    disabled={!pivotFeedback.trim() || isPivoting}
-                    className="order-1 sm:order-2 py-5 bg-slate-900 text-white font-black text-[11px] uppercase tracking-widest rounded-2xl hover:bg-amber-600 disabled:opacity-20 transition-all shadow-xl shadow-slate-200 flex items-center justify-center gap-3 font-display"
-                  >
-                    {isPivoting ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        ĐANG TÁI CẤU TRÚC...
-                      </>
-                    ) : (
-                      <>
-                        XÁC NHẬN CẬP NHẬT <IconMapper name="bolt" className=" text-lg" />
-                      </>
-                    )}
-                  </button>
-                </div>
-              </div>
-            </motion.div>
+        <div className="p-10 sm:p-12">
+
+          {/* Header */}
+          <div className="flex items-start gap-6 mb-10">
+            <div className="w-16 h-16 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center shrink-0 shadow-inner border border-amber-100">
+              <IconMapper name="psychology" className="text-3xl" />
+            </div>
+
+            <div>
+              <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tighter mb-2 italic">
+                Điều chỉnh lộ trình
+              </h3>
+
+              <p className="text-slate-500 text-sm font-medium leading-relaxed">
+                AI sẽ tái cấu trúc tương lai dựa trên phản hồi của bạn.
+              </p>
+            </div>
           </div>
-        )}
-      </AnimatePresence>
+
+          {/* Info Box */}
+          <div className="bg-blue-50/50 border border-blue-100 rounded-2xl p-6 mb-8 flex gap-4">
+            <IconMapper name="info" className="text-blue-500 text-xl shrink-0 mt-0.5" />
+            <p className="text-[11px] text-blue-700 font-medium leading-relaxed italic">
+              Hệ thống sẽ giữ lại các cột mốc đã hoàn thành và thiết kế lại kịch bản từ thời điểm hiện tại
+              trở đi dựa trên ý kiến mới của bạn.
+            </p>
+          </div>
+
+          {/* Textarea */}
+          <textarea
+            className="w-full h-40 p-6 bg-slate-50 border border-slate-200 rounded-3xl text-sm focus:ring-4 focus:ring-blue-50 focus:border-blue-600 outline-none resize-none transition-all mb-8 font-medium italic shadow-inner"
+            placeholder="Ví dụ: Tôi thấy bước tiếp theo quá mạo hiểm, tôi muốn chuyển hướng sang ổn định tài chính trước..."
+            value={pivotFeedback}
+            onChange={(e) => setPivotFeedback(e.target.value)}
+            disabled={isPivoting}
+          />
+
+          {/* Buttons */}
+          <div className="flex flex-col gap-4">
+
+            <button
+              onClick={handlePivot}
+              disabled={!pivotFeedback.trim() || isPivoting}
+              className="w-full py-5 bg-slate-900 text-white font-black text-[11px] uppercase tracking-widest rounded-2xl hover:bg-amber-600 disabled:opacity-20 transition-all shadow-xl flex items-center justify-center gap-3"
+            >
+              {isPivoting ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  ĐANG TÁI CẤU TRÚC...
+                </>
+              ) : (
+                <>
+                  CẬP NHẬT LỘ TRÌNH MỚI
+                  <IconMapper name="bolt" className="text-lg" />
+                </>
+              )}
+            </button>
+
+            <button
+              onClick={() => setIsPivotModalOpen(false)}
+              disabled={isPivoting}
+              className="w-full py-5 bg-white border border-slate-200 text-slate-400 font-black text-[10px] uppercase tracking-widest rounded-2xl hover:bg-slate-50 transition-all"
+            >
+              Hủy bỏ
+            </button>
+
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  )}
+</AnimatePresence>
       <SharedFooter />
     </AnimatedBackground>
   );
