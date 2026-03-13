@@ -1,10 +1,4 @@
-const getBaseUrl = () => {
-  const envUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
-  const cleanUrl = envUrl.replace(/\/$/, '');
-  return cleanUrl.endsWith('/api') ? cleanUrl : `${cleanUrl}/api`;
-};
-
-const API_BASE_URL = getBaseUrl();
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'https://futuretrace-server.onrender.com').replace(/\/$/, '');
 
 export class ApiError extends Error {
   constructor(message, status, payload) {
@@ -41,7 +35,7 @@ export function createAdminApi({
     }
 
     if (!refreshPromise) {
-      refreshPromise = fetch(`${API_BASE_URL}/admin/auth/refresh`, {
+      refreshPromise = fetch(`${API_BASE_URL}/api/admin/auth/refresh`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
