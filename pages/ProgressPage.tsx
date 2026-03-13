@@ -15,6 +15,10 @@ const ProgressPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
+  const [isPivotModalOpen, setIsPivotModalOpen] = useState(false);
+  const [pivotFeedback, setPivotFeedback] = useState('');
+  const [isPivoting, setIsPivoting] = useState(false);
+
   const fetchProgress = async () => {
     setIsLoading(true);
     setError(null);
@@ -46,6 +50,76 @@ const ProgressPage: React.FC = () => {
   }, [searchParams, navigate]);
 
   const selectedProgress = progressList[selectedIdx];
+
+  const handleToggleMilestone = async (pIdx: number, mIdx: number) => {
+    const item = progressList[pIdx];
+    let newCompleted = [...item.completedMilestones];
+    
+    if (newCompleted.includes(mIdx)) {
+      newCompleted = newCompleted.filter(i => i !== mIdx);
+    } else {
+      newCompleted.push(mIdx);
+      newCompleted.sort((a, b) => a - b);
+    }
+
+    // Optimistic update
+    const newList = [...progressList];
+    newList[pIdx] = { ...item, completedMilestones: newCompleted };
+    setProgressList(newList);
+
+    try {
+      const res = await apiFetch(`/premium/progress/${item.id}`, {
+        method: 'PUT',
+        body: JSON.stringify({ completedMilestones: newCompleted })
+      });
+      if (!res.ok) throw new Error('Cập nhật thất bại');
+    } catch (err) {
+      console.error(err);
+      // Rollback on error
+      fetchProgress();
+      alert('Không thể cập nhật trạng thái cột mốc. Vui lòng thử lại sau.');
+    }
+  };
+
+  const handlePivot = async () => {
+    if (!pivotFeedback.trim()) return;
+    setIsPivoting(true);
+    const item = progressList[selectedIdx];
+
+    try {
+      const res = await apiFetch('/premium/pivot', {
+        method: 'POST',
+        body: JSON.stringify({
+          progressId: item.id,
+          currentReport: item.report,
+          completedMilestones: item.completedMilestones.map(idx => item.report.milestones[idx]),
+          feedback: pivotFeedback,
+          context: item.context,
+          timeframe: item.timeframe
+        })
+      });
+
+      if (!res.ok) {
+        throw new Error('Không thể điều chỉnh lộ trình.');
+      }
+
+      const { report: newReport } = await res.json();
+      
+      // Update local state
+      const newList = [...progressList];
+      newList[selectedIdx] = { ...item, report: newReport };
+      setProgressList(newList);
+      
+      setIsPivotModalOpen(false);
+      setPivotFeedback('');
+      alert('Lộ trình của bạn đã được điều chỉnh thành công dựa trên phản hồi mới!');
+    } catch (err: any) {
+      console.error(err);
+      alert(err.message || 'Lỗi khi điều chỉnh lộ trình.');
+    } finally {
+      setIsPivoting(false);
+    }
+  };
 
   const handleDelete = async (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
@@ -214,9 +288,18 @@ const ProgressPage: React.FC = () => {
                 
                 <div className="p-10 sm:p-12 space-y-12">
                    <div className="space-y-6">
-                      <h4 className="text-[10px] font-black text-slate-900 uppercase tracking-widest flex items-center gap-3">
-                         <span className="material-symbols-outlined text-blue-600 text-xl">list_alt</span> CÁC CỘT MỐC TIẾP THEO
-                      </h4>
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-[10px] font-black text-slate-900 uppercase tracking-widest flex items-center gap-3">
+                           <span className="material-symbols-outlined text-blue-600 text-xl">list_alt</span> CÁC CỘT MỐC TIẾP THEO
+                        </h4>
+                        <button 
+                          onClick={() => setIsPivotModalOpen(true)}
+                          className="flex items-center gap-2 text-[9px] font-black text-amber-600 hover:text-amber-700 uppercase tracking-widest transition-colors bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-100"
+                        >
+                          <span className="material-symbols-outlined text-sm">psychology</span> ĐIỀU CHỈNH LỘ TRÌNH
+                        </button>
+                      </div>
+
                       <div className="space-y-4">
                         {selectedProgress.report.milestones.map((m, idx) => {
                           const status = getMilestoneStatus(selectedProgress, idx);
@@ -232,11 +315,14 @@ const ProgressPage: React.FC = () => {
                                 <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{m.month}</span>
                                 <span className={`text-sm font-bold break-words leading-tight ${status === 'Đã hoàn thành' ? 'text-emerald-700 line-through' : 'text-slate-900'}`}>{m.event}</span>
                               </div>
-                              <div className={`w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center border transition-all ${
-                                status === 'Đã hoàn thành' ? 'bg-emerald-500 text-white border-emerald-500 shadow-lg shadow-emerald-200' :
-                                status === 'Đang tiến hành' ? 'bg-amber-500 text-white border-amber-500 animate-pulse shadow-lg shadow-amber-200' :
-                                'bg-slate-100 text-slate-400 border-slate-200'
-                              }`}>
+                              <div 
+                                className={`w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center border transition-all ${
+                                  status === 'Đã hoàn thành' ? 'bg-emerald-500 text-white border-emerald-500 shadow-lg shadow-emerald-200' :
+                                  status === 'Đang tiến hành' ? 'bg-amber-500 text-white border-amber-500 shadow-lg shadow-amber-200' :
+                                  'bg-white text-slate-300 border-slate-200'
+                                }`}
+                                title={status === 'Đã hoàn thành' ? 'Đã hoàn thành' : status === 'Đang tiến hành' ? 'Đang thực hiện' : 'Chưa bắt đầu'}
+                              >
                                 <span className="material-symbols-outlined text-xl">
                                   {status === 'Đã hoàn thành' ? 'check_circle' : status === 'Đang tiến hành' ? 'pending' : 'circle'}
                                 </span>
@@ -263,6 +349,58 @@ const ProgressPage: React.FC = () => {
            </AnimatePresence>
         </aside>
       </main>
+
+      {/* Pivot Modal */}
+      <AnimatePresence>
+        {isPivotModalOpen && (
+          <div className="fixed inset-0 z-[250] flex items-center justify-center p-6">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => !isPivoting && setIsPivotModalOpen(false)} className="absolute inset-0 bg-slate-950/80 backdrop-blur-md" />
+            <motion.div initial={{ opacity: 0, scale: 0.9, y: 30 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 30 }} className="relative w-full max-w-lg bg-white rounded-[3rem] p-10 shadow-2xl border border-slate-100 overflow-hidden">
+              <div className="text-center mb-10">
+                <div className="w-20 h-20 bg-amber-50 text-amber-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-inner border border-amber-100">
+                  <span className="material-symbols-outlined text-4xl">psychology</span>
+                </div>
+                <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tighter mb-4 italic">Điều chỉnh lộ trình</h3>
+                <p className="text-slate-500 text-sm font-medium leading-relaxed">Bạn gặp khó khăn gì hoặc muốn thay đổi mục tiêu như thế nào? AI sẽ dựa trên các cột mốc bạn đã xong để thiết kế lại tương lai.</p>
+              </div>
+              
+              <textarea 
+                className="w-full h-40 p-6 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:ring-4 focus:ring-blue-50 focus:border-blue-600 outline-none resize-none transition-all mb-8 font-medium italic"
+                placeholder="Ví dụ: Tôi thấy bước 3 quá khó, tôi muốn chuyển sang học backend thay vì frontend vì thấy phù hợp hơn..."
+                value={pivotFeedback}
+                onChange={(e) => setPivotFeedback(e.target.value)}
+                disabled={isPivoting}
+              />
+
+              <div className="flex flex-col gap-4">
+                <button 
+                  onClick={handlePivot}
+                  disabled={!pivotFeedback.trim() || isPivoting}
+                  className="w-full py-5 bg-slate-900 text-white font-black text-[11px] uppercase tracking-[0.3em] rounded-2xl hover:bg-amber-600 disabled:opacity-20 transition-all shadow-xl flex items-center justify-center gap-3"
+                >
+                  {isPivoting ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      ĐANG TÁI CẤU TRÚC...
+                    </>
+                  ) : (
+                    <>
+                      CẬP NHẬT LỘ TRÌNH MỚI <span className="material-symbols-outlined text-lg">bolt</span>
+                    </>
+                  )}
+                </button>
+                <button 
+                  onClick={() => setIsPivotModalOpen(false)}
+                  disabled={isPivoting}
+                  className="w-full py-5 bg-white border border-slate-200 text-slate-400 font-black text-[10px] uppercase tracking-widest rounded-2xl hover:bg-slate-50 transition-all"
+                >
+                  Hủy bỏ
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
       <SharedFooter />
     </div>
   );
