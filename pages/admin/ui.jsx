@@ -159,10 +159,11 @@ export function AdminShell({ route, session, onNavigate, onLogout, children }) {
     <div className="ft-admin-shell">
       <aside className={cx('ft-sidebar', sidebarOpen && 'ft-sidebar--open')}>
         <div className="ft-sidebar__brand">
-          <div className="ft-brand-mark">FT</div>
+          <div className="ft-brand-mark" aria-hidden="true">
+            <img src="/favicon.png" alt="" />
+          </div>
           <div>
             <strong>FutureTrace Admin</strong>
-            <span>Blue-white control center</span>
           </div>
         </div>
 
@@ -211,16 +212,22 @@ export function AdminShell({ route, session, onNavigate, onLogout, children }) {
             >
               =
             </button>
-            <div className="ft-global-search">
-              <span>Tìm kiếm nhanh</span>
-              <input type="text" placeholder="users, simulations, prompts..." />
-            </div>
+            <label className="ft-global-search" aria-label="Tìm kiếm nhanh">
+              <div className="ft-global-search__box">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M10.5 3.75a6.75 6.75 0 1 1 0 13.5 6.75 6.75 0 0 1 0-13.5Zm0 1.5a5.25 5.25 0 1 0 0 10.5 5.25 5.25 0 0 0 0-10.5Zm6.89 11.08 3.39 3.39a.75.75 0 0 1-1.06 1.06l-3.39-3.39a.75.75 0 1 1 1.06-1.06Z" />
+                </svg>
+                <input type="text" placeholder="Tìm kiếm..." />
+              </div>
+            </label>
           </div>
           <div className="ft-topbar__right">
             <AdminBadge tone="blue">Production</AdminBadge>
             <AdminBadge tone="neutral">12/03/2026</AdminBadge>
             <div className="ft-avatar-pill">
-              <div className="ft-avatar-pill__badge">{(session?.name || 'A').slice(0, 2).toUpperCase()}</div>
+              <div className="ft-avatar-pill__badge" aria-hidden="true">
+                <img src="/favicon.png" alt="" />
+              </div>
               <div className="ft-avatar-pill__meta">
                 <strong>{session?.name || 'Admin'}</strong>
                 <small>{session?.role || 'super_admin'}</small>

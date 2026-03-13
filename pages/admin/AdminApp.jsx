@@ -27,13 +27,13 @@ const ADMIN_DEMO_CREDENTIALS = {
 function getHashPath() {
     // Expected hash: #/admin/dashboard or #/admin/users
     const rawHash = window.location.hash.replace(/^#/, '');
-    
+
     // If hash starts with /admin, strip it for internal resolution
     if (rawHash.startsWith('/admin')) {
         const subPath = rawHash.substring(6); // remove '/admin'
         return subPath || '/dashboard';
     }
-    
+
     // For backward compatibility or direct root access
     return rawHash === '/' || rawHash === '' ? '/dashboard' : rawHash;
 }
@@ -264,7 +264,7 @@ function DashboardPage({ api, navigate, onForbidden }) {
     const watchlists = data?.watchlists || {};
 
     return (
-        <div className="ft-page-stack">
+        <div className="ft-page-stack ft-settings-page">
             <AdminPageHeader
                 eyebrow="Overview"
                 title="Tổng quan vận hành"
@@ -721,7 +721,7 @@ function SimulationsPage({ api, navigate, onForbidden }) {
             </div>
 
             <AdminCard>
-                <div className="ft-filters">
+                <div className="ft-filters ft-community-filters">
                     <input
                         placeholder="Tìm theo title..."
                         value={search}
@@ -1075,16 +1075,17 @@ function CommunityPostsPage({ api, navigate, onForbidden }) {
                 </div>
             </AdminCard>
 
-            <div className="ft-card-grid">
+            <div className="ft-card-grid ft-community-card-grid">
                 {posts.map((post) => (
                     <AdminCard
                         key={post.id}
+                        className="ft-community-post-card"
                         title={post.title}
                         subtitle={`${post.authorName} • ${post.category}`}
                         actions={<AdminBadge tone={getToneByStatus(post.status)}>{post.status}</AdminBadge>}
                     >
                         <p className="ft-rich-paragraph">{post.excerpt}</p>
-                        <div className="ft-row-inline ft-row-inline--spread">
+                        <div className="ft-row-inline ft-row-inline--spread ft-community-post-card__meta">
                             <small>{post.likes} likes • {post.commentsCount} comments</small>
                             <button className="ft-link-button" onClick={() => navigate(`/community/posts/${post.id}`)}>
                                 Xem chi tiết
@@ -1138,8 +1139,8 @@ function CommunityPostDetailPage({ api, postId, navigate, onForbidden }) {
                 }
             />
 
-            <div className="ft-grid ft-grid--2-1">
-                <AdminCard title="Nội dung bài viết">
+            <div className="ft-grid ft-grid--2-1 ft-community-detail-grid">
+                <AdminCard title="Nội dung bài viết" className="ft-community-content-card">
                     <div className="ft-row-inline">
                         <AdminBadge tone={getToneByStatus(post.status)}>{post.status}</AdminBadge>
                         <AdminBadge tone="neutral">{post.category}</AdminBadge>
@@ -1152,14 +1153,14 @@ function CommunityPostDetailPage({ api, postId, navigate, onForbidden }) {
                     {fieldLabel('Source scenario', post.sourceScenarioId)}
                 </AdminCard>
 
-                <AdminCard title="Moderation panel">
+                <AdminCard title="Moderation panel" className="ft-community-panel-card">
                     {fieldLabel('Hiện trạng', post.status)}
                     {fieldLabel('Tác giả', post.authorName)}
                     {fieldLabel('Ngày tạo', post.createdAt)}
                 </AdminCard>
             </div>
 
-            <AdminCard title="Bình luận">
+            <AdminCard title="Bình luận" className="ft-community-comments-card">
                 <div className="ft-list">
                     {comments.map((comment) => (
                         <div className="ft-list-item" key={comment.id}>
@@ -1213,8 +1214,8 @@ function ReviewQueuePage({ api, onForbidden }) {
                 description="Tổng hợp các content report cần moderator xử lý."
             />
 
-            <div className="ft-grid ft-grid--2-1">
-                <AdminCard title="Queue">
+            <div className="ft-grid ft-grid--2-1 ft-community-review-grid">
+                <AdminCard title="Queue" className="ft-community-review-queue-card">
                     <div className="ft-review-list">
                         {items.map((item) => (
                             <button
@@ -1235,6 +1236,7 @@ function ReviewQueuePage({ api, onForbidden }) {
 
                 {selectedItem ? (
                     <AdminCard
+                        className="ft-community-review-decision-card"
                         title="Decision panel"
                         subtitle="Mỗi quyết định moderation đều ghi audit log."
                         actions={<AdminBadge tone={getToneByStatus(selectedItem.status)}>{selectedItem.status}</AdminBadge>}
@@ -1314,7 +1316,6 @@ function AiLogsPage({ api, onForbidden }) {
                                 <th>Type</th>
                                 <th>User</th>
                                 <th>Status</th>
-                                <th>Model</th>
                                 <th>Latency</th>
                                 <th>Cost</th>
                             </tr>
@@ -1331,7 +1332,6 @@ function AiLogsPage({ api, onForbidden }) {
                                     <td>
                                         <AdminBadge tone={getToneByStatus(log.status)}>{log.status}</AdminBadge>
                                     </td>
-                                    <td>{log.model}</td>
                                     <td>{formatLatency(log.latencyMs)}</td>
                                     <td>{formatCost(log.estimatedCost)}</td>
                                 </tr>
@@ -1474,12 +1474,20 @@ function SettingsPage({ api, onForbidden }) {
                 }
             />
 
-            <div className="ft-card-grid">
+            <div className="ft-card-grid ft-settings-card-grid">
                 {groups.map((group) => (
-                    <AdminCard key={group.id} title={group.title} subtitle={group.description}>
+                    <AdminCard
+                        key={group.id}
+                        className="ft-settings-group-card"
+                        title={group.title}
+                        subtitle={group.description}
+                    >
                         <div className="ft-settings-list">
                             {group.fields.map((field, fieldIndex) => (
-                                <label className="ft-setting-row" key={field.key}>
+                                <label
+                                    className={`ft-setting-row ${field.type === 'toggle' ? 'ft-setting-row--toggle' : 'ft-setting-row--field'}`}
+                                    key={field.key}
+                                >
                                     <div>
                                         <strong>{field.label}</strong>
                                         <p>{field.description}</p>
