@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import SharedHeader from '../components/SharedHeader';
 import SharedFooter from '../components/SharedFooter';
 import { useNavigate } from 'react-router-dom';
-const API_BASE_URL = (import.meta as any).env.VITE_API_BASE_URL || 'https://futuretrace-server.onrender.com/api';
+const API_BASE_URL = (import.meta as any).env.VITE_API_BASE_URL || 'https://futuretrace-server.onrender.com';
 
 
 const PremiumPage: React.FC = () => {
