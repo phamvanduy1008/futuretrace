@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Navigate } from 'react-router-dom';
-const API_BASE_URL = (import.meta as any).env.VITE_API_BASE_URL || 'https://localhost:3000';
+const API_BASE_URL = (import.meta as any).env.VITE_API_BASE_URL || 'https://futuretrace-server.onrender.com';
 import { motion } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
 import SharedHeader from '../components/SharedHeader';

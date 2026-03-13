@@ -16,7 +16,7 @@ export interface CommunityPostData {
 
 export const communityService = {
   getPosts: async (page = 1, limit = 3, filter = 'all', q = '') => {
-    const url = new URL(`${(import.meta as any).env.VITE_API_BASE_URL}/api/community/posts`);
+    const url = new URL(`${(import.meta as any).env.VITE_API_BASE_URL || 'https://futuretrace-server.onrender.com'}/api/community/posts`);
     url.searchParams.append('page', page.toString());
     url.searchParams.append('limit', limit.toString());
     url.searchParams.append('filter', filter);

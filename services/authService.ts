@@ -1,4 +1,4 @@
-const API_BASE_URL = (import.meta as any).env.VITE_API_BASE_URL;
+const API_BASE_URL = (import.meta as any).env.VITE_API_BASE_URL || 'https://futuretrace-server.onrender.com';
 
 const normalizeUser = (user: any) => {
   if (!user) return null;

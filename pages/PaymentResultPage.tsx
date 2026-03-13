@@ -3,7 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import SharedHeader from '../components/SharedHeader';
 import SharedFooter from '../components/SharedFooter';
-const BACKEND_URL = (import.meta as any).env.VITE_API_BASE_URL;
+const BACKEND_URL = (import.meta as any).env.VITE_API_BASE_URL || 'https://futuretrace-server.onrender.com';
 
 const PaymentResultPage: React.FC = () => {
   const [searchParams] = useSearchParams();

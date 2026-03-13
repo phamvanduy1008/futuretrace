@@ -1,7 +1,7 @@
 
 import { logout } from './authService';
 
-const API_BASE_URL = (import.meta as any).env.VITE_API_BASE_URL;
+const API_BASE_URL = (import.meta as any).env.VITE_API_BASE_URL || 'https://futuretrace-server.onrender.com';
 
 export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
   const token = localStorage.getItem('token');

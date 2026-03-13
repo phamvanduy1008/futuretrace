@@ -1,5 +1,5 @@
 
-const API_URL = (import.meta as any).env.VITE_API_BASE_URL;
+const API_URL = (import.meta as any).env.VITE_API_BASE_URL || 'https://futuretrace-server.onrender.com';
 const API_BASE_URL = `${API_URL}/api`;
 
 // Token management

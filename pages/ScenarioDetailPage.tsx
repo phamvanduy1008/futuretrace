@@ -31,7 +31,7 @@ const ScenarioDetailPage: React.FC = () => {
   const fetchProgress = async (scenarioId: string) => {
     try {
       const token = localStorage.getItem("token");
-      const apiBase = (import.meta as any).env.VITE_API_BASE_URL;
+      const apiBase = (import.meta as any).env.VITE_API_BASE_URL || 'https://futuretrace-server.onrender.com';
       const response = await fetch(`${apiBase}/api/premium/progress/by-scenario/${scenarioId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
