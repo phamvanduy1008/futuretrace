@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import SharedHeader from '../components/SharedHeader';
 import SharedFooter from '../components/SharedFooter';
 
-const BACKEND_URL = 'http://localhost:5000';
+const BACKEND_URL = 'https://futuretrace-server.onrender.com';
 
 const PaymentResultPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -16,7 +16,7 @@ const PaymentResultPage: React.FC = () => {
       // Read the "resultCode" and "orderId" from URL query string
       const resultCode = searchParams.get('resultCode');
       const orderId = searchParams.get('orderId');
-      
+
       // According to MoMo docs: 0 means success
       if (resultCode === '0' && orderId) {
         try {
@@ -25,13 +25,13 @@ const PaymentResultPage: React.FC = () => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ orderId }),
           });
-          
+
           if (res.ok) {
             const data = await res.json();
             // Verify from backend that the payment was truly successful
-            const code = data?.momo_payment?.resultCode !== undefined 
-                           ? data.momo_payment.resultCode 
-                           : data?.resultCode;
+            const code = data?.momo_payment?.resultCode !== undefined
+              ? data.momo_payment.resultCode
+              : data?.resultCode;
 
             if (code === 0) {
               setStatus('success');
@@ -57,7 +57,7 @@ const PaymentResultPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
       <SharedHeader />
-      
+
       <main className="flex-1 flex items-center justify-center p-6">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}

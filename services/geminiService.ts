@@ -4,7 +4,7 @@ import {
   PremiumAnalysisReport,
 } from "../types";
 
-const API_BASE_URL = (import.meta as any).env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+const API_BASE_URL = (import.meta as any).env.VITE_API_BASE_URL || 'https://futuretrace-server.onrender.com/api';
 
 const getAuthToken = () => localStorage.getItem('token');
 
@@ -20,7 +20,7 @@ export const generateSimulation = async (
     },
     body: JSON.stringify({
       ...data,
-      tier: 'FREE' 
+      tier: 'FREE'
     })
   });
 
@@ -47,7 +47,7 @@ export const generatePremiumAnalysis = async (
       'Authorization': `Bearer ${token}`
     },
     body: JSON.stringify({
-      scenario: { title, description, id: scenarioId }, 
+      scenario: { title, description, id: scenarioId },
       context,
       timeframe
     })
