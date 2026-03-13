@@ -85,7 +85,7 @@ const CommunityPage: React.FC = () => {
           </motion.div>
           <motion.h1 
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-            className="text-4xl sm:text-7xl font-black tracking-tighter mb-10 font-display text-slate-900 leading-none uppercase italic"
+            className="text-4xl sm:text-7xl font-black text-slate-900 leading-[1.6] sm:leading-[1.4] mb-12 mb-10 font-display text-slate-900 leading-none uppercase italic"
           >
             {query ? (
               <>Kết quả cho: <br /><span className="text-blue-600">"{query}"</span></>

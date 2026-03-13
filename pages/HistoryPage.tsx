@@ -305,43 +305,76 @@ const HistoryPage: React.FC = () => {
                 <AnimatePresence>
                   {item.isFolder && expandedFolders[item.id] && (
                     <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      className="ml-8 sm:ml-16 space-y-3 border-l-2 border-blue-100 pl-6 sm:pl-10 overflow-hidden mb-6"
+                      layout
+                      initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                      animate={{ 
+                        opacity: 1, 
+                        height: "auto", 
+                        marginTop: 16,
+                        transition: {
+                          height: { type: "spring", stiffness: 300, damping: 30 },
+                          opacity: { duration: 0.2, delay: 0.1 }
+                        }
+                      }}
+                      exit={{ 
+                        opacity: 0, 
+                        height: 0, 
+                        marginTop: 0,
+                        transition: {
+                          height: { type: "spring", stiffness: 300, damping: 30 },
+                          opacity: { duration: 0.1 }
+                        }
+                      }}
+                      className="ml-6 sm:ml-12 pl-6 sm:pl-10 border-l-2 border-dashed border-blue-200 space-y-4 mb-8"
                     >
-                      {item.scenarios?.map((sub: any) => (
-                        <div
+                      {item.scenarios?.map((sub: any, idx: number) => (
+                        <motion.div
                           key={sub.id}
+                          initial={{ y: -20, opacity: 0 }}
+                          animate={{ y: 0, opacity: 1 }}
+                          transition={{ delay: idx * 0.05 + 0.1 }}
                           onClick={() =>
                             navigate(`/detail/${sub.id}`, {
                               state: { scenario: sub },
                             })
                           }
-                          className="bg-white border border-slate-100 p-5 rounded-xl hover:border-blue-400 hover:shadow-md transition-all cursor-pointer flex items-center justify-between group/sub"
+                          className="group/sub bg-white border border-slate-100 p-5 rounded-2xl hover:border-blue-400 hover:shadow-xl hover:shadow-blue-500/5 transition-all cursor-pointer flex items-center justify-between relative overflow-hidden"
                         >
-                          <div className="space-y-1">
-                            <div className="flex items-center gap-2">
-                              <span
-                                className={`w-2 h-2 rounded-full ${sub.color}`}
-                              ></span>
-                              <h4 className="text-sm font-bold text-slate-800 group-hover/sub:text-blue-600 transition-colors">
+                          <div className="absolute inset-0 bg-gradient-to-r from-blue-50/0 to-blue-50/50 opacity-0 group-hover/sub:opacity-100 transition-opacity" />
+                          
+                          <div className="relative z-10 flex-1 flex items-center gap-4">
+                            <div className={`w-10 h-10 rounded-xl ${
+                              (sub.category === 'Positive' || sub.category === 'positive' || sub.category === 'Success') ? 'bg-emerald-50 text-emerald-600' :
+                              (sub.category === 'Risk' || sub.category === 'risk') ? 'bg-rose-50 text-rose-600' : 'bg-blue-50 text-blue-600'
+                            } flex items-center justify-center shrink-0`}>
+                              <IconMapper name={
+                                (sub.category === 'Positive' || sub.category === 'positive' || sub.category === 'Success') ? 'trending_up' :
+                                (sub.category === 'Risk' || sub.category === 'risk') ? 'warning' : 'insights'
+                              } className="text-lg" />
+                            </div>
+                            
+                            <div className="space-y-1">
+                              <h4 className="text-sm sm:text-base font-bold text-slate-800 group-hover/sub:text-blue-600 transition-colors">
                                 {sub.title}
                               </h4>
+                              <p className="text-[11px] sm:text-xs text-slate-500 font-medium line-clamp-1">
+                                {sub.desc}
+                              </p>
                             </div>
-                            <p className="text-[10px] text-slate-400 font-medium line-clamp-1">
-                              {sub.desc}
-                            </p>
                           </div>
-                          <div className="flex items-center gap-4">
-                            <div className="text-right">
-                              <span className="text-[10px] font-black text-slate-900">
-                                {sub.metrics.roi}% ROI
+
+                          <div className="relative z-10 flex items-center gap-6 ml-4">
+                            <div className="text-right hidden sm:block">
+                              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">ROI</p>
+                              <span className="text-sm font-black text-slate-900 bg-slate-50 px-2 py-1 rounded-lg">
+                                {sub.metrics.roi}%
                               </span>
                             </div>
-                            <IconMapper name="arrow_forward" className=" text-slate-200 group-hover/sub:text-blue-600 text-sm" />
+                            <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center group-hover/sub:bg-blue-600 group-hover/sub:text-white transition-all">
+                              <IconMapper name="chevron_right" className="text-sm" />
+                            </div>
                           </div>
-                        </div>
+                        </motion.div>
                       ))}
                     </motion.div>
                   )}

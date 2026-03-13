@@ -188,7 +188,7 @@ const PremiumAnalysisPage: React.FC = () => {
           <div className="flex items-center gap-3 text-[10px] font-black text-amber-600 uppercase tracking-widest mb-8">
             <IconMapper name="workspace_premium" className=" text-[16px]" /> BÁO CÁO PHÂN TÍCH ĐẶC QUYỀN
           </div>
-          <h1 className="text-3xl sm:text-6xl font-black tracking-tighter text-slate-900 leading-[1.1] mb-12 uppercase italic">
+          <h1 className="text-3xl sm:text-5xl font-black text-slate-900 leading-[1.6] sm:leading-[1.4] mb-12 uppercase italic">
             Lộ trình: <span className="text-blue-600">"{scenario.title}"</span>
           </h1>
           
@@ -199,7 +199,7 @@ const PremiumAnalysisPage: React.FC = () => {
             <h3 className="text-[10px] font-black uppercase tracking-widest text-blue-600 mb-6 flex items-center gap-3">
                <IconMapper name="history_edu" className=" text-lg" /> Diễn biến chi tiết (Narrative)
             </h3>
-            <p className="text-lg text-slate-700 leading-relaxed font-medium italic opacity-90">
+            <p className="text-lg text-slate-700 leading-relaxed font-medium italic opacity-90 text-justify hyphens-auto">
               {report.detailedNarrative}
             </p>
           </div>
@@ -210,61 +210,67 @@ const PremiumAnalysisPage: React.FC = () => {
            <div className="lg:col-span-8 space-y-10">
               <section className="bg-slate-950 p-10 sm:p-14 rounded-[3rem] text-white shadow-2xl relative overflow-hidden">
                 <h3 className="text-[10px] font-black uppercase tracking-widest text-amber-400 mb-12">Cột mốc chiến lược (Milestones)</h3>
-                <div className="space-y-2">
+                <div className="space-y-0">
                   {report.milestones.map((m, i) => {
                     const status = getMilestoneStatus(i);
                     return (
-                      <div key={i} className="flex gap-8 group">
-                        <div className="flex flex-col items-center shrink-0 w-16">
-                          <div className={`w-24 h-16 rounded-2xl border flex flex-col items-center justify-center transition-all ${
+                      <div key={i} className="flex gap-5 group">
+                        {/* Timeline column */}
+                        <div className="flex flex-col items-center shrink-0">
+                          <div className={`w-20 min-h-[4rem] rounded-2xl border flex flex-col items-center justify-center px-2 py-3 text-center transition-all ${
                             status === 'Đã hoàn thành' ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400' :
                             status === 'Đang tiến hành' ? 'bg-amber-500/20 border-amber-500/40 text-amber-400 animate-pulse' :
-                            'bg-white/5 border-white/10 text-slate-600'
+                            'bg-white/5 border-white/10 text-slate-500'
                           }`}>
-                            <span className="text-l font-black leading-none">{m.month}</span>
+                            <span className="text-[11px] font-black leading-snug whitespace-pre-wrap break-words">{m.month}</span>
                           </div>
                           {i < report.milestones.length - 1 && (
-                            <div className={`w-px h-28 mt-4 opacity-20 ${
+                            <div className={`w-px flex-1 min-h-[2rem] my-2 opacity-20 ${
                               status === 'Đã hoàn thành' ? 'bg-emerald-500' : 'bg-gradient-to-b from-amber-500/30 to-transparent'
                             }`}></div>
                           )}
                         </div>
 
-                        <div className="flex-1 pt-1 pb-12">
-                          <div className="flex items-start justify-between gap-6 mb-3">
-                             <div className="max-w-md">
-                               <div className="flex items-center gap-3 mb-2">
-                                 <h4 className={`text-lg font-black font-display tracking-tight leading-tight transition-colors uppercase italic ${
-                                   status === 'Đã hoàn thành' ? 'text-emerald-400' : 
-                                   status === 'Đang tiến hành' ? 'text-amber-400' : 'text-white'
-                                 }`}>
-                                   {m.event}
-                                 </h4>
-                                 <span className={`text-[8px] font-black px-2 py-0.5 rounded-md border ${
-                                   status === 'Đã hoàn thành' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
-                                   status === 'Đang tiến hành' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
-                                   'bg-white/5 text-slate-600 border-white/10'
-                                 }`}>
-                                   {status.toUpperCase()}
-                                 </span>
-                               </div>
-                               <p className="text-slate-400 text-xs font-medium leading-relaxed italic opacity-70 line-clamp-2">
-                                 {m.impact}
-                               </p>
-                             </div>
+                        {/* Content column */}
+                        <div className="flex-1 min-w-0 pt-1 pb-8">
+                          <div className="flex items-start justify-between gap-3">
+                            {/* Left: title → badge (own row) → impact */}
+                            <div className="flex-1 min-w-0">
+                              {/* Row 1: title */}
+                              <h4 className={`text-base font-black font-display leading-relaxed transition-colors uppercase italic break-words mb-2 ${
+                                status === 'Đã hoàn thành' ? 'text-emerald-400' : 
+                                status === 'Đang tiến hành' ? 'text-amber-400' : 'text-white'
+                              }`}>
+                                {m.event}
+                              </h4>
+                              {/* Row 2: badge — always on its own line */}
+                              <div className="mb-2">
+                                <span className={`inline-block text-[8px] font-black px-2 py-1 rounded-md border whitespace-nowrap ${
+                                  status === 'Đã hoàn thành' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                                  status === 'Đang tiến hành' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
+                                  'bg-white/5 text-slate-500 border-white/10'
+                                }`}>
+                                  {status.toUpperCase()}
+                                </span>
+                              </div>
+                              {/* Row 3: impact */}
+                              <p className="text-slate-400 text-[11px] font-medium leading-relaxed italic opacity-70 line-clamp-2">
+                                {m.impact}
+                              </p>
+                            </div>
 
-                             <div className="flex items-center gap-3 self-start">
-                               <div className="px-3 py-1 bg-white/5 border border-white/10 rounded-lg text-[9px] font-black uppercase tracking-widest text-emerald-400">
-                                 {m.probability}%
-                               </div>
-
-                               <button 
-                                 onClick={() => { setSelectedMilestone(m); setSelectedMilestoneIndex(i); }}
-                                 className="w-10 h-10 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center text-blue-400 hover:bg-blue-600 hover:text-white transition-all shadow-lg"
-                               >
-                                 <IconMapper name="visibility" className=" text-xl" />
-                               </button>
-                             </div>
+                            {/* Right: probability + view button */}
+                            <div className="flex flex-col items-end gap-2 shrink-0 ml-3">
+                              <div className="px-3 py-1 bg-white/5 border border-white/10 rounded-lg text-[9px] font-black uppercase tracking-widest text-emerald-400 whitespace-nowrap">
+                                {m.probability > 1 ? Math.round(m.probability) : Math.round(m.probability * 100)}%
+                              </div>
+                              <button 
+                                onClick={() => { setSelectedMilestone(m); setSelectedMilestoneIndex(i); }}
+                                className="w-9 h-9 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center text-blue-400 hover:bg-blue-600 hover:text-white transition-all shadow-lg"
+                              >
+                                <IconMapper name="visibility" className=" text-lg" />
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -312,7 +318,7 @@ const PremiumAnalysisPage: React.FC = () => {
                                {translateInfluence(f.influence).toUpperCase()}
                             </span>
                          </div>
-                         <h5 className="font-black text-slate-900 text-sm tracking-tight uppercase italic">{f.factor}</h5>
+                         <h5 className="font-black text-slate-900 text-sm leading-relaxed uppercase italic">{f.factor}</h5>
                          <p className="text-xs text-slate-600 leading-relaxed font-medium italic opacity-80">{f.description}</p>
                       </div>
                     ))}
@@ -356,7 +362,7 @@ const PremiumAnalysisPage: React.FC = () => {
               <div className="p-8 sm:p-10 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
                 <div>
                    <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-2 block">CHI TIẾT THỰC THI</span>
-                   <h3 className="text-xl sm:text-2xl font-black text-slate-900 font-display tracking-tight leading-tight uppercase italic">{selectedMilestone.event}</h3>
+                   <h3 className="text-xl sm:text-2xl font-black text-slate-900 font-display leading-[1.4] uppercase italic">{selectedMilestone.event}</h3>
                 </div>
                 <button 
                   onClick={() => setSelectedMilestone(null)}
@@ -427,38 +433,59 @@ const PremiumAnalysisPage: React.FC = () => {
 
       <AnimatePresence>
         {isFeedbackModalOpen && (
-          <div className="fixed inset-0 z-[250] flex items-center justify-center p-6">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-slate-950/80 backdrop-blur-md" />
-            <motion.div initial={{ opacity: 0, scale: 0.9, y: 30 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 30 }} className="relative w-full max-w-lg bg-white rounded-[3rem] p-10 shadow-2xl border border-slate-100">
-              <div className="text-center mb-10">
-                <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                  <IconMapper name="chat_bubble" className=" text-3xl" />
-                </div>
-                <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tighter mb-4">Phản hồi cột mốc</h3>
-                <p className="text-slate-600 text-sm font-medium">Bạn có gặp khó khăn gì hay vấn đề gì hoặc đã gặp phải kết quả không mong muốn nào không?</p>
-              </div>
-              
-              <textarea 
-                className="w-full h-40 p-6 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:ring-4 focus:ring-blue-50 focus:border-blue-600 outline-none resize-none transition-all mb-8 font-medium italic"
-                placeholder="Nhập phản hồi của bạn tại đây..."
-                value={feedback}
-                onChange={(e) => setFeedback(e.target.value)}
-              />
+          <div className="fixed inset-0 z-[250] flex items-center justify-center p-4 sm:p-6">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-slate-950/85 backdrop-blur-lg" />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.92, y: 24 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.92, y: 24 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 28 }}
+              className="relative w-full max-w-lg bg-white rounded-[2.5rem] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.5)] border border-slate-100 overflow-hidden"
+            >
+              {/* Header gradient strip */}
+              <div className="h-1.5 w-full bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500" />
 
-              <div className="flex flex-col gap-4">
-                <button 
-                  onClick={submitFeedback}
-                  disabled={!feedback.trim()}
-                  className="w-full py-5 bg-slate-900 text-white font-black text-[11px] uppercase tracking-widest rounded-2xl hover:bg-blue-600 disabled:bg-slate-100 disabled:text-slate-400 transition-all shadow-xl"
-                >
-                  Gửi phản hồi <IconMapper name="send" className=" text-lg" />
-                </button>
-                <button 
-                  onClick={handleNoFeedback}
-                  className="w-full py-5 bg-white border border-slate-200 text-slate-400 font-black text-[10px] uppercase tracking-widest rounded-2xl hover:bg-slate-50 transition-all"
-                >
-                  Tôi không có feedback gì cả
-                </button>
+              <div className="p-8 sm:p-10">
+                {/* Icon + Title */}
+                <div className="flex items-center gap-5 mb-6">
+                  <div className="w-14 h-14 bg-blue-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30 shrink-0">
+                    <IconMapper name="chat_bubble" className=" text-2xl" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-1">Cột mốc hoàn thành</p>
+                    <h3 className="text-xl sm:text-2xl font-black text-slate-900 leading-tight">Phản hồi cột mốc</h3>
+                  </div>
+                </div>
+
+                {/* Description */}
+                <p className="text-slate-500 text-sm font-medium leading-relaxed mb-6 pl-1">
+                  Bạn có gặp khó khăn, vấn đề hoặc kết quả không mong muốn nào khi thực hiện cột mốc này không? Chia sẻ để AI tối ưu lộ trình tiếp theo.
+                </p>
+
+                {/* Textarea */}
+                <textarea
+                  className="w-full h-36 p-5 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none resize-none transition-all mb-6 font-medium text-slate-700 placeholder:text-slate-400 placeholder:italic"
+                  placeholder="Ví dụ: Tôi gặp khó khăn ở bước học toán tích phân, kết quả thi thử chỉ đạt 6 điểm thay vì 8 điểm mong muốn..."
+                  value={feedback}
+                  onChange={(e) => setFeedback(e.target.value)}
+                />
+
+                {/* Actions */}
+                <div className="flex flex-col gap-3">
+                  <button
+                    onClick={submitFeedback}
+                    disabled={!feedback.trim()}
+                    className="w-full py-4 bg-blue-600 text-white font-black text-[11px] uppercase tracking-widest rounded-2xl hover:bg-blue-700 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed transition-all shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2"
+                  >
+                    <IconMapper name="send" className=" text-base" /> Gửi phản hồi &amp; Tối ưu lộ trình
+                  </button>
+                  <button
+                    onClick={handleNoFeedback}
+                    className="w-full py-4 bg-slate-50 border border-slate-200 text-slate-500 font-black text-[10px] uppercase tracking-widest rounded-2xl hover:bg-slate-100 transition-all"
+                  >
+                    Bỏ qua — Đánh dấu hoàn thành ngay
+                  </button>
+                </div>
               </div>
             </motion.div>
           </div>
@@ -467,31 +494,58 @@ const PremiumAnalysisPage: React.FC = () => {
 
       <AnimatePresence>
         {isConfirmPivotModalOpen && (
-          <div className="fixed inset-0 z-[250] flex items-center justify-center p-6">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-slate-950/80 backdrop-blur-md" />
-            <motion.div initial={{ opacity: 0, scale: 0.9, y: 30 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 30 }} className="relative w-full max-w-lg bg-white rounded-[3rem] p-10 shadow-2xl border border-slate-100">
-              <div className="text-center mb-10">
-                <div className="w-16 h-16 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                  <IconMapper name="psychology" className=" text-3xl" />
-                </div>
-                <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tighter mb-4">Tối ưu lộ trình</h3>
-                <p className="text-slate-600 text-sm font-medium leading-relaxed">Bạn có đồng ý để chúng tôi đưa ra các phương án mới hơn phù hợp với trường hợp của bạn không?</p>
-                <p className="text-[10px] text-amber-600 font-black uppercase tracking-widest mt-4 italic">* Các cột mốc đã hoàn thành sẽ được giữ nguyên.</p>
-              </div>
+          <div className="fixed inset-0 z-[250] flex items-center justify-center p-4 sm:p-6">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-slate-950/85 backdrop-blur-lg" />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.92, y: 24 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.92, y: 24 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 28 }}
+              className="relative w-full max-w-lg bg-white rounded-[2.5rem] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.5)] border border-slate-100 overflow-hidden"
+            >
+              {/* Amber gradient header strip */}
+              <div className="h-1.5 w-full bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500" />
 
-              <div className="flex flex-col gap-4">
-                <button 
-                  onClick={() => handleConfirmPivot(true)}
-                  className="w-full py-5 bg-amber-600 text-white font-black text-[11px] uppercase tracking-widest rounded-2xl hover:bg-amber-700 shadow-xl shadow-amber-200 transition-all"
-                >
-                  Đồng ý & Cập nhật <IconMapper name="bolt" className=" text-lg" />
-                </button>
-                <button 
-                  onClick={() => handleConfirmPivot(false)}
-                  className="w-full py-5 bg-white border border-slate-200 text-slate-400 font-black text-[10px] uppercase tracking-widest rounded-2xl hover:bg-slate-50 transition-all"
-                >
-                  Không, giữ nguyên lộ trình cũ
-                </button>
+              <div className="p-8 sm:p-10">
+                {/* Icon + Title */}
+                <div className="flex items-center gap-5 mb-6">
+                  <div className="w-14 h-14 bg-amber-500 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-amber-500/30 shrink-0">
+                    <IconMapper name="psychology" className=" text-2xl" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-1">AI Điều chỉnh</p>
+                    <h3 className="text-xl sm:text-2xl font-black text-slate-900 leading-tight">Tối ưu lộ trình</h3>
+                  </div>
+                </div>
+
+                {/* Description */}
+                <p className="text-slate-600 text-sm font-medium leading-relaxed mb-4">
+                  Dựa trên phản hồi của bạn, AI sẽ phân tích và đề xuất các cột mốc mới phù hợp hơn với tình trạng hiện tại.
+                </p>
+
+                {/* Info box */}
+                <div className="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-2xl mb-8">
+                  <IconMapper name="info" className=" text-amber-600 text-lg shrink-0 mt-0.5" />
+                  <p className="text-[11px] text-amber-700 font-bold leading-relaxed">
+                    Các cột mốc bạn đã hoàn thành sẽ được giữ nguyên. Chỉ các cột mốc chưa thực hiện mới được tái cơ cấu.
+                  </p>
+                </div>
+
+                {/* Actions */}
+                <div className="flex flex-col gap-3">
+                  <button
+                    onClick={() => handleConfirmPivot(true)}
+                    className="w-full py-4 bg-amber-500 text-white font-black text-[11px] uppercase tracking-widest rounded-2xl hover:bg-amber-600 shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-2"
+                  >
+                    <IconMapper name="bolt" className=" text-base" /> Đồng ý &amp; Cập nhật lộ trình
+                  </button>
+                  <button
+                    onClick={() => handleConfirmPivot(false)}
+                    className="w-full py-4 bg-slate-50 border border-slate-200 text-slate-500 font-black text-[10px] uppercase tracking-widest rounded-2xl hover:bg-slate-100 transition-all"
+                  >
+                    Không, giữ nguyên lộ trình cũ
+                  </button>
+                </div>
               </div>
             </motion.div>
           </div>

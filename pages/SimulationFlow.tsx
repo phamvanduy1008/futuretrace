@@ -131,7 +131,7 @@ const SimulationFlow: React.FC = () => {
             >
               Mô phỏng đa thời gian v4.2
             </motion.div>
-            <h1 className="text-4xl sm:text-6xl font-black mb-4 font-display tracking-tighter text-slate-900 leading-none">
+            <h1 className="text-4xl sm:text-6xl font-black mb-4 font-display tracking-tighter text-slate-900 leading-[1.8]">
               Nhập biến số <span className="text-blue-600">đầu vào.</span>
             </h1>
             <p className="text-slate-500 text-lg max-w-2xl mx-auto font-medium leading-relaxed">
@@ -264,8 +264,8 @@ const SimulationFlow: React.FC = () => {
                     onChange={(e) => setData({...data, [slider.id]: parseInt(e.target.value)})}
                   />
                   <div className="flex justify-between px-1">
-                    <span className="text-[8px] font-bold text-slate-300 uppercase tracking-tighter">{slider.labels[0]}</span>
-                    <span className="text-[8px] font-bold text-slate-300 uppercase tracking-tighter">{slider.labels[4]}</span>
+                    <span className="text-[8px] font-bold text-slate-300 uppercase text-slate-900 leading-[1.6] sm:leading-[1.4] mb-12">{slider.labels[0]}</span>
+                    <span className="text-[8px] font-bold text-slate-300 uppercase text-slate-900 leading-[1.6] sm:leading-[1.4] mb-12">{slider.labels[4]}</span>
                   </div>
                 </div>
               ))}
@@ -375,7 +375,7 @@ const SimulationFlow: React.FC = () => {
             >
               Phân tích hoàn tất • Report FT-{Math.floor(Math.random()*9000)+1000}
             </motion.div>
-            <h1 className="text-5xl md:text-8xl font-black tracking-tighter mb-12 font-display text-slate-900 leading-[0.95] max-w-5xl">
+            <h1 className="text-5xl sm:text-7xl font-black leading-[1.6] sm:leading-[1.3] mb-12 font-display text-slate-900 max-w-5xl">
               {results.isEnterprise ? (
                 <span className="text-rose-600">Thông báo</span>
               ) : (
@@ -403,7 +403,7 @@ const SimulationFlow: React.FC = () => {
             <>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
                 <AnimatePresence>
-                  {results.scenarios.map((scenario, idx) => (
+                  {(results?.scenarios || []).map((scenario, idx) => (
                     <motion.div 
                       key={idx}
                       custom={idx}
@@ -433,7 +433,7 @@ const SimulationFlow: React.FC = () => {
                             scenario.type === 'Neutral' ? 'text-blue-500' : 
                             'text-rose-500'
                           }`}>
-                            <IconMapper name={scenario.type === 'Positive' ? 'trending_up' : scenario.type === 'Neutral' ? 'equalizer' : 'warning'} className=" text-2xl font-bold" />
+                            <IconMapper name={scenario?.type === 'Positive' ? 'trending_up' : scenario?.type === 'Neutral' ? 'equalizer' : 'warning'} className=" text-2xl font-bold" />
                           </div>
                         </div>
                         <h3 className="text-2xl font-black mb-4 group-hover:text-blue-600 transition-colors font-display tracking-tight leading-tight uppercase">{scenario.title}</h3>
@@ -487,26 +487,41 @@ const SimulationFlow: React.FC = () => {
                 </div>
                 <div className="flex flex-col items-center mb-20 text-center">
                   <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-6">Cột mốc chiến lược</span>
-                  <h3 className="text-4xl font-black text-white font-display uppercase tracking-tight">Timeline lộ trình tích hợp</h3>
+                  <h3 className="text-4xl font-black text-white font-display uppercase tracking-tight leading-relaxed">Timeline lộ trình tích hợp</h3>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-10 relative z-10">
+                  {/* Timeline Cards */}
                   {[
-                    { label: 'Khởi điểm', text: results.timeline.start, time: 'Hiện tại', icon: 'flag' },
-                    { label: 'Thích ứng', text: results.timeline.sixMonths, time: '6 Tháng', icon: 'sync_alt' },
-                    { label: 'Cân bằng', text: results.timeline.oneYear, time: '12 Tháng', icon: 'balance' },
-                    { label: 'Đột phá', text: results.timeline.threeYears, time: '36 Tháng', icon: 'rocket_launch' }
+                    { label: 'Khởi điểm', text: results?.timeline?.start, time: 'Hiện tại', icon: 'flag', ghost: 'start' },
+                    { label: 'Thích ứng', text: results?.timeline?.sixMonths, time: '6 Tháng', icon: 'sync_alt', ghost: 'trending_up' },
+                    { label: 'Cân bằng', text: results?.timeline?.oneYear, time: '12 Tháng', icon: 'balance', ghost: 'equalizer' },
+                    { label: 'Đột phá', text: results?.timeline?.threeYears, time: '36 Tháng', icon: 'rocket_launch', ghost: 'star' }
                   ].map((item, i) => (
-                    <div key={i} className="flex flex-col gap-8 p-10 rounded-[2.5rem] bg-white/5 border border-white/10 hover:bg-white/10 transition-all group">
-                      <div className="flex items-center gap-5">
-                        <div className="w-13 h-13 rounded-full bg-blue-600/20 border border-blue-600/50 flex items-center justify-center text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition-all shadow-xl">
-                          <IconMapper name={item.icon} className="" />
+                    <div key={i} className="flex flex-col min-h-[300px] p-10 rounded-[2.5rem] bg-white/5 border border-white/10 hover:bg-white/15 hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-500 group relative overflow-hidden backdrop-blur-sm">
+                      {/* Ghost Background Icon */}
+                      <div className="absolute -bottom-6 -right-6 opacity-[0.02] group-hover:opacity-[0.08] transition-all duration-700 pointer-events-none group-hover:scale-110 group-hover:-rotate-6">
+                        <IconMapper name={item.ghost || 'auto_awesome'} className="text-[180px] text-white" />
+                      </div>
+
+                      <div className="relative z-10 flex flex-col h-full items-start">
+                        <div className="flex items-center gap-5 mb-8">
+                          <div className="w-13 h-13 rounded-full bg-blue-600/20 border border-blue-600/50 flex items-center justify-center text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition-all shadow-xl">
+                            <IconMapper name={item.icon} className="" />
+                          </div>
+                          <div className="flex flex-col">
+                             <span className="text-[9px] font-black uppercase tracking-widest text-blue-400">{item.label}</span>
+                             <span className="text-xl font-black text-white font-display">{item.time}</span>
+                          </div>
                         </div>
-                        <div className="flex flex-col">
-                           <span className="text-[9px] font-black uppercase tracking-widest text-blue-400">{item.label}</span>
-                           <span className="text-xl font-black text-white font-display">{item.time}</span>
+                        <p className="text-sm text-slate-300 leading-[1.7] font-medium italic opacity-80 group-hover:opacity-100 transition-opacity flex-1 line-clamp-6 overflow-hidden">
+                          {item.text || "Đang tải lộ trình..."}
+                        </p>
+                        <div className="mt-8 w-full pt-5 border-t border-white/10 opacity-40 group-hover:opacity-100 transition-all group-hover:translate-x-1">
+                          <span className="text-[8px] font-black text-blue-500 uppercase tracking-[0.2em] flex items-center gap-2">
+                             <div className="w-1 h-1 bg-blue-500 rounded-full animate-pulse" /> FutureTrace Milestone
+                          </span>
                         </div>
                       </div>
-                      <p className="text-sm text-slate-300 leading-relaxed font-medium">{item.text}</p>
                     </div>
                   ))}
                 </div>
@@ -548,45 +563,51 @@ const SimulationFlow: React.FC = () => {
                 className="absolute inset-0 bg-slate-900/80 backdrop-blur-md" 
               />
               <motion.div 
-                initial={{ opacity: 0, scale: 0.9, y: 30 }} 
+                initial={{ opacity: 0, scale: 0.95, y: 30 }} 
                 animate={{ opacity: 1, scale: 1, y: 0 }} 
-                exit={{ opacity: 0, scale: 0.9, y: 30 }} 
-                className="relative w-full max-w-[480px] bg-white rounded-[3rem] p-10 sm:p-14 shadow-[0_100px_150px_-50px_rgba(0,0,0,0.5)] border border-slate-100 overflow-hidden"
+                exit={{ opacity: 0, scale: 0.95, y: 30 }} 
+                className="relative w-full max-w-[480px] bg-white rounded-[3rem] shadow-2xl border border-slate-100 overflow-hidden"
               >
-                <div className="text-center mb-10">
-                  <div className="w-20 h-20 bg-blue-50 text-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-inner border border-blue-100">
-                    <IconMapper name="create_new_folder" className=" text-4xl" />
+                {/* Header with Gradient Strip */}
+                <div className="h-2 bg-gradient-to-r from-blue-400 via-indigo-500 to-blue-600"></div>
+
+                <div className="p-10 sm:p-12">
+                  <div className="flex items-start gap-6 mb-10">
+                    <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center shrink-0 shadow-inner border border-blue-100">
+                      <IconMapper name="create_new_folder" className=" text-3xl" />
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tighter mb-2 italic">Lưu kịch bản</h3>
+                      <p className="text-slate-500 text-sm font-medium leading-relaxed">Bộ nhớ đám mây của riêng bạn.</p>
+                    </div>
                   </div>
-                  <h3 className="text-3xl font-black text-slate-900 font-display uppercase tracking-tighter mb-4">Lưu kịch bản</h3>
-                  <p className="text-slate-600 text-sm font-medium leading-relaxed mb-8">
-                    Nhập tên cho nhóm kịch bản này để dễ dàng tìm kiếm trong lịch sử.
-                  </p>
-                  
-                  <div className="relative">
+
+                  <div className="relative mb-8">
+                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Tên nhóm kịch bản</label>
                     <input 
                       type="text"
                       value={folderName}
                       onChange={(e) => setFolderName(e.target.value)}
-                      placeholder={`Nhóm kịch bản: ${data.decision.slice(0, 20)}...`}
-                      className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-medium outline-none focus:ring-2 focus:ring-blue-100 focus:bg-white transition-all"
+                      placeholder={`Ví dụ: Lộ trình IT - ${new Date().toLocaleDateString()}`}
+                      className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-600 transition-all shadow-inner italic"
                       autoFocus
                     />
                   </div>
-                </div>
 
-                <div className="flex flex-col gap-4">
-                  <button 
-                    onClick={handleSaveToHistory}
-                    className="w-full py-6 bg-blue-600 text-white font-black text-[12px] uppercase tracking-widest rounded-2xl hover:bg-blue-700 shadow-2xl shadow-blue-100 transition-all flex items-center justify-center gap-4"
-                  >
-                    LƯU NGAY <IconMapper name="save" className=" text-xl" />
-                  </button>
-                  <button 
-                    onClick={() => setIsSaveModalOpen(false)}
-                    className="w-full py-6 bg-white border border-slate-200 text-slate-400 font-black text-[10px] uppercase tracking-widest rounded-2xl hover:bg-slate-50 transition-all"
-                  >
-                    Hủy bỏ
-                  </button>
+                  <div className="flex flex-col gap-3">
+                    <button 
+                      onClick={handleSaveToHistory}
+                      className="w-full py-5 bg-slate-900 text-white font-black text-[11px] uppercase tracking-widest rounded-2xl hover:bg-blue-600 shadow-xl shadow-slate-200 transition-all flex items-center justify-center gap-3 font-display"
+                    >
+                      LƯU VÀO ĐÁM MÂY <IconMapper name="cloud_upload" className=" text-lg" />
+                    </button>
+                    <button 
+                      onClick={() => setIsSaveModalOpen(false)}
+                      className="w-full py-5 bg-white border border-slate-200 text-slate-300 font-black text-[10px] uppercase tracking-widest rounded-2xl hover:bg-slate-50 transition-all"
+                    >
+                      Hủy và thoát
+                    </button>
+                  </div>
                 </div>
               </motion.div>
             </div>
