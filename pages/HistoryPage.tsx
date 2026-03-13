@@ -1,4 +1,4 @@
-import { AnimatedBackground } from '../components/AnimatedBackground';
+import { AnimatedBackground } from "../components/AnimatedBackground";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -6,7 +6,7 @@ import SharedHeader from "../components/SharedHeader";
 import SharedFooter from "../components/SharedFooter";
 
 import { apiFetch } from "../services/apiClient";
-import { IconMapper } from '../components/IconMapper';
+import { IconMapper } from "../components/IconMapper";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -20,13 +20,15 @@ const HistoryPage: React.FC = () => {
   >({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [activeTab, setActiveTab] = useState<'all' | 'saved'>('all');
+  const [activeTab, setActiveTab] = useState<"all" | "saved">("all");
 
   const fetchHistory = async () => {
     setLoading(true);
     setError("");
     try {
-      const response = await apiFetch(`/simulations?saved=${activeTab === 'saved'}`);
+      const response = await apiFetch(
+        `/simulations?saved=${activeTab === "saved"}`,
+      );
       if (response.ok) {
         const data = await response.json();
         setHistoryItems(data.items);
@@ -60,18 +62,20 @@ const HistoryPage: React.FC = () => {
     const isCurrentlySaved = item.isSaved;
     try {
       const response = await apiFetch(`/simulations/${item.id}/save`, {
-        method: isCurrentlySaved ? "DELETE" : "POST"
+        method: isCurrentlySaved ? "DELETE" : "POST",
       });
       if (response.ok) {
         // Optimistic update or just refetch
-        setHistoryItems(prev => prev.map(i => {
-          if (i.id === item.id) return { ...i, isSaved: !isCurrentlySaved };
-          return i;
-        }));
+        setHistoryItems((prev) =>
+          prev.map((i) => {
+            if (i.id === item.id) return { ...i, isSaved: !isCurrentlySaved };
+            return i;
+          }),
+        );
 
         // If we are in 'saved' tab and just unsaved, we might want to remove it
-        if (activeTab === 'saved' && isCurrentlySaved) {
-          setHistoryItems(prev => prev.filter(i => i.id !== item.id));
+        if (activeTab === "saved" && isCurrentlySaved) {
+          setHistoryItems((prev) => prev.filter((i) => i.id !== item.id));
         }
       }
     } catch (err) {
@@ -108,7 +112,7 @@ const HistoryPage: React.FC = () => {
     ) {
       try {
         const response = await apiFetch(`/simulations/${id}`, {
-          method: "DELETE"
+          method: "DELETE",
         });
         if (response.ok) {
           fetchHistory();
@@ -141,42 +145,60 @@ const HistoryPage: React.FC = () => {
             onClick={() => navigate("/simulate")}
             className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-3 shadow-xl shadow-blue-50"
           >
-            <IconMapper name="add" className=" font-bold" /> Tạo
-            mới
+            <IconMapper name="add" className=" font-bold" /> Tạo mới
           </button>
         </div>
 
         <div className="flex items-center gap-8 mb-10 border-b border-slate-100 pb-0">
           <button
-            onClick={() => setActiveTab('all')}
-            className={`pb-4 text-xs font-black uppercase tracking-widest transition-all relative ${activeTab === 'all' ? 'text-blue-600' : 'text-slate-400 hover:text-slate-600'
-              }`}
+            onClick={() => setActiveTab("all")}
+            className={`pb-4 text-xs font-black uppercase tracking-widest transition-all relative ${
+              activeTab === "all"
+                ? "text-blue-600"
+                : "text-slate-400 hover:text-slate-600"
+            }`}
           >
             Toàn bộ lịch sử
-            {activeTab === 'all' && (
-              <motion.div layoutId="activeTab" className="absolute bottom-0 left-0 right-0 h-1 bg-blue-600 rounded-t-full" />
+            {activeTab === "all" && (
+              <motion.div
+                layoutId="activeTab"
+                className="absolute bottom-0 left-0 right-0 h-1 bg-blue-600 rounded-t-full"
+              />
             )}
           </button>
           <button
-            onClick={() => setActiveTab('saved')}
-            className={`pb-4 text-xs font-black uppercase tracking-widest transition-all relative ${activeTab === 'saved' ? 'text-blue-600' : 'text-slate-400 hover:text-slate-600'
-              }`}
+            onClick={() => setActiveTab("saved")}
+            className={`pb-4 text-xs font-black uppercase tracking-widest transition-all relative ${
+              activeTab === "saved"
+                ? "text-blue-600"
+                : "text-slate-400 hover:text-slate-600"
+            }`}
           >
             Đã lưu
-            {activeTab === 'saved' && (
-              <motion.div layoutId="activeTab" className="absolute bottom-0 left-0 right-0 h-1 bg-blue-600 rounded-t-full" />
+            {activeTab === "saved" && (
+              <motion.div
+                layoutId="activeTab"
+                className="absolute bottom-0 left-0 right-0 h-1 bg-blue-600 rounded-t-full"
+              />
             )}
           </button>
         </div>
 
         <div className="flex flex-col sm:flex-row items-center gap-4 mb-10 pb-8">
           <div className="relative w-full sm:flex-1">
-            <IconMapper name="search" className=" absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl" />
+            <IconMapper
+              name="search"
+              className=" absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl"
+            />
             <input
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-100 rounded-xl text-sm outline-none focus:bg-white focus:ring-2 focus:ring-blue-100 transition-all font-medium"
-              placeholder={activeTab === 'all' ? "Tìm kiếm kịch bản hoặc danh mục..." : "Tìm kiếm trong mục đã lưu..."}
+              placeholder={
+                activeTab === "all"
+                  ? "Tìm kiếm kịch bản hoặc danh mục..."
+                  : "Tìm kiếm trong mục đã lưu..."
+              }
             />
           </div>
           <div className="flex gap-2 w-full sm:w-auto">
@@ -192,7 +214,8 @@ const HistoryPage: React.FC = () => {
             <div className="py-20 text-center">
               <p className="text-slate-400 font-bold">Đang tải dữ liệu...</p>
             </div>
-          )}          {!loading && (
+          )}{" "}
+          {!loading && (
             <AnimatePresence>
               {currentItems.map((item, i) => (
                 <motion.div
@@ -206,7 +229,7 @@ const HistoryPage: React.FC = () => {
                     onClick={() => {
                       if (item.isFolder) {
                         toggleFolder(
-                          { stopPropagation: () => { } } as any,
+                          { stopPropagation: () => {} } as any,
                           item.id,
                         );
                       } else {
@@ -219,7 +242,10 @@ const HistoryPage: React.FC = () => {
                   >
                     {item.isFolder && (
                       <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
-                        <IconMapper name="folder_open" className=" text-6xl text-blue-600" />
+                        <IconMapper
+                          name="folder_open"
+                          className=" text-6xl text-blue-600"
+                        />
                       </div>
                     )}
 
@@ -229,10 +255,19 @@ const HistoryPage: React.FC = () => {
                           <span
                             className={`${item.isFolder ? "text-blue-600" : "text-slate-600"}`}
                           >
-                            {item.isFolder ? "THƯ MỤC MÔ PHỎNG" :
-                              (item.category === 'Positive' || item.category === 'positive' || item.category === 'Success') ? 'Tích cực' :
-                                (item.category === 'Risk' || item.category === 'risk') ? 'Rủi ro' :
-                                  (item.category === 'Neutral' || item.category === 'neutral') ? 'Ổn định' : item.category}
+                            {item.isFolder
+                              ? "THƯ MỤC MÔ PHỎNG"
+                              : item.category === "Positive" ||
+                                  item.category === "positive" ||
+                                  item.category === "Success"
+                                ? "Tích cực"
+                                : item.category === "Risk" ||
+                                    item.category === "risk"
+                                  ? "Rủi ro"
+                                  : item.category === "Neutral" ||
+                                      item.category === "neutral"
+                                    ? "Ổn định"
+                                    : item.category}
                           </span>
                           <span className="w-1 h-1 bg-slate-200 rounded-full hidden sm:block"></span>
                           <span>{item.date}</span>
@@ -249,7 +284,10 @@ const HistoryPage: React.FC = () => {
                         </div>
                         <div className="flex items-center gap-3">
                           {item.isFolder && (
-                            <IconMapper name="folder" className=" text-blue-600" />
+                            <IconMapper
+                              name="folder"
+                              className=" text-blue-600"
+                            />
                           )}
                           <h3 className="text-lg sm:text-xl font-bold group-hover:text-blue-600 transition-colors font-display text-slate-900 leading-tight">
                             {item.title}
@@ -269,7 +307,9 @@ const HistoryPage: React.FC = () => {
                             <div className="w-20 sm:w-24 h-1.5 bg-slate-100 rounded-full overflow-hidden">
                               <motion.div
                                 initial={false}
-                                animate={{ width: `${item.metrics?.roi || 0}%` }}
+                                animate={{
+                                  width: `${item.metrics?.roi || 0}%`,
+                                }}
                                 className={`h-full ${item.metrics?.roi > 80 ? "bg-emerald-500" : "bg-blue-600"}`}
                                 transition={{ duration: 0.6 }}
                               />
@@ -282,13 +322,17 @@ const HistoryPage: React.FC = () => {
                         <div className="flex items-center gap-2">
                           <button
                             onClick={(e) => handleSave(e, item)}
-                            className={`w-10 h-10 rounded-xl transition-all flex items-center justify-center shadow-sm ${item.isSaved
-                              ? "bg-blue-600 text-white shadow-blue-200"
-                              : "bg-slate-50 text-slate-400 hover:bg-blue-50 hover:text-blue-600"
-                              }`}
+                            className={`w-10 h-10 rounded-xl transition-all flex items-center justify-center shadow-sm ${
+                              item.isSaved
+                                ? "bg-blue-600 text-white shadow-blue-200"
+                                : "bg-slate-50 text-slate-400 hover:bg-blue-50 hover:text-blue-600"
+                            }`}
                             title={item.isSaved ? "Bỏ lưu" : "Lưu kịch bản"}
                           >
-                            <IconMapper name="bookmark" className={` text-xl ${item.isSaved ? "fill-white" : ""}`} />
+                            <IconMapper
+                              name="bookmark"
+                              className={` text-xl ${item.isSaved ? "fill-white" : ""}`}
+                            />
                           </button>
                           <button
                             onClick={(e) => handleDelete(e, item.id)}
@@ -297,7 +341,12 @@ const HistoryPage: React.FC = () => {
                           >
                             <IconMapper name="delete" className=" text-xl" />
                           </button>
-                          <IconMapper name={item.isFolder ? "expand_more" : "arrow_forward"} className={` text-slate-300 group-hover:text-blue-600 transition-all ${item.isFolder && expandedFolders[item.id] ? "rotate-90" : ""}`} />
+                          <IconMapper
+                            name={
+                              item.isFolder ? "expand_more" : "arrow_forward"
+                            }
+                            className={` text-slate-300 group-hover:text-blue-600 transition-all ${item.isFolder && expandedFolders[item.id] ? "rotate-90" : ""}`}
+                          />
                         </div>
                       </div>
                     </div>
@@ -343,7 +392,10 @@ const HistoryPage: React.FC = () => {
                                   {sub.metrics.roi}% ROI
                                 </span>
                               </div>
-                              <IconMapper name="arrow_forward" className=" text-slate-200 group-hover/sub:text-blue-600 text-sm" />
+                              <IconMapper
+                                name="arrow_forward"
+                                className=" text-slate-200 group-hover/sub:text-blue-600 text-sm"
+                              />
                             </div>
                           </div>
                         ))}
@@ -352,11 +404,14 @@ const HistoryPage: React.FC = () => {
                   </AnimatePresence>
                 </motion.div>
               ))}
-            </AnimatePresence>)}
-
+            </AnimatePresence>
+          )}
           {currentItems.length === 0 && (
             <div className="py-24 text-center border-2 border-dashed border-slate-100 rounded-3xl">
-              <IconMapper name="search_off" className=" text-4xl text-slate-200 mb-4" />
+              <IconMapper
+                name="search_off"
+                className=" text-4xl text-slate-200 mb-4"
+              />
               <p className="text-slate-400 font-black uppercase text-[10px] tracking-widest">
                 Không tìm thấy kịch bản phù hợp
               </p>
@@ -381,10 +436,11 @@ const HistoryPage: React.FC = () => {
                   <button
                     key={number}
                     onClick={() => paginate(number)}
-                    className={`w-10 h-10 rounded-xl text-[10px] font-black transition-all ${currentPage === number
-                      ? "bg-slate-900 text-white shadow-lg"
-                      : "text-slate-400 hover:bg-slate-50 hover:text-slate-900"
-                      }`}
+                    className={`w-10 h-10 rounded-xl text-[10px] font-black transition-all ${
+                      currentPage === number
+                        ? "bg-slate-900 text-white shadow-lg"
+                        : "text-slate-400 hover:bg-slate-50 hover:text-slate-900"
+                    }`}
                   >
                     {number}
                   </button>
