@@ -1824,8 +1824,13 @@ export default function AdminApp() {
                 setSession(admin);
                 window.localStorage.setItem(ADMIN_PROFILE_KEY, JSON.stringify(admin));
             })
-            .catch(() => {
+            .catch((err) => {
                 if (!active) return;
+                console.error('Session verify failed:', err);
+                if (err?.status === 401 || err?.status === 403) {
+                    clearAuth();
+                    navigate('/login');
+                }
             });
 
         return () => {
