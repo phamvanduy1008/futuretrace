@@ -1,10 +1,35 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import SharedHeader from '../components/SharedHeader';
 import SharedFooter from '../components/SharedFooter';
+import { useNavigate } from 'react-router-dom';
+const API_BASE_URL = (import.meta as any).env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+
 
 const PremiumPage: React.FC = () => {
+  const navigate = useNavigate();
+  const [userTier, setUserTier] = useState<string>('free');
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          const res = await fetch(`${API_BASE_URL}/api/auth/me`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          if (res.ok) {
+            const data = await res.json();
+            setUserTier(data.tier || 'free');
+          }
+        } catch (e) {
+          console.error('Error fetching user tier:', e);
+        }
+      }
+    };
+    fetchUser();
+  }, []);
   const plans = [
     {
       id: 'free',
@@ -18,14 +43,14 @@ const PremiumPage: React.FC = () => {
         'Lưu trữ tối đa 5 báo cáo',
         'Phân tích SWOT cơ bản'
       ],
-      isCurrent: true,
-      buttonText: 'Đang sử dụng',
+      isCurrent: userTier === 'free',
+      buttonText: userTier === 'free' ? 'Đang sử dụng' : 'Sử dụng',
       color: 'slate'
     },
     {
       id: 'premium',
       name: 'Premium',
-      price: '200.000đ',
+      price: '299.000đ',
       period: '/tháng',
       description: 'Tối ưu hóa chiến lược với phân tích chuyên sâu.',
       features: [
@@ -36,7 +61,8 @@ const PremiumPage: React.FC = () => {
         'Hỗ trợ AI ưu tiên xử lý'
       ],
       isPopular: true,
-      buttonText: 'Nâng cấp ngay',
+      isCurrent: userTier === 'premium_demo',
+      buttonText: userTier === 'premium_demo' ? 'Đang sử dụng' : 'Nâng cấp ngay',
       color: 'blue'
     },
     {
@@ -52,6 +78,7 @@ const PremiumPage: React.FC = () => {
         'Quản lý quyền truy cập đội ngũ',
         'Xuất báo cáo PDF/Excel chuyên nghiệp'
       ],
+      isCurrent: false,
       buttonText: 'Liên hệ tư vấn',
       color: 'indigo'
     }
@@ -60,17 +87,17 @@ const PremiumPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-white flex flex-col font-sans">
       <SharedHeader />
-      
+
       <main className="flex-1 max-w-[1440px] mx-auto w-full px-6 py-20 sm:py-32">
         <header className="text-center mb-24 max-w-3xl mx-auto">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             className="inline-flex items-center px-4 py-1.5 rounded-full bg-amber-50 text-amber-600 text-[10px] font-black uppercase tracking-[0.3em] mb-8 border border-amber-100"
           >
             FutureTrace Elite Access
           </motion.div>
-          <motion.h1 
+          <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
@@ -78,7 +105,7 @@ const PremiumPage: React.FC = () => {
           >
             Định lượng tương lai <br /> <span className="text-blue-600">ở cấp độ cao nhất.</span>
           </motion.h1>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
@@ -95,11 +122,10 @@ const PremiumPage: React.FC = () => {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 + i * 0.1 }}
-              className={`relative flex flex-col p-10 rounded-[3rem] border transition-all duration-500 group hover:shadow-2xl ${
-                plan.isPopular 
-                  ? 'bg-slate-950 text-white border-blue-600 ring-1 ring-blue-600 shadow-2xl scale-105 z-10' 
-                  : 'bg-white border-slate-100 text-slate-900 hover:border-blue-200'
-              }`}
+              className={`relative flex flex-col p-10 rounded-[3rem] border transition-all duration-500 group hover:shadow-2xl ${plan.isPopular
+                ? 'bg-slate-950 text-white border-blue-600 ring-1 ring-blue-600 shadow-2xl scale-105 z-10'
+                : 'bg-white border-slate-100 text-slate-900 hover:border-blue-200'
+                }`}
             >
               {plan.isPopular && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-5 py-1.5 bg-blue-600 rounded-full text-[9px] font-black uppercase tracking-widest text-white shadow-xl shadow-blue-500/20">
@@ -137,13 +163,17 @@ const PremiumPage: React.FC = () => {
 
               <button
                 disabled={plan.isCurrent}
-                className={`w-full py-5 rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] transition-all flex items-center justify-center gap-3 ${
-                  plan.isCurrent
-                    ? 'bg-slate-100 text-slate-400 cursor-default'
-                    : plan.isPopular
-                      ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-xl shadow-blue-900/20'
-                      : 'bg-slate-900 hover:bg-blue-600 text-white shadow-xl shadow-slate-200'
-                }`}
+                onClick={() => {
+                  if (plan.id === 'premium') {
+                    navigate('/checkout', { state: { plan } });
+                  }
+                }}
+                className={`w-full py-5 rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] transition-all flex items-center justify-center gap-3 ${plan.isCurrent
+                  ? 'bg-slate-100 text-slate-400 cursor-default'
+                  : plan.isPopular
+                    ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-xl shadow-blue-900/20'
+                    : 'bg-slate-900 hover:bg-blue-600 text-white shadow-xl shadow-slate-200'
+                  }`}
               >
                 {plan.buttonText}
                 {!plan.isCurrent && <span className="material-symbols-outlined text-sm">arrow_forward</span>}
