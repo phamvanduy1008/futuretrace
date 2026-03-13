@@ -1,5 +1,6 @@
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_URL = (import.meta as any).env.VITE_API_BASE_URL;
+const API_BASE_URL = `${API_URL}/api`;
 
 // Token management
 const getToken = (): string | null => localStorage.getItem('futuretrace_token');
@@ -41,7 +42,7 @@ const apiFetch = async (path: string, options: RequestInit = {}): Promise<Respon
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  let response = await fetch(`${API_URL}${path}`, { ...options, headers });
+  let response = await fetch(`${API_BASE_URL}${path}`, { ...options, headers });
 
   // Handle token expiry - try refresh
   if (response.status === 401) {
@@ -50,7 +51,7 @@ const apiFetch = async (path: string, options: RequestInit = {}): Promise<Respon
       const refreshed = await refreshAuthToken();
       if (refreshed) {
         headers['Authorization'] = `Bearer ${getToken()}`;
-        response = await fetch(`${API_URL}${path}`, { ...options, headers });
+        response = await fetch(`${API_BASE_URL}${path}`, { ...options, headers });
       } else {
         logout();
         window.location.hash = '#/login';
@@ -66,7 +67,7 @@ const refreshAuthToken = async (): Promise<boolean> => {
   const refreshToken = getRefreshToken();
   if (!refreshToken) return false;
   try {
-    const res = await fetch(`${API_URL}/auth/refresh`, {
+    const res = await fetch(`${API_BASE_URL}/auth/refresh`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ refreshToken })
@@ -84,14 +85,14 @@ const refreshAuthToken = async (): Promise<boolean> => {
 // ==================== AUTH API ====================
 
 export const apiLogin = async (email: string, password: string) => {
-  const res = await fetch(`${API_URL}/auth/login`, {
+  const res = await fetch(`${API_BASE_URL}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password })
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.message);
-  
+
   setToken(data.accessToken);
   setRefreshToken(data.refreshToken);
   setUser(data.user);
@@ -100,14 +101,14 @@ export const apiLogin = async (email: string, password: string) => {
 };
 
 export const apiRegister = async (email: string, password: string, full_name: string, role: string) => {
-  const res = await fetch(`${API_URL}/auth/register`, {
+  const res = await fetch(`${API_BASE_URL}/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password, full_name, role })
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.message);
-  
+
   setToken(data.accessToken);
   setRefreshToken(data.refreshToken);
   setUser(data.user);

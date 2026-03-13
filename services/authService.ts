@@ -1,4 +1,4 @@
-const API_BASE_URL = (import.meta as any).env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+const API_BASE_URL = (import.meta as any).env.VITE_API_BASE_URL;
 
 const normalizeUser = (user: any) => {
   if (!user) return null;
@@ -12,7 +12,7 @@ const normalizeUser = (user: any) => {
 };
 
 export const login = async (email: string, password: string) => {
-  const response = await fetch(`${API_BASE_URL}/auth/login`, {
+  const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),
@@ -33,7 +33,7 @@ export const login = async (email: string, password: string) => {
 
 export const register = async (userData: any) => {
   const { email, password, fullName, role } = userData;
-  const response = await fetch(`${API_BASE_URL}/auth/register`, {
+  const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -71,7 +71,7 @@ export const getUserProfile = async () => {
   const token = localStorage.getItem('token');
   if (!token) throw new Error('No token found');
 
-  const response = await fetch(`${API_BASE_URL}/auth/me`, {
+  const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
     headers: { 'Authorization': `Bearer ${token}` },
   });
 

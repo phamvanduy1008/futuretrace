@@ -4,7 +4,7 @@ import {
   PremiumAnalysisReport,
 } from "../types";
 
-const API_BASE_URL = (import.meta as any).env.VITE_API_BASE_URL || 'https://futuretrace-server.onrender.com/api';
+const API_BASE_URL = (import.meta as any).env.VITE_API_BASE_URL || 'https://futuretrace-server.onrender.com';
 
 const getAuthToken = () => localStorage.getItem('token');
 
@@ -12,7 +12,7 @@ export const generateSimulation = async (
   data: SimulationData,
 ): Promise<PredictionResult> => {
   const token = getAuthToken();
-  const response = await fetch(`${API_BASE_URL}/simulations`, {
+  const response = await fetch(`${API_BASE_URL}/api/simulations`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -40,7 +40,7 @@ export const generatePremiumAnalysis = async (
   timeframe?: number,
 ): Promise<any> => {
   const token = getAuthToken();
-  const response = await fetch(`${API_BASE_URL}/premium/analyze`, {
+  const response = await fetch(`${API_BASE_URL}/api/premium/analyze`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -69,7 +69,7 @@ export const pivotPremiumAnalysis = async (
   timeframe?: number,
 ): Promise<PremiumAnalysisReport> => {
   const token = getAuthToken();
-  const response = await fetch(`${API_BASE_URL}/premium/pivot`, {
+  const response = await fetch(`${API_BASE_URL}/api/premium/pivot`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
