@@ -4,8 +4,9 @@ import { motion } from 'framer-motion';
 import SharedHeader from '../components/SharedHeader';
 import SharedFooter from '../components/SharedFooter';
 import { useNavigate } from 'react-router-dom';
-const API_BASE_URL = (import.meta as any).env.VITE_API_BASE_URL || 'https://futuretrace-server.onrender.com';
-
+const API_BASE_URL = (import.meta as any).env.VITE_API_BASE_URL || 'http://localhost:5000';
+import { IconMapper } from '../components/IconMapper';
+import { AnimatedBackground } from '../components/AnimatedBackground';
 
 const PremiumPage: React.FC = () => {
   const navigate = useNavigate();
@@ -85,7 +86,7 @@ const PremiumPage: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-white flex flex-col font-sans">
+    <AnimatedBackground className="flex flex-col font-sans">
       <SharedHeader />
 
       <main className="flex-1 max-w-[1440px] mx-auto w-full px-6 py-20 sm:py-32">
@@ -93,7 +94,7 @@ const PremiumPage: React.FC = () => {
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center px-4 py-1.5 rounded-full bg-amber-50 text-amber-600 text-[10px] font-black uppercase tracking-[0.3em] mb-8 border border-amber-100"
+            className="inline-flex items-center px-4 py-1.5 rounded-full bg-amber-50 text-amber-600 text-[10px] font-black uppercase tracking-widest mb-8 border border-amber-100"
           >
             FutureTrace Elite Access
           </motion.div>
@@ -109,7 +110,7 @@ const PremiumPage: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-xl text-slate-500 font-medium leading-relaxed"
+            className="text-xl text-slate-600 font-medium leading-relaxed"
           >
             Nâng cấp lên Premium để mở khóa các phân tích kịch bản chiến lược chuyên sâu và hệ thống cảnh báo rủi ro tự động.
           </motion.p>
@@ -134,16 +135,16 @@ const PremiumPage: React.FC = () => {
               )}
 
               <div className="mb-10">
-                <h3 className={`text-sm font-black uppercase tracking-[0.3em] mb-6 ${plan.isPopular ? 'text-blue-400' : 'text-slate-400'}`}>
+                <h3 className={`text-sm font-black uppercase tracking-widest mb-6 ${plan.isPopular ? 'text-blue-400' : 'text-slate-400'}`}>
                   {plan.name}
                 </h3>
                 <div className="flex items-baseline gap-1 mb-4">
                   <span className="text-4xl font-black font-display tracking-tighter">{plan.price}</span>
-                  <span className={`text-xs font-bold uppercase tracking-widest ${plan.isPopular ? 'text-slate-500' : 'text-slate-400'}`}>
+                  <span className={`text-xs font-bold uppercase tracking-widest ${plan.isPopular ? 'text-slate-600' : 'text-slate-400'}`}>
                     {plan.period}
                   </span>
                 </div>
-                <p className={`text-sm font-medium leading-relaxed ${plan.isPopular ? 'text-slate-400' : 'text-slate-500'}`}>
+                <p className={`text-sm font-medium leading-relaxed ${plan.isPopular ? 'text-slate-400' : 'text-slate-600'}`}>
                   {plan.description}
                 </p>
               </div>
@@ -151,9 +152,7 @@ const PremiumPage: React.FC = () => {
               <div className="flex-1 mb-12 space-y-6">
                 {plan.features.map((feature, idx) => (
                   <div key={idx} className="flex items-start gap-3">
-                    <span className={`material-symbols-outlined text-xl ${plan.isPopular ? 'text-blue-500' : 'text-blue-600'}`}>
-                      check_circle
-                    </span>
+                    <IconMapper name="check_circle" className={` text-xl ${plan.isPopular ? 'text-blue-500' : 'text-blue-600'}`} />
                     <span className={`text-[11px] font-black uppercase tracking-widest leading-tight ${plan.isPopular ? 'text-slate-300' : 'text-slate-600'}`}>
                       {feature}
                     </span>
@@ -168,7 +167,7 @@ const PremiumPage: React.FC = () => {
                     navigate('/checkout', { state: { plan } });
                   }
                 }}
-                className={`w-full py-5 rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] transition-all flex items-center justify-center gap-3 ${plan.isCurrent
+                className={`w-full py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-3 ${plan.isCurrent
                   ? 'bg-slate-100 text-slate-400 cursor-default'
                   : plan.isPopular
                     ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-xl shadow-blue-900/20'
@@ -176,7 +175,7 @@ const PremiumPage: React.FC = () => {
                   }`}
               >
                 {plan.buttonText}
-                {!plan.isCurrent && <span className="material-symbols-outlined text-sm">arrow_forward</span>}
+                {!plan.isCurrent && <IconMapper name="arrow_forward" className=" text-sm" />}
               </button>
             </motion.div>
           ))}
@@ -184,9 +183,9 @@ const PremiumPage: React.FC = () => {
 
         <section className="mt-40 pt-20 border-t border-slate-100 text-center">
           <div className="max-w-2xl mx-auto space-y-10">
-            <span className="material-symbols-outlined text-slate-200 text-6xl">verified_user</span>
+            <IconMapper name="verified_user" className=" text-slate-200 text-6xl" />
             <h4 className="text-2xl font-black text-slate-900 font-display uppercase tracking-tight">Cam kết bảo mật & hiệu suất</h4>
-            <p className="text-sm text-slate-500 font-medium leading-relaxed uppercase tracking-widest">
+            <p className="text-sm text-slate-600 font-medium leading-relaxed uppercase tracking-widest">
               Dữ liệu mô phỏng của bạn được mã hóa hoàn toàn. Các gói Premium và Doanh nghiệp được ưu tiên sử dụng cụm máy chủ xử lý AI chuyên dụng của FutureTrace.
             </p>
           </div>
@@ -194,7 +193,7 @@ const PremiumPage: React.FC = () => {
       </main>
 
       <SharedFooter />
-    </div>
+    </AnimatedBackground>
   );
 };
 

@@ -1,8 +1,10 @@
+import { AnimatedBackground } from '../components/AnimatedBackground';
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SharedHeader from "../components/SharedHeader";
 import SharedFooter from "../components/SharedFooter";
 import { register } from "../services/authService";
+import { IconMapper } from '../components/IconMapper';
 
 const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
@@ -29,21 +31,19 @@ const RegisterPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <AnimatedBackground className="min-h-screen bg-white flex flex-col">
       <SharedHeader />
 
       <main className="flex-1 flex items-center justify-center py-16 sm:py-24 px-4">
         <div className="w-full max-w-[560px]">
           <div className="mb-12 text-center">
             <div className="w-16 h-16 bg-blue-600 text-white rounded-3xl flex items-center justify-center mb-6 mx-auto shadow-xl shadow-blue-200">
-              <span className="material-symbols-outlined text-4xl font-bold">
-                person_add
-              </span>
+              <IconMapper name="person_add" className=" text-4xl font-bold" />
             </div>
             <h1 className="text-3xl font-black mb-3 font-display tracking-tight text-slate-900">
               Khởi tạo ID nghiên cứu
             </h1>
-            <p className="text-slate-500 font-medium">
+            <p className="text-slate-600 font-medium">
               Bắt đầu hành trình định lượng các quỹ đạo tương lai.
             </p>
           </div>
@@ -52,7 +52,7 @@ const RegisterPage: React.FC = () => {
             <form className="space-y-10" onSubmit={handleSubmit}>
               {error && (
                 <div className="p-4 bg-rose-50 border border-rose-100 text-rose-600 rounded-2xl text-xs font-bold flex items-center gap-3">
-                  <span className="material-symbols-outlined text-lg">error</span>
+                  <IconMapper name="error" className=" text-lg" />
                   {error}
                 </div>
               )}
@@ -114,10 +114,8 @@ const RegisterPage: React.FC = () => {
                       onChange={() => setRole("student")}
                     />
                     <div className="flex flex-col items-center justify-center p-10 border-2 border-slate-50 rounded-3xl transition-all peer-checked:border-blue-600 peer-checked:bg-blue-50/50 hover:border-slate-200 bg-white">
-                      <span className="material-symbols-outlined text-4xl mb-4 text-slate-300 group-hover:text-blue-600 transition-colors">
-                        school
-                      </span>
-                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 peer-checked:text-blue-600">
+                      <IconMapper name="school" className=" text-4xl mb-4 text-slate-300 group-hover:text-blue-600 transition-colors" />
+                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-600 peer-checked:text-blue-600">
                         Học thuật
                       </span>
                     </div>
@@ -132,10 +130,8 @@ const RegisterPage: React.FC = () => {
                       onChange={() => setRole("worker")}
                     />
                     <div className="flex flex-col items-center justify-center p-10 border-2 border-slate-50 rounded-3xl transition-all peer-checked:border-blue-600 peer-checked:bg-blue-50/50 hover:border-slate-200 bg-white">
-                      <span className="material-symbols-outlined text-4xl mb-4 text-slate-300 group-hover:text-blue-600 transition-colors">
-                        work
-                      </span>
-                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 peer-checked:text-blue-600">
+                      <IconMapper name="work" className=" text-4xl mb-4 text-slate-300 group-hover:text-blue-600 transition-colors" />
+                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-600 peer-checked:text-blue-600">
                         Chuyên gia
                       </span>
                     </div>
@@ -159,7 +155,7 @@ const RegisterPage: React.FC = () => {
                   >
                     Tôi xác nhận quyền sở hữu dữ liệu
                   </label>
-                  <p className="text-slate-500 text-[10px] mt-2 font-medium leading-relaxed uppercase tracking-wider">
+                  <p className="text-slate-600 text-[10px] mt-2 font-medium leading-relaxed uppercase tracking-wider">
                     Hệ thống AI xử lý dữ liệu dựa trên các tham số giả lập và
                     không chịu trách nhiệm cho các quyết định thực tế.
                   </p>
@@ -168,7 +164,7 @@ const RegisterPage: React.FC = () => {
 
               <button
                 disabled={loading}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black h-16 rounded-2xl transition-all shadow-2xl shadow-blue-100 uppercase text-[11px] tracking-[0.2em] disabled:opacity-50 flex items-center justify-center"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black h-16 rounded-2xl transition-all shadow-2xl shadow-blue-100 uppercase text-[11px] tracking-widest disabled:opacity-50 flex items-center justify-center"
               >
                 {loading ? (
                   <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -193,7 +189,7 @@ const RegisterPage: React.FC = () => {
       </main>
 
       <SharedFooter />
-    </div>
+    </AnimatedBackground>
   );
 };
 

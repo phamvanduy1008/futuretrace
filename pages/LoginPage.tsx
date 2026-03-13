@@ -1,8 +1,10 @@
+import { AnimatedBackground } from '../components/AnimatedBackground';
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SharedHeader from "../components/SharedHeader";
 import SharedFooter from "../components/SharedFooter";
 import { login } from "../services/authService";
+import { IconMapper } from '../components/IconMapper';
 
 interface LoginPageProps {
   onLogin: () => void;
@@ -32,21 +34,19 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <AnimatedBackground className="min-h-screen bg-white flex flex-col">
       <SharedHeader />
 
       <main className="flex-1 flex items-center justify-center p-6 py-16 sm:py-24">
         <div className="w-full max-w-[440px] flex flex-col items-center">
           <div className="text-center mb-10">
             <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-3xl flex items-center justify-center mb-6 mx-auto border border-blue-100 shadow-sm">
-              <span className="material-symbols-outlined text-4xl font-bold">
-                lock
-              </span>
+              <IconMapper name="lock" className=" text-4xl font-bold" />
             </div>
             <h1 className="text-3xl font-black mb-2 font-display tracking-tight text-slate-900">
               Chào mừng trở lại
             </h1>
-            <p className="text-slate-500 font-medium">
+            <p className="text-slate-600 font-medium">
               Đăng nhập để tiếp tục nghiên cứu quyết định
             </p>
           </div>
@@ -55,7 +55,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
             <form className="flex flex-col gap-7" onSubmit={handleSubmit}>
               {error && (
                 <div className="p-4 bg-rose-50 border border-rose-100 text-rose-600 rounded-2xl text-xs font-bold flex items-center gap-3">
-                  <span className="material-symbols-outlined text-lg">error</span>
+                  <IconMapper name="error" className=" text-lg" />
                   {error}
                 </div>
               )}
@@ -99,7 +99,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
 
               <button
                 disabled={loading}
-                className="mt-4 w-full bg-slate-900 hover:bg-blue-600 text-white font-black h-16 rounded-2xl transition-all shadow-2xl shadow-slate-200 uppercase text-[11px] tracking-[0.2em] disabled:opacity-50 flex items-center justify-center"
+                className="mt-4 w-full bg-slate-900 hover:bg-blue-600 text-white font-black h-16 rounded-2xl transition-all shadow-2xl shadow-slate-200 uppercase text-[11px] tracking-widest disabled:opacity-50 flex items-center justify-center"
               >
                 {loading ? (
                   <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -142,10 +142,8 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
           </div>
 
           <div className="mt-12 flex items-center gap-3 text-slate-400">
-            <span className="material-symbols-outlined text-[18px]">
-              verified_user
-            </span>
-            <span className="text-[9px] font-black uppercase tracking-[0.2em]">
+            <IconMapper name="verified_user" className=" text-[18px]" />
+            <span className="text-[9px] font-black uppercase tracking-widest">
               KẾT NỐI ĐƯỢC MÃ HÓA AES-256
             </span>
           </div>
@@ -153,7 +151,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
       </main>
 
       <SharedFooter />
-    </div>
+    </AnimatedBackground>
   );
 };
 

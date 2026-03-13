@@ -1,100 +1,114 @@
-
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FutureTrace | Decision Research</title>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-          theme: {
-            extend: {
-              fontFamily: {
-                sans: ['Lexend', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-                display: ['Lexend', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-              },
-              animation: {
-                'pulse-slow': 'pulse 6s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                'float': 'float 8s ease-in-out infinite',
-              },
-              keyframes: {
-                float: {
-                  '0%, 100%': { transform: 'translateY(0) scale(1)' },
-                  '50%': { transform: 'translateY(-20px) scale(1.05)' },
-                }
-              }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FutureTrace | Decision Research</title>
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="apple-touch-icon" href="/favicon.png">
+  <script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+    rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Be Vietnam Pro"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+            display: ['"Be Vietnam Pro"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+          },
+          animation: {
+            'pulse-slow': 'pulse 6s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'float': 'float 8s ease-in-out infinite',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0) scale(1)' },
+              '50%': { transform: 'translateY(-20px) scale(1.05)' },
             }
           }
         }
-    </script>
-    <style>
-        :root {
-            --primary: #2563eb;
-        }
-        body {
-            font-family: 'Lexend', sans-serif;
-            background-color: #ffffff;
-            overflow-x: hidden;
-        }
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
-        }
-        
-        /* Hiệu ứng nền lưới kỹ thuật số */
-        .digital-grid {
-            background-image: 
-                linear-gradient(to right, rgba(226, 232, 240, 0.4) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(226, 232, 240, 0.4) 1px, transparent 1px);
-            background-size: 40px 40px;
-        }
+      }
+    }
+  </script>
+  <style>
+    :root {
+      --primary: #2563eb;
+    }
 
-        /* Quầng sáng Ambient */
-        .ambient-glow {
-            position: fixed;
-            width: 600px;
-            height: 600px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(37, 99, 235, 0.08) 0%, transparent 70%);
-            filter: blur(80px);
-            z-index: -1;
-            pointer-events: none;
-        }
+    body {
+      font-family: 'Be Vietnam Pro', sans-serif;
+      background-color: #ffffff;
+      overflow-x: hidden;
+    }
 
-        @keyframes scanline {
-            0% { transform: translateY(-100%); }
-            100% { transform: translateY(100%); }
-        }
-        .scan-effect {
-            position: relative;
-            overflow: hidden;
-        }
-        .scan-effect::after {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 2px;
-            background: rgba(37, 99, 235, 0.5);
-            animation: scanline 3s linear infinite;
-        }
+    /* Hiệu ứng nền lưới kỹ thuật số */
+    .digital-grid {
+      background-image:
+        linear-gradient(to right, rgba(226, 232, 240, 0.4) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(226, 232, 240, 0.4) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
 
-        /* Scrollbar hiện đại */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f8fafc;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
-    </style>
-<script type="importmap">
+    /* Quầng sáng Ambient */
+    .ambient-glow {
+      position: fixed;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(37, 99, 235, 0.08) 0%, transparent 70%);
+      filter: blur(80px);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    @keyframes scanline {
+      0% {
+        transform: translateY(-100%);
+      }
+
+      100% {
+        transform: translateY(100%);
+      }
+    }
+
+    .scan-effect {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .scan-effect::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: rgba(37, 99, 235, 0.5);
+      animation: scanline 3s linear infinite;
+    }
+
+    /* Scrollbar hiện đại */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f8fafc;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+  <script type="importmap">
 {
   "imports": {
     "react": "https://esm.sh/react@^19.2.4",
@@ -108,14 +122,15 @@
   }
 }
 </script>
-<link rel="stylesheet" href="/index.css">
+  <link rel="stylesheet" href="/index.css">
 </head>
+
 <body class="antialiased text-slate-900 bg-white">
-    <div class="ambient-glow top-[-100px] left-[-100px] animate-float"></div>
-    <div class="ambient-glow bottom-[-100px] right-[-100px] animate-float" style="animation-delay: -4s;"></div>
-    <div class="digital-grid fixed inset-0 z-[-2]"></div>
-    <div id="root"></div>
-    <script type="module" src="index.tsx"></script>
-<script type="module" src="/index.tsx"></script>
+  <div class="ambient-glow top-[-100px] left-[-100px] animate-float"></div>
+  <div class="ambient-glow bottom-[-100px] right-[-100px] animate-float" style="animation-delay: -4s;"></div>
+  <!-- <div class="digital-grid fixed inset-0 z-[-2]"></div> -->
+  <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
 </body>
+
 </html>

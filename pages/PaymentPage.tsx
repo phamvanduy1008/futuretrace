@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Navigate } from 'react-router-dom';
-const API_BASE_URL = (import.meta as any).env.VITE_API_BASE_URL || 'https://futuretrace-server.onrender.com';
-import { motion } from 'framer-motion';
+const API_BASE_URL = (import.meta as any).env.VITE_API_BASE_URL || 'http://localhost:5000';
+import { motion, AnimatePresence } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
 import SharedHeader from '../components/SharedHeader';
 import SharedFooter from '../components/SharedFooter';
+import { IconMapper } from '../components/IconMapper';
+import { AnimatedBackground } from '../components/AnimatedBackground';
 
 
 const PaymentPage: React.FC = () => {
@@ -40,14 +42,13 @@ const PaymentPage: React.FC = () => {
         }
 
         try {
-          const res = await fetch(`${API_BASE_URL}/api/payment/check-status`, {
+          const res = await fetch(`${API_BASE_URL}/payment/check-status`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ orderId })
           });
           if (res.ok) {
             const data = await res.json();
-            // MoMo check status returns resultCode at root level or inside momo_payment
             const code = data?.momo_payment?.resultCode !== undefined
               ? data.momo_payment.resultCode
               : data?.resultCode;
@@ -61,7 +62,7 @@ const PaymentPage: React.FC = () => {
         } catch (e) {
           console.error('Lỗi khi kiểm tra trạng thái:', e);
         }
-      }, 60000); // 1 minute
+      }, 60000);
     }
     return () => clearInterval(interval);
   }, [showQRModal, orderId, navigate, setError]);
@@ -79,8 +80,6 @@ const PaymentPage: React.FC = () => {
   const priceVat = (price * 0.1);
   const totalPrice = price + priceVat;
 
-
-  // Validation: yêu cầu điền đầy đủ
   const isFormValid = fullName.trim() !== '' && addressLine1.trim() !== '';
 
   const handlePayment = async () => {
@@ -146,50 +145,66 @@ const PaymentPage: React.FC = () => {
     }
   };
 
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: { y: 0, opacity: 1, transition: { duration: 0.5, ease: 'easeOut' } },
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex flex-col">
+    <AnimatedBackground className="flex flex-col font-sans">
       <SharedHeader />
 
-      <main className="flex-1 max-w-7xl mx-auto w-full px-5 sm:px-8 lg:px-12 py-10 sm:py-16 lg:py-20">
-        <button
+      <motion.main
+        initial="hidden"
+        animate="visible"
+        variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } } }}
+        className="flex-1 max-w-[1440px] mx-auto w-full px-6 sm:px-10 py-12 sm:py-20"
+      >
+        {/* Back button */}
+        <motion.button
+          variants={itemVariants}
           onClick={() => navigate('/premium')}
-          className="group flex items-center gap-2 text-slate-600 hover:text-slate-900 font-medium mb-10 transition-colors"
+          className="group flex items-center gap-3 text-slate-400 hover:text-blue-600 font-black text-[10px] uppercase tracking-widest mb-12 transition-colors"
         >
-          <span className="material-symbols-outlined text-lg transition-transform group-hover:-translate-x-1">
-            arrow_back
-          </span>
+          <IconMapper name="arrow_back" className="text-lg transition-transform group-hover:-translate-x-1" />
           Quay lại chọn gói
-        </button>
+        </motion.button>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 xl:gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 xl:gap-14">
           {/* LEFT - Payment & Billing */}
           <div className="lg:col-span-7 order-2 lg:order-1">
-            <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-2">
-              Hoàn tất thanh toán
-            </h1>
-            <p className="text-slate-600 mb-10">
-              Vui lòng điền thông tin hóa đơn và chọn phương thức thanh toán phù hợp.
-            </p>
+            <motion.div variants={itemVariants}>
+              <div className="flex items-center gap-2 text-[9px] font-black text-blue-600 uppercase tracking-widest mb-4">
+                PREMIUM <IconMapper name="chevron_right" className="text-[10px]" /> THANH TOÁN
+              </div>
+              <h1 className="text-3xl sm:text-5xl font-black tracking-tight font-display text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-500 leading-normal pb-2 uppercase italic pt-2">
+                Hoàn tất thanh toán
+              </h1>
+              <p className="text-slate-600 mt-3 text-lg font-medium italic mb-14">
+                "Chọn phương thức thanh toán và điền thông tin hóa đơn."
+              </p>
+            </motion.div>
 
             {/* Payment Method */}
-            <section className="mb-12">
-              <h2 className="text-xl font-semibold text-slate-900 mb-5">
+            <motion.section variants={itemVariants} className="mb-14">
+              <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-3">
+                <IconMapper name="credit_card" className="text-blue-600 text-lg" />
                 Phương thức thanh toán
               </h2>
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-5 sm:grid-cols-2">
                 {/* MoMo */}
                 <label
-                  className={`relative flex flex-col p-6 border-2 rounded-2xl cursor-pointer transition-all duration-200 ${paymentMethod === 'momo'
-                    ? 'border-pink-600 bg-pink-50/60 shadow-sm'
-                    : 'border-slate-200 hover:border-slate-300 bg-white'
+                  className={`relative flex flex-col p-8 rounded-[2rem] cursor-pointer transition-all duration-300 group ${paymentMethod === 'momo'
+                    ? 'bg-white border-2 border-pink-500 ring-2 ring-pink-500/10 shadow-[0_20px_50px_-12px_rgba(236,72,153,0.15)]'
+                    : 'bg-white border-2 border-slate-100 hover:border-slate-200 shadow-[0_10px_30px_-5px_rgba(0,0,0,0.05)]'
                     }`}
                 >
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-pink-600 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow">
+                  <div className="flex items-center justify-between mb-5">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-purple-600 rounded-2xl flex items-center justify-center text-white font-black text-xs shadow-lg shadow-pink-500/20">
                         MoMo
                       </div>
-                      <span className="font-semibold text-slate-900">MoMo</span>
+                      <span className="font-black text-slate-900 uppercase tracking-tight text-sm">MoMo</span>
                     </div>
                     <input
                       type="radio"
@@ -200,22 +215,22 @@ const PaymentPage: React.FC = () => {
                       className="w-5 h-5 text-pink-600 border-slate-300 focus:ring-pink-500"
                     />
                   </div>
-                  <p className="text-sm text-slate-600">Thanh toán nhanh chóng qua ví MoMo</p>
+                  <p className="text-xs text-slate-500 font-medium italic">Thanh toán nhanh chóng qua ví MoMo</p>
                 </label>
 
                 {/* VNPAY */}
                 <label
-                  className={`relative flex flex-col p-6 border-2 rounded-2xl cursor-pointer transition-all duration-200 ${paymentMethod === 'vnpay'
-                    ? 'border-blue-600 bg-blue-50/60 shadow-sm'
-                    : 'border-slate-200 hover:border-slate-300 bg-white'
+                  className={`relative flex flex-col p-8 rounded-[2rem] cursor-pointer transition-all duration-300 group ${paymentMethod === 'vnpay'
+                    ? 'bg-white border-2 border-blue-500 ring-2 ring-blue-500/10 shadow-[0_20px_50px_-12px_rgba(37,99,235,0.15)]'
+                    : 'bg-white border-2 border-slate-100 hover:border-slate-200 shadow-[0_10px_30px_-5px_rgba(0,0,0,0.05)]'
                     }`}
                 >
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow">
+                  <div className="flex items-center justify-between mb-5">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white font-black text-xs shadow-lg shadow-blue-500/20">
                         VNPAY
                       </div>
-                      <span className="font-semibold text-slate-900">VNPay</span>
+                      <span className="font-black text-slate-900 uppercase tracking-tight text-sm">VNPay</span>
                     </div>
                     <input
                       type="radio"
@@ -226,104 +241,110 @@ const PaymentPage: React.FC = () => {
                       className="w-5 h-5 text-blue-600 border-slate-300 focus:ring-blue-500"
                     />
                   </div>
-                  <p className="text-sm text-slate-600">Thanh toán qua cổng VNPay (đang phát triển)</p>
+                  <p className="text-xs text-slate-500 font-medium italic">Thanh toán qua cổng VNPay (đang phát triển)</p>
                 </label>
               </div>
-            </section>
+            </motion.section>
 
             {/* Billing Info */}
-            <section>
-              <h2 className="text-xl font-semibold text-slate-900 mb-5">
+            <motion.section variants={itemVariants}>
+              <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-3">
+                <IconMapper name="receipt_long" className="text-blue-600 text-lg" />
                 Thông tin hóa đơn
               </h2>
-              <div className="grid gap-5 sm:grid-cols-2">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1.5">
-                    Họ và tên *
-                  </label>
-                  <input
-                    type="text"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    placeholder="Nguyễn Văn A"
-                    className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all placeholder:text-slate-400"
-                  />
-                </div>
+              <div className="bg-white rounded-[2.5rem] border border-slate-100 p-8 sm:p-10 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.05)]">
+                <div className="grid gap-6 sm:grid-cols-2">
+                  <div>
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">
+                      Họ và tên *
+                    </label>
+                    <input
+                      type="text"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      placeholder="Nguyễn Văn A"
+                      className="w-full px-5 py-4 border-2 border-slate-100 rounded-2xl focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all placeholder:text-slate-300 text-slate-900 font-medium bg-slate-50/50"
+                    />
+                  </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1.5">
-                    Quốc gia
-                  </label>
-                  <div className="relative">
-                    <select
-                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none appearance-none transition-all"
-                      disabled
-                    >
-                      <option>{country}</option>
-                    </select>
-                    <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none">
-                      expand_more
-                    </span>
+                  <div>
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">
+                      Quốc gia
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={country}
+                        readOnly
+                        className="w-full px-5 py-4 border-2 border-slate-100 rounded-2xl bg-slate-50/50 text-slate-500 font-medium cursor-not-allowed outline-none"
+                      />
+                      <IconMapper name="expand_more" className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 text-lg pointer-events-none" />
+                    </div>
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">
+                      Địa chỉ *
+                    </label>
+                    <input
+                      type="text"
+                      value={addressLine1}
+                      onChange={(e) => setAddressLine1(e.target.value)}
+                      placeholder="Số nhà, đường, phường/xã..."
+                      className="w-full px-5 py-4 border-2 border-slate-100 rounded-2xl focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 outline-none transition-all placeholder:text-slate-300 text-slate-900 font-medium bg-slate-50/50"
+                    />
                   </div>
                 </div>
-
-                <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium text-slate-700 mb-1.5">
-                    Địa chỉ *
-                  </label>
-                  <input
-                    type="text"
-                    value={addressLine1}
-                    onChange={(e) => setAddressLine1(e.target.value)}
-                    placeholder="Số nhà, đường, phường/xã..."
-                    className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all placeholder:text-slate-400"
-                  />
-                </div>
               </div>
-            </section>
+            </motion.section>
           </div>
 
           {/* RIGHT - Order Summary */}
           <div className="lg:col-span-5 order-1 lg:order-2">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="bg-white rounded-2xl shadow-lg border border-slate-100 p-7 lg:p-8 sticky top-6 lg:top-24"
+              variants={itemVariants}
+              className="bg-white rounded-[3rem] border border-slate-100 p-8 sm:p-10 sticky top-6 lg:top-24 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.08)]"
             >
-              <div className="flex items-center gap-3 mb-6">
-                <span className="text-3xl">✨</span>
-                <h3 className="text-2xl font-bold text-slate-900">{plan.name}</h3>
+              {/* Plan Header */}
+              <div className="flex items-center gap-4 mb-8 pb-8 border-b border-slate-100">
+                <div className="w-14 h-14 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg shadow-amber-500/20">
+                  <IconMapper name="workspace_premium" className="text-white text-3xl" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-black text-slate-900 font-display tracking-tight uppercase italic">{plan.name}</h3>
+                  <p className="text-xs font-bold text-slate-400 mt-1">Gói dịch vụ cao cấp</p>
+                </div>
               </div>
 
+              {/* Features */}
               <ul className="space-y-4 mb-8">
                 {plan.features.map((feature: string, i: number) => (
-                  <li key={i} className="flex items-start gap-3 text-slate-700">
-                    <span className="material-symbols-outlined text-blue-500 text-xl mt-0.5">
-                      check_circle
-                    </span>
-                    <span className="text-sm leading-relaxed font-medium">{feature}</span>
+                  <li key={i} className="flex items-start gap-4">
+                    <IconMapper name="check_circle" className="text-blue-600 text-xl font-bold mt-0.5 flex-shrink-0" />
+                    <span className="text-sm font-bold text-slate-700 leading-relaxed pt-0.5">{feature}</span>
                   </li>
                 ))}
               </ul>
 
-              <div className="border-t border-slate-100 pt-6 space-y-4">
+              {/* Price Breakdown */}
+              <div className="bg-slate-50 rounded-2xl p-6 space-y-4 mb-8">
                 <div className="flex justify-between text-sm">
-                  <span className="text-slate-600">Gói {plan.period.replace('/', '')}</span>
-                  <span className="font-semibold">{price.toLocaleString('vi-VN')} đ</span>
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Gói {plan.period.replace('/', '')}</span>
+                  <span className="font-black text-slate-900">{price.toLocaleString('vi-VN')} đ</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-slate-600">VAT (10%)</span>
-                  <span className="font-semibold">{priceVat.toLocaleString('vi-VN')} đ</span>
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">VAT (10%)</span>
+                  <span className="font-black text-slate-900">{priceVat.toLocaleString('vi-VN')} đ</span>
                 </div>
-                <div className="flex justify-between pt-4 border-t border-slate-100 text-lg font-bold">
-                  <span className="text-slate-900">Tổng thanh toán</span>
-                  <span className="text-2xl text-slate-900">{totalPrice.toLocaleString('vi-VN')} đ</span>
+                <div className="flex justify-between pt-4 border-t border-slate-200">
+                  <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest">Tổng thanh toán</span>
+                  <span className="text-3xl font-black text-slate-900 font-display tracking-tighter">{totalPrice.toLocaleString('vi-VN')} đ</span>
                 </div>
               </div>
 
               {error && (
-                <div className="mt-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm">
+                <div className="mb-6 p-5 bg-rose-50 border border-rose-200 text-rose-700 rounded-2xl text-[11px] font-black uppercase tracking-widest flex items-center gap-3">
+                  <IconMapper name="error" className="text-rose-500 text-lg flex-shrink-0" />
                   {error}
                 </div>
               )}
@@ -331,83 +352,103 @@ const PaymentPage: React.FC = () => {
               <button
                 onClick={handlePayment}
                 disabled={loading || !isFormValid}
-                className={`w-full mt-8 py-4 px-6 font-bold text-white rounded-xl transition-all flex items-center justify-center gap-3 shadow-md ${loading || !isFormValid
-                  ? 'bg-slate-400 cursor-not-allowed'
-                  : 'bg-slate-900 hover:bg-slate-800 active:scale-[0.98]'
+                className={`w-full py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-4 shadow-xl ${loading || !isFormValid
+                  ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                  : 'bg-slate-900 hover:bg-blue-600 text-white shadow-slate-200 hover:shadow-blue-500/20 active:scale-[0.98]'
                   }`}
               >
                 {loading ? (
                   <>
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     Đang xử lý...
                   </>
                 ) : (
-                  'Thanh toán ngay'
+                  <>
+                    Thanh toán ngay
+                    <IconMapper name="arrow_forward" className="text-sm" />
+                  </>
                 )}
               </button>
 
-              <p className="text-xs text-slate-500 mt-6 text-center leading-relaxed">
+              <p className="text-[9px] text-slate-400 mt-6 text-center leading-relaxed font-medium uppercase tracking-widest">
                 Gia hạn {plan.period.replace('/', '')} cho đến khi bị hủy. Bạn sẽ bị tính phí {totalPrice.toLocaleString('vi-VN')}đ
                 {plan.period}. Bằng việc tiếp tục, bạn đồng ý với Điều khoản dịch vụ.
               </p>
             </motion.div>
           </div>
         </div>
-      </main>
+      </motion.main>
 
       {/* QR Modal */}
-      {showQRModal && qrUrl && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="bg-white rounded-2xl max-w-md w-full p-8 relative shadow-2xl"
-          >
-            <button
+      <AnimatePresence>
+        {showQRModal && qrUrl && (
+          <div className="fixed inset-0 z-[250] flex items-center justify-center p-6">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               onClick={() => setShowQRModal(false)}
-              className="absolute top-4 right-4 text-slate-500 hover:text-slate-900 transition-colors"
+              className="absolute inset-0 bg-slate-950/80 backdrop-blur-md"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 30 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 30 }}
+              className="relative w-full max-w-md bg-white rounded-[3rem] p-10 shadow-2xl border border-slate-100 overflow-hidden"
             >
-              <span className="material-symbols-outlined text-3xl">close</span>
-            </button>
-
-            <h3 className="text-2xl font-bold text-center mb-6 text-slate-900">
-              Thanh toán qua MoMo
-            </h3>
-
-            <div className="flex flex-col items-center gap-6">
-              <div className="bg-white p-4 rounded-xl shadow-lg border border-slate-200">
-                <QRCodeSVG
-                  value={qrUrl}
-                  size={220}
-                  level="H"
-                />
-              </div>
-
-              <div className="text-center space-y-3">
-                <p className="text-slate-700 font-medium">
-                  Mở ứng dụng ngân hàng/ Momo → Chọn "Quét mã QR" và quét mã này để thanh toán{' '}
-                  <span className="font-bold">{totalPrice.toLocaleString('vi-VN')}đ</span>
-                </p>
-                <p className="text-sm text-slate-500">
-                  Mã QR có hiệu lực trong khoảng 10 phút. Không chia sẻ mã này với bất kỳ ai.
-                </p>
-              </div>
-
-              <a
-                href={qrUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-4 rounded-xl text-center transition-all shadow-md"
+              <button
+                onClick={() => setShowQRModal(false)}
+                className="absolute top-6 right-6 w-10 h-10 rounded-xl bg-slate-100 text-slate-500 hover:bg-slate-900 hover:text-white transition-all flex items-center justify-center"
               >
-                Mở MoMo ngay
-              </a>
-            </div>
-          </motion.div>
-        </div>
-      )}
+                <IconMapper name="close" className="text-xl" />
+              </button>
+
+              <div className="text-center mb-10">
+                <div className="w-20 h-20 bg-gradient-to-br from-pink-500 to-purple-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-pink-500/20 text-white font-black text-lg">
+                  MoMo
+                </div>
+                <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tighter mb-2 italic font-display">
+                  Quét mã thanh toán
+                </h3>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Qua ví điện tử MoMo</p>
+              </div>
+
+              <div className="flex flex-col items-center gap-8">
+                <div className="bg-white p-5 rounded-3xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] border border-slate-100">
+                  <QRCodeSVG
+                    value={qrUrl}
+                    size={220}
+                    level="H"
+                  />
+                </div>
+
+                <div className="text-center space-y-3">
+                  <p className="text-slate-600 font-medium text-sm italic">
+                    Mở ứng dụng ngân hàng / MoMo → Chọn "Quét mã QR" và quét mã này để thanh toán{' '}
+                    <span className="font-black text-slate-900 not-italic">{totalPrice.toLocaleString('vi-VN')}đ</span>
+                  </p>
+                  <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest">
+                    Mã QR có hiệu lực trong 10 phút. Không chia sẻ mã này.
+                  </p>
+                </div>
+
+                <a
+                  href={qrUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full bg-gradient-to-br from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-black py-5 rounded-2xl text-center text-[10px] uppercase tracking-widest transition-all shadow-xl shadow-pink-500/20 flex items-center justify-center gap-3"
+                >
+                  Mở MoMo ngay
+                  <IconMapper name="open_in_new" className="text-sm" />
+                </a>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       <SharedFooter />
-    </div>
+    </AnimatedBackground>
   );
 };
 

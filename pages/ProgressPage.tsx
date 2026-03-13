@@ -1,3 +1,4 @@
+import { AnimatedBackground } from '../components/AnimatedBackground';
 
 import React, { useState, useEffect } from 'react';
 import SharedHeader from '../components/SharedHeader';
@@ -6,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ProgressItem } from '../types';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { apiFetch } from '../services/apiClient';
+import { IconMapper } from '../components/IconMapper';
 
 const ProgressPage: React.FC = () => {
   const [progressList, setProgressList] = useState<ProgressItem[]>([]);
@@ -155,62 +157,62 @@ const ProgressPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#f8fafc] flex flex-col font-sans">
+    <AnimatedBackground className="min-h-screen bg-[#f8fafc] flex flex-col font-sans">
         <SharedHeader />
         <main className="flex-1 flex flex-col items-center justify-center p-6 text-center">
           <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-6"></div>
-          <p className="text-slate-500 font-medium tracking-widest uppercase text-sm">Đang tải dữ liệu tiến trình...</p>
+          <p className="text-slate-600 font-medium tracking-widest uppercase text-sm">Đang tải dữ liệu tiến trình...</p>
         </main>
         <SharedFooter />
-      </div>
+      </AnimatedBackground>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#f8fafc] flex flex-col font-sans">
+      <AnimatedBackground className="min-h-screen bg-[#f8fafc] flex flex-col font-sans">
         <SharedHeader />
         <main className="flex-1 flex flex-col items-center justify-center p-6 text-center">
           <div className="w-24 h-24 bg-rose-100 rounded-3xl flex items-center justify-center mb-8">
-            <span className="material-symbols-outlined text-rose-500 text-5xl">warning</span>
+            <IconMapper name="warning" className=" text-rose-500 text-5xl" />
           </div>
           <h2 className="text-3xl font-black text-slate-900 mb-4 uppercase italic">Lỗi kết nối</h2>
-          <p className="text-slate-500 max-w-md mb-10 font-medium">{error}</p>
+          <p className="text-slate-600 max-w-md mb-10 font-medium">{error}</p>
           <button onClick={fetchProgress} className="px-10 py-4 bg-blue-600 text-white rounded-2xl font-black uppercase tracking-widest text-[11px] shadow-xl shadow-blue-500/20">Thử lại</button>
         </main>
         <SharedFooter />
-      </div>
+      </AnimatedBackground>
     );
   }
 
   if (progressList.length === 0) {
     return (
-      <div className="min-h-screen bg-[#f8fafc] flex flex-col font-sans">
+      <AnimatedBackground className="min-h-screen bg-[#f8fafc] flex flex-col font-sans">
         <SharedHeader />
         <main className="flex-1 flex flex-col items-center justify-center p-6 text-center">
           <div className="w-24 h-24 bg-slate-100 rounded-3xl flex items-center justify-center mb-8">
-            <span className="material-symbols-outlined text-slate-400 text-5xl">trending_up</span>
+            <IconMapper name="trending_up" className=" text-slate-400 text-5xl" />
           </div>
           <h2 className="text-3xl font-black text-slate-900 mb-4 uppercase italic">Chưa có tiến trình nào</h2>
-          <p className="text-slate-500 max-w-md mb-10 font-medium">Hãy tạo kịch bản chi tiết từ các kịch bản mô phỏng để bắt đầu theo dõi tiến trình của bạn.</p>
+          <p className="text-slate-600 max-w-md mb-10 font-medium">Hãy tạo kịch bản chi tiết từ các kịch bản mô phỏng để bắt đầu theo dõi tiến trình của bạn.</p>
           <button onClick={() => navigate('/simulate')} className="px-10 py-4 bg-blue-600 text-white rounded-2xl font-black uppercase tracking-widest text-[11px] shadow-xl shadow-blue-500/20">Bắt đầu mô phỏng</button>
         </main>
         <SharedFooter />
-      </div>
+      </AnimatedBackground>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] flex flex-col font-sans">
+    <AnimatedBackground className="min-h-screen bg-[#f8fafc] flex flex-col font-sans">
       <SharedHeader />
       <main className="flex-1 max-w-[1440px] mx-auto w-full px-4 sm:px-8 py-12 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 mb-16">
         <div className="lg:col-span-8 flex flex-col gap-10">
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
             <div className="flex items-center gap-2 text-[9px] font-black text-blue-600 uppercase tracking-widest mb-4">
-              BẢNG ĐIỀU KHIỂN <span className="material-symbols-outlined text-[10px]">chevron_right</span> TIẾN TRÌNH CỦA TÔI
+              BẢNG ĐIỀU KHIỂN <IconMapper name="chevron_right" className=" text-[10px]" /> TIẾN TRÌNH CỦA TÔI
             </div>
             <h1 className="text-3xl sm:text-5xl font-black tracking-tight mb-4 font-display text-slate-900 leading-tight uppercase italic">Theo dõi Quỹ đạo Thực thi</h1>
-            <p className="text-slate-500 text-sm sm:text-lg leading-relaxed max-w-2xl font-medium italic">
+            <p className="text-slate-600 text-sm sm:text-lg leading-relaxed max-w-2xl font-medium italic">
               "Quản lý các cột mốc và điều chỉnh chiến lược dựa trên tiến độ thực tế của bạn."
             </p>
           </motion.div>
@@ -233,7 +235,7 @@ const ProgressPage: React.FC = () => {
                   <div className={`w-14 h-14 flex items-center justify-center rounded-2xl border transition-all ${
                     selectedIdx === i ? 'bg-blue-600 text-white border-blue-600 scale-110 shadow-lg shadow-blue-500/20' : 'bg-slate-50 text-slate-400 border-slate-100'
                   }`}>
-                    <span className="material-symbols-outlined text-2xl">trending_up</span>
+                    <IconMapper name="trending_up" className=" text-2xl" />
                   </div>
                   <div className="flex items-center gap-2">
                     <button 
@@ -241,7 +243,7 @@ const ProgressPage: React.FC = () => {
                       className="w-10 h-10 rounded-xl bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white transition-all flex items-center justify-center shadow-sm"
                       title="Xóa tiến trình"
                     >
-                      <span className="material-symbols-outlined text-xl">delete</span>
+                      <IconMapper name="delete" className=" text-xl" />
                     </button>
                     <span className={`text-[8px] sm:text-[10px] font-black uppercase px-4 py-1.5 rounded-xl border shadow-sm bg-blue-50 text-blue-600 border-blue-100`}>
                       {item.category}
@@ -251,7 +253,7 @@ const ProgressPage: React.FC = () => {
                 <div>
                   <h3 className="text-2xl font-black mb-3 text-slate-900 group-hover:text-blue-600 transition-colors font-display tracking-tight leading-tight uppercase italic">{item.title}</h3>
                   <p className="text-xs text-slate-400 font-black uppercase tracking-widest mb-2">{item.date}</p>
-                  <p className="text-sm text-slate-500 leading-relaxed line-clamp-2 font-medium italic opacity-80">"{item.scenario.description}"</p>
+                  <p className="text-sm text-slate-600 leading-relaxed line-clamp-2 font-medium italic opacity-80">"{item.scenario.description}"</p>
                 </div>
                 <div className="space-y-4 pt-4 border-t border-slate-50">
                    <div className="flex justify-between text-[10px] font-black uppercase text-slate-400">
@@ -282,7 +284,7 @@ const ProgressPage: React.FC = () => {
                className="bg-white border border-slate-200 rounded-[3rem] overflow-hidden shadow-[0_50px_100px_-20px_rgba(0,0,0,0.12)] lg:sticky lg:top-32"
              >
                 <div className="p-10 sm:p-12 border-b border-slate-100 bg-slate-50/50">
-                  <span className="text-[10px] font-black text-blue-600 uppercase tracking-[0.3em] block mb-4">CHI TIẾT TIẾN TRÌNH</span>
+                  <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest block mb-4">CHI TIẾT TIẾN TRÌNH</span>
                   <h2 className="text-2xl sm:text-4xl font-black text-slate-900 font-display tracking-tight leading-none uppercase italic">{selectedProgress.title}</h2>
                 </div>
                 
@@ -290,13 +292,13 @@ const ProgressPage: React.FC = () => {
                    <div className="space-y-6">
                       <div className="flex items-center justify-between">
                         <h4 className="text-[10px] font-black text-slate-900 uppercase tracking-widest flex items-center gap-3">
-                           <span className="material-symbols-outlined text-blue-600 text-xl">list_alt</span> CÁC CỘT MỐC TIẾP THEO
+                           <IconMapper name="list_alt" className=" text-blue-600 text-xl" /> CÁC CỘT MỐC TIẾP THEO
                         </h4>
                         <button 
                           onClick={() => setIsPivotModalOpen(true)}
                           className="flex items-center gap-2 text-[9px] font-black text-amber-600 hover:text-amber-700 uppercase tracking-widest transition-colors bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-100"
                         >
-                          <span className="material-symbols-outlined text-sm">psychology</span> ĐIỀU CHỈNH LỘ TRÌNH
+                          <IconMapper name="psychology" className=" text-sm" /> ĐIỀU CHỈNH LỘ TRÌNH
                         </button>
                       </div>
 
@@ -315,17 +317,12 @@ const ProgressPage: React.FC = () => {
                                 <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{m.month}</span>
                                 <span className={`text-sm font-bold break-words leading-tight ${status === 'Đã hoàn thành' ? 'text-emerald-700 line-through' : 'text-slate-900'}`}>{m.event}</span>
                               </div>
-                              <div 
-                                className={`w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center border transition-all ${
-                                  status === 'Đã hoàn thành' ? 'bg-emerald-500 text-white border-emerald-500 shadow-lg shadow-emerald-200' :
-                                  status === 'Đang tiến hành' ? 'bg-amber-500 text-white border-amber-500 shadow-lg shadow-amber-200' :
-                                  'bg-white text-slate-300 border-slate-200'
-                                }`}
-                                title={status === 'Đã hoàn thành' ? 'Đã hoàn thành' : status === 'Đang tiến hành' ? 'Đang thực hiện' : 'Chưa bắt đầu'}
-                              >
-                                <span className="material-symbols-outlined text-xl">
-                                  {status === 'Đã hoàn thành' ? 'check_circle' : status === 'Đang tiến hành' ? 'pending' : 'circle'}
-                                </span>
+                              <div className={`w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center border transition-all ${
+                                status === 'Đã hoàn thành' ? 'bg-emerald-500 text-white border-emerald-500 shadow-lg shadow-emerald-200' :
+                                status === 'Đang tiến hành' ? 'bg-amber-500 text-white border-amber-500 animate-pulse shadow-lg shadow-amber-200' :
+                                'bg-slate-100 text-slate-400 border-slate-200'
+                              }`}>
+                                <IconMapper name={status === 'Đã hoàn thành' ? 'check_circle' : status === 'Đang tiến hành' ? 'pending' : 'circle'} className=" text-xl" />
                               </div>
                             </div>
                           );
@@ -340,9 +337,9 @@ const ProgressPage: React.FC = () => {
                       timeframe: selectedProgress.timeframe,
                       existingProgress: selectedProgress
                     }})}
-                    className="w-full py-6 bg-slate-900 text-white text-[10px] font-black uppercase tracking-[0.3em] rounded-2xl hover:bg-blue-600 shadow-2xl shadow-slate-200 transition-all flex items-center justify-center gap-4 hover:gap-6 group"
+                    className="w-full py-6 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-blue-600 shadow-2xl shadow-slate-200 transition-all flex items-center justify-center gap-4 hover:gap-6 group"
                    >
-                      VÀO CHI TIẾT LỘ TRÌNH <span className="material-symbols-outlined text-xl group-hover:scale-125 transition-transform">arrow_forward</span>
+                      VÀO CHI TIẾT LỘ TRÌNH <IconMapper name="arrow_forward" className=" text-xl group-hover:scale-125 transition-transform" />
                    </button>
                 </div>
              </motion.div>
@@ -358,7 +355,7 @@ const ProgressPage: React.FC = () => {
             <motion.div initial={{ opacity: 0, scale: 0.9, y: 30 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 30 }} className="relative w-full max-w-lg bg-white rounded-[3rem] p-10 shadow-2xl border border-slate-100 overflow-hidden">
               <div className="text-center mb-10">
                 <div className="w-20 h-20 bg-amber-50 text-amber-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-inner border border-amber-100">
-                  <span className="material-symbols-outlined text-4xl">psychology</span>
+                  <IconMapper name="psychology" className=" text-4xl" />
                 </div>
                 <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tighter mb-4 italic">Điều chỉnh lộ trình</h3>
                 <p className="text-slate-500 text-sm font-medium leading-relaxed">Bạn gặp khó khăn gì hoặc muốn thay đổi mục tiêu như thế nào? AI sẽ dựa trên các cột mốc bạn đã xong để thiết kế lại tương lai.</p>
@@ -376,7 +373,7 @@ const ProgressPage: React.FC = () => {
                 <button 
                   onClick={handlePivot}
                   disabled={!pivotFeedback.trim() || isPivoting}
-                  className="w-full py-5 bg-slate-900 text-white font-black text-[11px] uppercase tracking-[0.3em] rounded-2xl hover:bg-amber-600 disabled:opacity-20 transition-all shadow-xl flex items-center justify-center gap-3"
+                  className="w-full py-5 bg-slate-900 text-white font-black text-[11px] uppercase tracking-widest rounded-2xl hover:bg-amber-600 disabled:opacity-20 transition-all shadow-xl flex items-center justify-center gap-3"
                 >
                   {isPivoting ? (
                     <>
@@ -385,7 +382,7 @@ const ProgressPage: React.FC = () => {
                     </>
                   ) : (
                     <>
-                      CẬP NHẬT LỘ TRÌNH MỚI <span className="material-symbols-outlined text-lg">bolt</span>
+                      CẬP NHẬT LỘ TRÌNH MỚI <IconMapper name="bolt" className=" text-lg" />
                     </>
                   )}
                 </button>
@@ -402,7 +399,7 @@ const ProgressPage: React.FC = () => {
         )}
       </AnimatePresence>
       <SharedFooter />
-    </div>
+    </AnimatedBackground>
   );
 };
 

@@ -5,6 +5,8 @@ import SharedHeader from '../components/SharedHeader';
 import SharedFooter from '../components/SharedFooter';
 import { communityService } from '../services/communityService';
 import { CommunityPost } from '../types';
+import { IconMapper } from '../components/IconMapper';
+import { AnimatedBackground } from '../components/AnimatedBackground';
 
 const POSTS_PER_PAGE = 3;
 
@@ -70,14 +72,14 @@ const CommunityPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] flex flex-col font-sans">
+    <AnimatedBackground className="flex flex-col font-sans">
       <SharedHeader />
       
       <main className="flex-1 max-w-[1100px] mx-auto w-full px-6 py-12 sm:py-24">
         <header className="mb-24 text-center">
           <motion.div 
             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center px-6 py-2 rounded-full bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-[0.4em] mb-10 border border-blue-100 shadow-sm"
+            className="inline-flex items-center px-6 py-2 rounded-full bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest mb-10 border border-blue-100 shadow-sm"
           >
             FutureTrace Research Network
           </motion.div>
@@ -93,7 +95,7 @@ const CommunityPage: React.FC = () => {
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-            className="text-xl text-slate-500 font-medium max-w-2xl mx-auto leading-relaxed"
+            className="text-xl text-slate-600 font-medium max-w-2xl mx-auto leading-relaxed"
           >
             {query 
               ? `Hệ thống tìm thấy một số quỹ đạo nghiên cứu phù hợp với yêu cầu của bạn.`
@@ -107,7 +109,7 @@ const CommunityPage: React.FC = () => {
           {['all', 'positive', 'neutral', 'risk'].map((f) => (
             <button
               key={f} onClick={() => setFilter(f)}
-              className={`px-10 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all border ${
+              className={`px-10 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border ${
                 filter === f 
                   ? 'bg-slate-900 text-white border-slate-900 shadow-2xl scale-105' 
                   : 'bg-white text-slate-400 border-slate-100 hover:border-slate-300 shadow-[0_10px_30px_-5px_rgba(0,0,0,0.05)]'
@@ -126,7 +128,7 @@ const CommunityPage: React.FC = () => {
           </div>
         ) : error ? (
           <div className="py-24 text-center border-2 border-dashed border-rose-200 rounded-[3.5rem] bg-rose-50/30">
-             <span className="material-symbols-outlined text-6xl text-rose-200 mb-8">error_outline</span>
+             <IconMapper name="error_outline" className=" text-6xl text-rose-200 mb-8" />
              <p className="text-rose-600 font-black uppercase text-sm tracking-widest">{error}</p>
              <button 
               onClick={() => fetchPosts()}
@@ -164,7 +166,7 @@ const CommunityPage: React.FC = () => {
                         <div className="flex items-center gap-5">
                           {post.isAnonymous || !post.authorAvatar ? (
                             <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 border border-slate-100 shadow-inner">
-                              <span className="material-symbols-outlined text-2xl">{post.isAnonymous ? 'visibility_off' : 'person'}</span>
+                              <IconMapper name={post.isAnonymous ? 'visibility_off' : 'person'} className=" text-2xl" />
                             </div>
                           ) : (
                             <img src={post.authorAvatar} className="w-12 h-12 rounded-2xl border-2 border-white shadow-xl" alt={post.author || 'Avatar'} />
@@ -186,7 +188,7 @@ const CommunityPage: React.FC = () => {
                         {post.title}
                       </h2>
                       
-                      <p className="text-slate-500 font-medium leading-relaxed italic text-base sm:text-lg opacity-80">
+                      <p className="text-slate-600 font-medium leading-relaxed italic text-base sm:text-lg opacity-80">
                         "{post.desc}"
                       </p>
 
@@ -196,16 +198,16 @@ const CommunityPage: React.FC = () => {
                             onClick={(e) => handleLike(e, post.id)}
                             className="flex items-center gap-3 group/btn"
                           >
-                            <span className={`material-symbols-outlined transition-colors text-2xl ${post.isLiked ? 'text-rose-500 fill-rose-500' : 'text-slate-300 group-hover/btn:text-rose-500'}`}>favorite</span>
+                            <IconMapper name="favorite" className={`transition-colors text-2xl ${post.isLiked ? 'text-rose-500' : 'text-slate-300 group-hover/btn:text-rose-500'}`} style={post.isLiked ? { fill: 'currentColor' } : {}} />
                             <span className={`text-[11px] font-black ${post.isLiked ? 'text-rose-600' : 'text-slate-400 group-hover/btn:text-slate-900'}`}>{post.likes}</span>
                           </button>
                           <button onClick={() => navigate(`/detail/${post.id}`, { state: { scenario: post, fromCommunity: true } })} className="flex items-center gap-3 group/btn">
-                            <span className="material-symbols-outlined text-slate-300 group-hover/btn:text-blue-600 transition-colors text-2xl">chat_bubble</span>
+                            <IconMapper name="chat_bubble" className="text-slate-300 group-hover/btn:text-blue-600 transition-colors text-2xl" />
                             <span className="text-[11px] font-black text-slate-400 group-hover/btn:text-slate-900">{post.commentsCount}</span>
                           </button>
                         </div>
                         <button onClick={() => navigate(`/detail/${post.id}`, { state: { scenario: post, fromCommunity: true } })} className="flex items-center gap-3 text-[11px] font-black text-blue-600 uppercase tracking-widest hover:translate-x-3 transition-all group">
-                           Báo cáo đầy đủ <span className="material-symbols-outlined text-xl group-hover:scale-125 transition-transform">arrow_forward</span>
+                           Báo cáo đầy đủ <IconMapper name="arrow_forward" className="text-xl group-hover:scale-125 transition-transform" />
                         </button>
                       </div>
                     </div>
@@ -216,8 +218,8 @@ const CommunityPage: React.FC = () => {
 
             {posts.length === 0 && (
               <div className="py-24 text-center border-2 border-dashed border-slate-200 rounded-[3.5rem] bg-white shadow-xl">
-                 <span className="material-symbols-outlined text-6xl text-slate-100 mb-8">search_off</span>
-                 <p className="text-slate-400 font-black uppercase text-xs tracking-[0.3em]">Hệ thống không tìm thấy quỹ đạo phù hợp</p>
+                 <IconMapper name="search_off" className=" text-6xl text-slate-100 mb-8" />
+                 <p className="text-slate-400 font-black uppercase text-xs tracking-widest">Hệ thống không tìm thấy quỹ đạo phù hợp</p>
                  <button 
                   onClick={() => { setFilter('all'); navigate('/community'); }}
                   className="mt-8 text-blue-600 text-[11px] font-black uppercase tracking-widest hover:underline bg-blue-50 px-8 py-3 rounded-xl border border-blue-100 transition-all"
@@ -237,7 +239,7 @@ const CommunityPage: React.FC = () => {
               disabled={currentPage === 1}
               className="w-14 h-14 rounded-2xl border border-slate-100 bg-white flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-200 disabled:opacity-30 disabled:pointer-events-none transition-all shadow-[0_10px_30px_-5px_rgba(0,0,0,0.05)] hover:shadow-xl"
             >
-              <span className="material-symbols-outlined">chevron_left</span>
+              <IconMapper name="chevron_left" className="" />
             </button>
             
             <div className="flex items-center gap-3 bg-white p-2.5 rounded-[2rem] border border-slate-100 shadow-[0_10px_30px_-5px_rgba(0,0,0,0.05)]">
@@ -261,14 +263,14 @@ const CommunityPage: React.FC = () => {
               disabled={currentPage === totalPages}
               className="w-14 h-14 rounded-2xl border border-slate-100 bg-white flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-200 disabled:opacity-30 disabled:pointer-events-none transition-all shadow-[0_10px_30px_-5px_rgba(0,0,0,0.05)] hover:shadow-xl"
             >
-              <span className="material-symbols-outlined">chevron_right</span>
+              <IconMapper name="chevron_right" className="" />
             </button>
           </nav>
         )}
       </main>
 
       <SharedFooter />
-    </div>
+    </AnimatedBackground>
   );
 };
 

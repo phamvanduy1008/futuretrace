@@ -4,10 +4,12 @@ import SharedHeader from '../components/SharedHeader';
 import SharedFooter from '../components/SharedFooter';
 import { motion } from 'framer-motion';
 import { MATRIX_DATA } from '../data/mockDatabase';
+import { IconMapper } from '../components/IconMapper';
+import { AnimatedBackground } from '../components/AnimatedBackground';
 
 const ComparisonMatrixPage: React.FC = () => {
   return (
-    <div className="min-h-screen bg-white flex flex-col font-sans">
+    <AnimatedBackground className="flex flex-col font-sans">
       <SharedHeader />
       
       <main className="flex-1 max-w-[1440px] mx-auto w-full px-4 sm:px-8 py-8 sm:py-16 mb-20">
@@ -16,7 +18,7 @@ const ComparisonMatrixPage: React.FC = () => {
             PHÂN TÍCH ĐA BIẾN: MATRIX VIEW v2.0
           </div>
           <h1 className="text-3xl sm:text-6xl font-black tracking-tight mb-6 font-display text-slate-900 leading-tight">So sánh Đa biến</h1>
-          <p className="text-slate-500 text-sm sm:text-xl max-w-3xl leading-relaxed font-medium">
+          <p className="text-slate-600 text-sm sm:text-xl max-w-3xl leading-relaxed font-medium">
             Phân tích điểm tương đồng, khác biệt và hiệu quả tương đối giữa các nhánh thời gian dự kiến để tìm ra lộ trình tối ưu nhất.
           </p>
         </motion.div>
@@ -26,12 +28,12 @@ const ComparisonMatrixPage: React.FC = () => {
             <table className="w-full border-collapse">
               <thead>
                 <tr className="bg-slate-50/50 border-b border-slate-100">
-                  <th className="w-1/4 p-8 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">HỆ SỐ BIẾN THỂ</th>
+                  <th className="w-1/4 p-8 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">HỆ SỐ BIẾN THỂ</th>
                   {MATRIX_DATA.columns.map(col => (
                     <th key={col.id} className="p-8 text-left">
                       <div className="flex items-center gap-3">
                         <div className={`w-3 h-3 rounded-full ${col.color.replace('text-', 'bg-')} shadow-sm`}></div>
-                        <span className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em]">{col.label}</span>
+                        <span className="text-[11px] font-black text-slate-900 uppercase tracking-widest">{col.label}</span>
                       </div>
                     </th>
                   ))}
@@ -42,7 +44,7 @@ const ComparisonMatrixPage: React.FC = () => {
                   <tr key={i} className="border-b border-slate-50 last:border-0 hover:bg-slate-50/30 transition-all group">
                     <td className="p-8 border-r border-slate-50 bg-slate-50/10">
                       <div className="flex items-center gap-4">
-                        <span className="material-symbols-outlined text-slate-400 group-hover:text-blue-600 transition-colors text-2xl">{row.icon}</span>
+                        <IconMapper name={row.icon} className=" text-slate-400 group-hover:text-blue-600 transition-colors text-2xl" />
                         <span className="text-xs font-black text-slate-700 uppercase tracking-widest group-hover:translate-x-1 transition-transform">{row.label}</span>
                       </div>
                     </td>
@@ -87,16 +89,16 @@ const ComparisonMatrixPage: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-16">
           <motion.div initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} className="bg-slate-900 p-10 rounded-3xl shadow-xl border border-slate-800 relative overflow-hidden">
             <div className="absolute top-0 right-0 p-8 opacity-10">
-              <span className="material-symbols-outlined text-[100px] text-white">insights</span>
+              <IconMapper name="insights" className=" text-[100px] text-white" />
             </div>
-            <h3 className="text-xs font-black mb-4 uppercase tracking-[0.3em] text-blue-400 font-display">Tối ưu hóa Lợi ích</h3>
+            <h3 className="text-xs font-black mb-4 uppercase tracking-widest text-blue-400 font-display">Tối ưu hóa Lợi ích</h3>
             <p className="text-sm text-slate-400 leading-relaxed font-medium relative z-10">
               Dựa trên phân tích ma trận, quỹ đạo "Kỹ sư Cao cấp" duy trì chỉ số hạnh phúc trung bình cao hơn 25% so với các phương án mạo hiểm.
             </p>
           </motion.div>
           <motion.div initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }} className="bg-white border border-slate-100 p-10 rounded-3xl shadow-sm hover:shadow-2xl hover:border-blue-600/10 transition-all">
-            <h3 className="text-xs font-black mb-4 uppercase tracking-[0.3em] text-rose-600 font-display">Cảnh báo tới hạn</h3>
-            <p className="text-sm text-slate-500 leading-relaxed font-medium">
+            <h3 className="text-xs font-black mb-4 uppercase tracking-widest text-rose-600 font-display">Cảnh báo tới hạn</h3>
+            <p className="text-sm text-slate-600 leading-relaxed font-medium">
               Mô hình kinh doanh tự do đòi hỏi quỹ dự phòng tài chính gấp 1.5 lần so với các kịch bản còn lại để tránh điểm sụt giảm thanh khoản.
             </p>
           </motion.div>
@@ -104,7 +106,7 @@ const ComparisonMatrixPage: React.FC = () => {
       </main>
 
       <SharedFooter />
-    </div>
+    </AnimatedBackground>
   );
 };
 

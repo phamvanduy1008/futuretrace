@@ -1,3 +1,4 @@
+import { AnimatedBackground } from '../components/AnimatedBackground';
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -5,6 +6,7 @@ import SharedHeader from "../components/SharedHeader";
 import SharedFooter from "../components/SharedFooter";
 
 import { apiFetch } from "../services/apiClient";
+import { IconMapper } from '../components/IconMapper';
 
 const ITEMS_PER_PAGE = 5;
 
@@ -120,7 +122,7 @@ const HistoryPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col font-sans">
+    <AnimatedBackground className="min-h-screen bg-white flex flex-col font-sans">
       <SharedHeader />
 
       <main className="flex-1 max-w-[1200px] mx-auto w-full px-4 sm:px-8 py-10 sm:py-16">
@@ -129,7 +131,7 @@ const HistoryPage: React.FC = () => {
             <h1 className="text-3xl sm:text-4xl font-bold tracking-tight font-display text-slate-900">
               Lịch sử Quyết định
             </h1>
-            <p className="text-slate-500 text-sm sm:text-lg max-w-2xl leading-relaxed font-medium">
+            <p className="text-slate-600 text-sm sm:text-lg max-w-2xl leading-relaxed font-medium">
               Kho lưu trữ bảo mật các kịch bản mô phỏng đa thời gian đã thực
               thi.
             </p>
@@ -138,7 +140,7 @@ const HistoryPage: React.FC = () => {
             onClick={() => navigate("/simulate")}
             className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-3 shadow-xl shadow-blue-50"
           >
-            <span className="material-symbols-outlined font-bold">add</span> Tạo
+            <IconMapper name="add" className=" font-bold" /> Tạo
             mới
           </button>
         </div>
@@ -146,7 +148,7 @@ const HistoryPage: React.FC = () => {
         <div className="flex items-center gap-8 mb-10 border-b border-slate-100 pb-0">
           <button
             onClick={() => setActiveTab('all')}
-            className={`pb-4 text-xs font-black uppercase tracking-[0.2em] transition-all relative ${
+            className={`pb-4 text-xs font-black uppercase tracking-widest transition-all relative ${
               activeTab === 'all' ? 'text-blue-600' : 'text-slate-400 hover:text-slate-600'
             }`}
           >
@@ -157,7 +159,7 @@ const HistoryPage: React.FC = () => {
           </button>
           <button
             onClick={() => setActiveTab('saved')}
-            className={`pb-4 text-xs font-black uppercase tracking-[0.2em] transition-all relative ${
+            className={`pb-4 text-xs font-black uppercase tracking-widest transition-all relative ${
               activeTab === 'saved' ? 'text-blue-600' : 'text-slate-400 hover:text-slate-600'
             }`}
           >
@@ -170,9 +172,7 @@ const HistoryPage: React.FC = () => {
 
         <div className="flex flex-col sm:flex-row items-center gap-4 mb-10 pb-8">
           <div className="relative w-full sm:flex-1">
-            <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl">
-              search
-            </span>
+            <IconMapper name="search" className=" absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl" />
             <input
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -216,9 +216,7 @@ const HistoryPage: React.FC = () => {
                 >
                   {item.isFolder && (
                     <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
-                      <span className="material-symbols-outlined text-6xl text-blue-600">
-                        folder_open
-                      </span>
+                      <IconMapper name="folder_open" className=" text-6xl text-blue-600" />
                     </div>
                   )}
 
@@ -226,7 +224,7 @@ const HistoryPage: React.FC = () => {
                     <div className="flex-1 space-y-3">
                       <div className="flex flex-wrap items-center gap-3 text-[9px] font-black text-slate-400 uppercase tracking-widest">
                         <span
-                          className={`${item.isFolder ? "text-blue-600" : "text-slate-500"}`}
+                          className={`${item.isFolder ? "text-blue-600" : "text-slate-600"}`}
                         >
                           {item.isFolder ? "THƯ MỤC MÔ PHỎNG" : item.category}
                         </span>
@@ -245,15 +243,13 @@ const HistoryPage: React.FC = () => {
                       </div>
                       <div className="flex items-center gap-3">
                         {item.isFolder && (
-                          <span className="material-symbols-outlined text-blue-600">
-                            folder
-                          </span>
+                          <IconMapper name="folder" className=" text-blue-600" />
                         )}
                         <h3 className="text-lg sm:text-xl font-bold group-hover:text-blue-600 transition-colors font-display text-slate-900 leading-tight">
                           {item.title}
                         </h3>
                       </div>
-                      <p className="text-slate-500 text-xs sm:text-sm leading-relaxed max-w-3xl line-clamp-2 sm:line-clamp-none font-medium">
+                      <p className="text-slate-600 text-xs sm:text-sm leading-relaxed max-w-3xl line-clamp-2 sm:line-clamp-none font-medium">
                         {item.desc}
                       </p>
                     </div>
@@ -287,24 +283,16 @@ const HistoryPage: React.FC = () => {
                           }`}
                           title={item.isSaved ? "Bỏ lưu" : "Lưu kịch bản"}
                         >
-                          <span className={`material-symbols-outlined text-xl ${item.isSaved ? "fill-white" : ""}`}>
-                            bookmark
-                          </span>
+                          <IconMapper name="bookmark" className={` text-xl ${item.isSaved ? "fill-white" : ""}`} />
                         </button>
                         <button
                           onClick={(e) => handleDelete(e, item.id)}
                           className="w-10 h-10 rounded-xl bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white transition-all flex items-center justify-center shadow-sm"
                           title="Xóa kịch bản"
                         >
-                          <span className="material-symbols-outlined text-xl">
-                            delete
-                          </span>
+                          <IconMapper name="delete" className=" text-xl" />
                         </button>
-                        <span
-                          className={`material-symbols-outlined text-slate-300 group-hover:text-blue-600 transition-all ${item.isFolder && expandedFolders[item.id] ? "rotate-90" : ""}`}
-                        >
-                          {item.isFolder ? "expand_more" : "arrow_forward"}
-                        </span>
+                        <IconMapper name={item.isFolder ? "expand_more" : "arrow_forward"} className={` text-slate-300 group-hover:text-blue-600 transition-all ${item.isFolder && expandedFolders[item.id] ? "rotate-90" : ""}`} />
                       </div>
                     </div>
                   </div>
@@ -348,9 +336,7 @@ const HistoryPage: React.FC = () => {
                                 {sub.metrics.roi}% ROI
                               </span>
                             </div>
-                            <span className="material-symbols-outlined text-slate-200 group-hover/sub:text-blue-600 text-sm">
-                              arrow_forward
-                            </span>
+                            <IconMapper name="arrow_forward" className=" text-slate-200 group-hover/sub:text-blue-600 text-sm" />
                           </div>
                         </div>
                       ))}
@@ -363,9 +349,7 @@ const HistoryPage: React.FC = () => {
 
           {currentItems.length === 0 && (
             <div className="py-24 text-center border-2 border-dashed border-slate-100 rounded-3xl">
-              <span className="material-symbols-outlined text-4xl text-slate-200 mb-4">
-                search_off
-              </span>
+              <IconMapper name="search_off" className=" text-4xl text-slate-200 mb-4" />
               <p className="text-slate-400 font-black uppercase text-[10px] tracking-widest">
                 Không tìm thấy kịch bản phù hợp
               </p>
@@ -381,7 +365,7 @@ const HistoryPage: React.FC = () => {
               disabled={currentPage === 1}
               className="w-10 h-10 rounded-xl border border-slate-100 bg-white flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-200 disabled:opacity-30 disabled:pointer-events-none transition-all"
             >
-              <span className="material-symbols-outlined">chevron_left</span>
+              <IconMapper name="chevron_left" className="" />
             </button>
 
             <div className="flex items-center gap-1.5">
@@ -409,14 +393,14 @@ const HistoryPage: React.FC = () => {
               disabled={currentPage === totalPages}
               className="w-10 h-10 rounded-xl border border-slate-100 bg-white flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-200 disabled:opacity-30 disabled:pointer-events-none transition-all"
             >
-              <span className="material-symbols-outlined">chevron_right</span>
+              <IconMapper name="chevron_right" className="" />
             </button>
           </nav>
         )}
       </main>
 
       <SharedFooter />
-    </div>
+    </AnimatedBackground>
   );
 };
 
