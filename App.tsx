@@ -16,6 +16,7 @@ import ComparisonMatrixPage from './pages/ComparisonMatrixPage';
 import PaymentPage from './pages/PaymentPage';
 import PaymentResultPage from './pages/PaymentResultPage';
 import { getUserProfile, logout } from './services/authService';
+import AdminApp from './pages/admin/AdminApp';
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
@@ -124,6 +125,8 @@ const App: React.FC = () => {
           path="/payment-result"
           element={isAuthenticated ? <PaymentResultPage /> : <Navigate to="/login" />}
         />
+
+        <Route path="/admin/*" element={<AdminApp />} />
 
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>

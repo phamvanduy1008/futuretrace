@@ -1,4 +1,10 @@
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api').replace(/\/$/, '');
+const getBaseUrl = () => {
+  const envUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+  const cleanUrl = envUrl.replace(/\/$/, '');
+  return cleanUrl.endsWith('/api') ? cleanUrl : `${cleanUrl}/api`;
+};
+
+const API_BASE_URL = getBaseUrl();
 
 export class ApiError extends Error {
   constructor(message, status, payload) {

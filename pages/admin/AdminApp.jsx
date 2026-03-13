@@ -12,6 +12,7 @@ import {
     formatPercent,
 } from './ui';
 import { ApiError, createAdminApi } from './api';
+import './admin.css';
 
 const ADMIN_STORAGE_KEY = 'futuretrace_admin_auth';
 const ADMIN_PROFILE_KEY = 'futuretrace_admin_profile';

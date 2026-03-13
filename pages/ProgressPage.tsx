@@ -31,7 +31,7 @@ const ProgressPage: React.FC = () => {
       }
       const data = await res.json();
       setProgressList(data);
-      
+
       const id = searchParams.get('id');
       if (id && data.length > 0) {
         const idx = data.findIndex((p: ProgressItem) => p.id === id);
@@ -56,7 +56,7 @@ const ProgressPage: React.FC = () => {
   const handleToggleMilestone = async (pIdx: number, mIdx: number) => {
     const item = progressList[pIdx];
     let newCompleted = [...item.completedMilestones];
-    
+
     if (newCompleted.includes(mIdx)) {
       newCompleted = newCompleted.filter(i => i !== mIdx);
     } else {
@@ -106,12 +106,12 @@ const ProgressPage: React.FC = () => {
       }
 
       const { report: newReport } = await res.json();
-      
+
       // Update local state
       const newList = [...progressList];
       newList[selectedIdx] = { ...item, report: newReport };
       setProgressList(newList);
-      
+
       setIsPivotModalOpen(false);
       setPivotFeedback('');
       alert('Lộ trình của bạn đã được điều chỉnh thành công dựa trên phản hồi mới!');
@@ -130,7 +130,7 @@ const ProgressPage: React.FC = () => {
         const res = await apiFetch(`/premium/progress/${id}`, {
           method: 'DELETE'
         });
-        
+
         if (!res.ok) {
           throw new Error('Không thể xóa tiến trình');
         }
@@ -157,7 +157,7 @@ const ProgressPage: React.FC = () => {
 
   if (isLoading) {
     return (
-    <AnimatedBackground className="min-h-screen bg-[#f8fafc] flex flex-col font-sans">
+      <AnimatedBackground className="min-h-screen bg-[#f8fafc] flex flex-col font-sans">
         <SharedHeader />
         <main className="flex-1 flex flex-col items-center justify-center p-6 text-center">
           <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-6"></div>
@@ -187,7 +187,7 @@ const ProgressPage: React.FC = () => {
 
   if (progressList.length === 0) {
     return (
-      <AnimatedBackground className="min-h-screen bg-[#f8fafc] flex flex-col font-sans">
+      <AnimatedBackground className=" bg-[#f8fafc] flex flex-col font-sans">
         <SharedHeader />
         <main className="flex-1 flex flex-col items-center justify-center p-6 text-center">
           <div className="w-24 h-24 bg-slate-100 rounded-3xl flex items-center justify-center mb-8">
@@ -205,7 +205,7 @@ const ProgressPage: React.FC = () => {
   return (
     <AnimatedBackground className="min-h-screen bg-[#f8fafc] flex flex-col font-sans">
       <SharedHeader />
-      <main className="flex-1 max-w-[1440px] mx-auto w-full px-4 sm:px-8 py-12 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 mb-16">
+      <main className="flex-1 max-w-[1440px] h-[1200px] mx-auto w-full px-4 sm:px-8 py-12 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 mb-16">
         <div className="lg:col-span-8 flex flex-col gap-10">
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
             <div className="flex items-center gap-2 text-[9px] font-black text-blue-600 uppercase tracking-widest mb-4">
@@ -219,26 +219,24 @@ const ProgressPage: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {progressList.map((item, i) => (
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
-                key={item.id} 
+                key={item.id}
                 onClick={() => setSelectedIdx(i)}
-                className={`group p-8 sm:p-10 flex flex-col gap-8 cursor-pointer transition-all rounded-[2.5rem] border bg-white ${
-                  selectedIdx === i 
-                    ? 'border-blue-600 ring-2 ring-blue-600/10 shadow-[0_40px_80px_-15px_rgba(37,99,235,0.15)]' 
-                    : 'border-slate-100 hover:border-slate-200 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.05)] hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.08)]'
-                }`}
+                className={`group p-8 sm:p-10 flex flex-col gap-8 cursor-pointer transition-all rounded-[2.5rem] border bg-white ${selectedIdx === i
+                  ? 'border-blue-600 ring-2 ring-blue-600/10 shadow-[0_40px_80px_-15px_rgba(37,99,235,0.15)]'
+                  : 'border-slate-100 hover:border-slate-200 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.05)] hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.08)]'
+                  }`}
               >
                 <div className="flex justify-between items-start">
-                  <div className={`w-14 h-14 flex items-center justify-center rounded-2xl border transition-all ${
-                    selectedIdx === i ? 'bg-blue-600 text-white border-blue-600 scale-110 shadow-lg shadow-blue-500/20' : 'bg-slate-50 text-slate-400 border-slate-100'
-                  }`}>
+                  <div className={`w-14 h-14 flex items-center justify-center rounded-2xl border transition-all ${selectedIdx === i ? 'bg-blue-600 text-white border-blue-600 scale-110 shadow-lg shadow-blue-500/20' : 'bg-slate-50 text-slate-400 border-slate-100'
+                    }`}>
                     <IconMapper name="trending_up" className=" text-2xl" />
                   </div>
                   <div className="flex items-center gap-2">
-                    <button 
+                    <button
                       onClick={(e) => handleDelete(e, item.id)}
                       className="w-10 h-10 rounded-xl bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white transition-all flex items-center justify-center shadow-sm"
                       title="Xóa tiến trình"
@@ -256,18 +254,18 @@ const ProgressPage: React.FC = () => {
                   <p className="text-sm text-slate-600 leading-relaxed line-clamp-2 font-medium italic opacity-80">"{item.scenario.description}"</p>
                 </div>
                 <div className="space-y-4 pt-4 border-t border-slate-50">
-                   <div className="flex justify-between text-[10px] font-black uppercase text-slate-400">
-                     <span>TIẾN ĐỘ HOÀN THÀNH</span>
-                     <span className="text-blue-600">{Math.round((item.completedMilestones.length / item.report.milestones.length) * 100)}%</span>
-                   </div>
-                   <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden shadow-inner">
-                     <motion.div 
-                        initial={{ width: 0 }} 
-                        animate={{ width: `${(item.completedMilestones.length / item.report.milestones.length) * 100}%` }} 
-                        className="h-full bg-blue-600 shadow-sm" 
-                        transition={{ duration: 0.8 }}
-                     />
-                   </div>
+                  <div className="flex justify-between text-[10px] font-black uppercase text-slate-400">
+                    <span>TIẾN ĐỘ HOÀN THÀNH</span>
+                    <span className="text-blue-600">{Math.round((item.completedMilestones.length / item.report.milestones.length) * 100)}%</span>
+                  </div>
+                  <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden shadow-inner">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${(item.completedMilestones.length / item.report.milestones.length) * 100}%` }}
+                      className="h-full bg-blue-600 shadow-sm"
+                      transition={{ duration: 0.8 }}
+                    />
+                  </div>
                 </div>
               </motion.div>
             ))}
@@ -275,75 +273,75 @@ const ProgressPage: React.FC = () => {
         </div>
 
         <aside className="lg:col-span-4 mt-8 lg:mt-0">
-           <AnimatePresence mode='wait'>
-             <motion.div 
-               key={selectedIdx}
-               initial={{ opacity: 0, scale: 0.95 }}
-               animate={{ opacity: 1, scale: 1 }}
-               exit={{ opacity: 0, scale: 1.05 }}
-               className="bg-white border border-slate-200 rounded-[3rem] overflow-hidden shadow-[0_50px_100px_-20px_rgba(0,0,0,0.12)] lg:sticky lg:top-32"
-             >
-                <div className="p-10 sm:p-12 border-b border-slate-100 bg-slate-50/50">
-                  <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest block mb-4">CHI TIẾT TIẾN TRÌNH</span>
-                  <h2 className="text-2xl sm:text-4xl font-black text-slate-900 font-display tracking-tight leading-none uppercase italic">{selectedProgress.title}</h2>
-                </div>
-                
-                <div className="p-10 sm:p-12 space-y-12">
-                   <div className="space-y-6">
-                      <div className="flex items-center justify-between">
-                        <h4 className="text-[10px] font-black text-slate-900 uppercase tracking-widest flex items-center gap-3">
-                           <IconMapper name="list_alt" className=" text-blue-600 text-xl" /> CÁC CỘT MỐC TIẾP THEO
-                        </h4>
-                        <button 
-                          onClick={() => setIsPivotModalOpen(true)}
-                          className="flex items-center gap-2 text-[9px] font-black text-amber-600 hover:text-amber-700 uppercase tracking-widest transition-colors bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-100"
-                        >
-                          <IconMapper name="psychology" className=" text-sm" /> ĐIỀU CHỈNH LỘ TRÌNH
-                        </button>
-                      </div>
+          <AnimatePresence mode='wait'>
+            <motion.div
+              key={selectedIdx}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 1.05 }}
+              className="bg-white border border-slate-200 rounded-[3rem] overflow-hidden shadow-[0_50px_100px_-20px_rgba(0,0,0,0.12)] lg:sticky lg:top-32"
+            >
+              <div className="p-10 sm:p-12 border-b border-slate-100 bg-slate-50/50">
+                <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest block mb-4">CHI TIẾT TIẾN TRÌNH</span>
+                <h2 className="text-2xl sm:text-4xl font-black text-slate-900 font-display tracking-tight leading-none uppercase italic">{selectedProgress.title}</h2>
+              </div>
 
-                      <div className="space-y-4">
-                        {selectedProgress.report.milestones.map((m, idx) => {
-                          const status = getMilestoneStatus(selectedProgress, idx);
-                          return (
-                            <div key={idx} className={`p-6 rounded-2xl border flex items-center gap-4 transition-all ${
-                              status === 'Đã hoàn thành' 
-                                ? 'bg-emerald-50 border-emerald-100 opacity-60' 
-                                : status === 'Đang tiến hành'
-                                ? 'bg-amber-50 border-amber-200 ring-1 ring-amber-500/20 shadow-sm'
-                                : 'bg-slate-50 border-slate-100'
+              <div className="p-10 sm:p-12 space-y-12">
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-[10px] font-black text-slate-900 uppercase tracking-widest flex items-center gap-3">
+                      <IconMapper name="list_alt" className=" text-blue-600 text-xl" /> CÁC CỘT MỐC TIẾP THEO
+                    </h4>
+                    <button
+                      onClick={() => setIsPivotModalOpen(true)}
+                      className="flex items-center gap-2 text-[9px] font-black text-amber-600 hover:text-amber-700 uppercase tracking-widest transition-colors bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-100"
+                    >
+                      <IconMapper name="psychology" className=" text-sm" /> ĐIỀU CHỈNH LỘ TRÌNH
+                    </button>
+                  </div>
+
+                  <div className="space-y-4">
+                    {selectedProgress.report.milestones.map((m, idx) => {
+                      const status = getMilestoneStatus(selectedProgress, idx);
+                      return (
+                        <div key={idx} className={`p-6 rounded-2xl border flex items-center gap-4 transition-all ${status === 'Đã hoàn thành'
+                          ? 'bg-emerald-50 border-emerald-100 opacity-60'
+                          : status === 'Đang tiến hành'
+                            ? 'bg-amber-50 border-amber-200 ring-1 ring-amber-500/20 shadow-sm'
+                            : 'bg-slate-50 border-slate-100'
+                          }`}>
+                          <div className="flex flex-col flex-1 min-w-0">
+                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{m.month}</span>
+                            <span className={`text-sm font-bold break-words leading-tight ${status === 'Đã hoàn thành' ? 'text-emerald-700 line-through' : 'text-slate-900'}`}>{m.event}</span>
+                          </div>
+                          <div className={`w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center border transition-all ${status === 'Đã hoàn thành' ? 'bg-emerald-500 text-white border-emerald-500 shadow-lg shadow-emerald-200' :
+                            status === 'Đang tiến hành' ? 'bg-amber-500 text-white border-amber-500 animate-pulse shadow-lg shadow-amber-200' :
+                              'bg-slate-100 text-slate-400 border-slate-200'
                             }`}>
-                              <div className="flex flex-col flex-1 min-w-0">
-                                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{m.month}</span>
-                                <span className={`text-sm font-bold break-words leading-tight ${status === 'Đã hoàn thành' ? 'text-emerald-700 line-through' : 'text-slate-900'}`}>{m.event}</span>
-                              </div>
-                              <div className={`w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center border transition-all ${
-                                status === 'Đã hoàn thành' ? 'bg-emerald-500 text-white border-emerald-500 shadow-lg shadow-emerald-200' :
-                                status === 'Đang tiến hành' ? 'bg-amber-500 text-white border-amber-500 animate-pulse shadow-lg shadow-amber-200' :
-                                'bg-slate-100 text-slate-400 border-slate-200'
-                              }`}>
-                                <IconMapper name={status === 'Đã hoàn thành' ? 'check_circle' : status === 'Đang tiến hành' ? 'pending' : 'circle'} className=" text-xl" />
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                   </div>
+                            <IconMapper name={status === 'Đã hoàn thành' ? 'check_circle' : status === 'Đang tiến hành' ? 'pending' : 'circle'} className=" text-xl" />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
 
-                   <button 
-                    onClick={() => navigate('/premium-analysis', { state: { 
-                      scenario: selectedProgress.scenario, 
-                      context: selectedProgress.context, 
+                <button
+                  onClick={() => navigate('/premium-analysis', {
+                    state: {
+                      scenario: selectedProgress.scenario,
+                      context: selectedProgress.context,
                       timeframe: selectedProgress.timeframe,
                       existingProgress: selectedProgress
-                    }})}
-                    className="w-full py-6 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-blue-600 shadow-2xl shadow-slate-200 transition-all flex items-center justify-center gap-4 hover:gap-6 group"
-                   >
-                      VÀO CHI TIẾT LỘ TRÌNH <IconMapper name="arrow_forward" className=" text-xl group-hover:scale-125 transition-transform" />
-                   </button>
-                </div>
-             </motion.div>
-           </AnimatePresence>
+                    }
+                  })}
+                  className="w-full py-6 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-blue-600 shadow-2xl shadow-slate-200 transition-all flex items-center justify-center gap-4 hover:gap-6 group"
+                >
+                  VÀO CHI TIẾT LỘ TRÌNH <IconMapper name="arrow_forward" className=" text-xl group-hover:scale-125 transition-transform" />
+                </button>
+              </div>
+            </motion.div>
+          </AnimatePresence>
         </aside>
       </main>
 
@@ -360,8 +358,8 @@ const ProgressPage: React.FC = () => {
                 <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tighter mb-4 italic">Điều chỉnh lộ trình</h3>
                 <p className="text-slate-500 text-sm font-medium leading-relaxed">Bạn gặp khó khăn gì hoặc muốn thay đổi mục tiêu như thế nào? AI sẽ dựa trên các cột mốc bạn đã xong để thiết kế lại tương lai.</p>
               </div>
-              
-              <textarea 
+
+              <textarea
                 className="w-full h-40 p-6 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:ring-4 focus:ring-blue-50 focus:border-blue-600 outline-none resize-none transition-all mb-8 font-medium italic"
                 placeholder="Ví dụ: Tôi thấy bước 3 quá khó, tôi muốn chuyển sang học backend thay vì frontend vì thấy phù hợp hơn..."
                 value={pivotFeedback}
@@ -370,7 +368,7 @@ const ProgressPage: React.FC = () => {
               />
 
               <div className="flex flex-col gap-4">
-                <button 
+                <button
                   onClick={handlePivot}
                   disabled={!pivotFeedback.trim() || isPivoting}
                   className="w-full py-5 bg-slate-900 text-white font-black text-[11px] uppercase tracking-widest rounded-2xl hover:bg-amber-600 disabled:opacity-20 transition-all shadow-xl flex items-center justify-center gap-3"
@@ -386,7 +384,7 @@ const ProgressPage: React.FC = () => {
                     </>
                   )}
                 </button>
-                <button 
+                <button
                   onClick={() => setIsPivotModalOpen(false)}
                   disabled={isPivoting}
                   className="w-full py-5 bg-white border border-slate-200 text-slate-400 font-black text-[10px] uppercase tracking-widest rounded-2xl hover:bg-slate-50 transition-all"
