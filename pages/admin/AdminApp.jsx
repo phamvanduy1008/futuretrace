@@ -25,16 +25,29 @@ const ADMIN_DEMO_CREDENTIALS = {
 };
 
 function getHashPath() {
-    const hash = window.location.hash.replace(/^#/, '');
-    return hash || '/dashboard';
+    // Expected hash: #/admin/dashboard or #/admin/users
+    const rawHash = window.location.hash.replace(/^#/, '');
+    
+    // If hash starts with /admin, strip it for internal resolution
+    if (rawHash.startsWith('/admin')) {
+        const subPath = rawHash.substring(6); // remove '/admin'
+        return subPath || '/dashboard';
+    }
+    
+    // For backward compatibility or direct root access
+    return rawHash === '/' || rawHash === '' ? '/dashboard' : rawHash;
 }
 
 function useHashRoute() {
     const [route, setRoute] = useState(getHashPath);
 
     useEffect(() => {
-        if (!window.location.hash) {
-            window.location.hash = '/dashboard';
+        const currentHash = window.location.hash;
+        if (!currentHash || currentHash === '#' || currentHash === '#/') {
+            window.location.hash = '/admin/dashboard';
+        } else if (currentHash.startsWith('#/') && !currentHash.startsWith('#/admin')) {
+            // If someone types #/dashboard directly, normalize it to #/admin/dashboard
+            window.location.hash = `/admin${currentHash.substring(1)}`;
         }
 
         const handleChange = () => setRoute(getHashPath());
@@ -43,7 +56,9 @@ function useHashRoute() {
     }, []);
 
     const navigate = useCallback((path) => {
-        window.location.hash = path;
+        // Always prepend /admin if not already there
+        const targetPath = path.startsWith('/admin') ? path : `/admin${path}`;
+        window.location.hash = targetPath;
     }, []);
 
     return { route, navigate };
@@ -1853,7 +1868,7 @@ export default function AdminApp() {
             onNavigate={navigate}
             onLogout={handleLogout}
         >
-            {resolvePage(route === '/login' ? '/dashboard' : route, {
+            {resolvePage(route === '/login' || route === '/admin/login' ? '/dashboard' : route, {
                 api,
                 navigate,
                 onForbidden: () => navigate('/403'),
