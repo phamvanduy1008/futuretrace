@@ -77,7 +77,7 @@ const SimulationFlow: React.FC = () => {
         id: s.id || `SC-${Date.now()}-${idx}`
       }));
       const finalResult = { ...result, scenarios: scenariosWithIds };
-      
+
       setResults(finalResult);
       setLoadingProgress(100);
       setTimeout(() => setStep(SimulationStep.RESULTS), 800);
@@ -120,12 +120,12 @@ const SimulationFlow: React.FC = () => {
     return (
       <AnimatedBackground className="flex flex-col min-h-screen">
         <SharedHeader />
-        <motion.div 
+        <motion.div
           initial="initial" animate="animate" variants={pageVariants}
           className="flex-1 max-w-5xl mx-auto px-6 py-10 w-full"
         >
           <div className="flex flex-col items-center mb-10 text-center">
-            <motion.div 
+            <motion.div
               initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
               className="px-6 py-2 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-widest mb-6 border border-blue-100"
             >
@@ -141,31 +141,31 @@ const SimulationFlow: React.FC = () => {
           <div className="space-y-12">
             <div className="relative group">
               <div className="absolute -inset-2 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-[2.5rem] blur-xl opacity-10 group-focus-within:opacity-20 transition duration-1000"></div>
-              <textarea 
+              <textarea
                 className="relative w-full h-[320px] p-10 bg-white/70 backdrop-blur-xl border border-slate-200 rounded-[2.5rem] text-lg leading-relaxed focus:ring-4 focus:ring-blue-50 focus:border-blue-600 outline-none resize-none transition-all shadow-2xl shadow-slate-100/50 font-medium"
                 placeholder="Ví dụ: Em đang phân vân giữa việc chọn học ngành Công nghệ thông tin tại Bách Khoa hay đi du học Đức..."
                 maxLength={1000}
                 value={data.decision}
-                onChange={(e) => setData({...data, decision: e.target.value})}
+                onChange={(e) => setData({ ...data, decision: e.target.value })}
               />
               <div className="absolute bottom-10 right-12 text-[10px] font-black text-slate-400 uppercase tracking-widest bg-slate-50 px-3 py-1 rounded-md border border-slate-100">
                 {data.decision.length} / 1000 ký tự
               </div>
             </div>
-            
+
             <div className="flex flex-col sm:flex-row items-center justify-between gap-8 pt-4">
               <div className="flex flex-wrap gap-3 justify-center sm:justify-start">
                 {["Chọn ngành IT", "Du học", "Học đại học"].map((hint) => (
-                  <button 
+                  <button
                     key={hint}
-                    onClick={() => setData({...data, decision: `Dự án: ${hint} - Em đang lên kế hoạch cho việc...`})}
+                    onClick={() => setData({ ...data, decision: `Dự án: ${hint} - Em đang lên kế hoạch cho việc...` })}
                     className="px-6 py-3 text-[10px] font-black uppercase tracking-widest bg-white border border-slate-200 text-slate-600 hover:border-blue-600 hover:text-blue-600 hover:bg-blue-50/30 transition-all rounded-2xl shadow-sm"
                   >
                     + {hint}
                   </button>
                 ))}
               </div>
-              <button 
+              <button
                 onClick={handleNextStep}
                 disabled={!data.decision.trim()}
                 className="w-full sm:w-auto bg-slate-900 hover:bg-blue-600 disabled:bg-slate-100 disabled:text-slate-400 text-white font-black py-6 px-14 rounded-2xl shadow-2xl shadow-slate-200 transition-all flex items-center justify-center gap-4 text-xs uppercase tracking-widest"
@@ -183,12 +183,12 @@ const SimulationFlow: React.FC = () => {
     return (
       <AnimatedBackground className="flex flex-col min-h-screen">
         <SharedHeader />
-        <motion.div 
+        <motion.div
           initial="initial" animate="animate" variants={pageVariants}
           className="flex-1 max-w-6xl mx-auto px-6 py-10 w-full"
         >
           {error && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
               className="mb-8 p-6 bg-white border-2 border-rose-100 rounded-[2.5rem] shadow-[0_20px_50px_rgba(244,63,94,0.1)] overflow-hidden relative"
             >
@@ -204,13 +204,13 @@ const SimulationFlow: React.FC = () => {
                   <p className="text-sm text-slate-600 font-medium leading-relaxed">{error.message}</p>
                 </div>
                 <div className="flex flex-col gap-3 w-full sm:w-auto">
-                   <button 
+                  <button
                     onClick={handleSelectKey}
                     className="bg-rose-600 text-white px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-rose-700 transition-all shadow-lg shadow-rose-100 flex items-center justify-center gap-2"
                   >
                     Cấu hình Key
                   </button>
-                  <button 
+                  <button
                     onClick={() => { setError(null); setStep(SimulationStep.PROCESSING); startSimulation(); }}
                     className="bg-slate-900 text-white px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 transition-all flex items-center justify-center gap-2"
                   >
@@ -222,9 +222,9 @@ const SimulationFlow: React.FC = () => {
           )}
 
           <div className="mb-10 text-center">
-             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-600 text-[10px] font-black uppercase tracking-widest mb-4">
-               Chuẩn hóa bối cảnh hệ thống
-             </div>
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-600 text-[10px] font-black uppercase tracking-widest mb-4">
+              Chuẩn hóa bối cảnh hệ thống
+            </div>
             <h1 className="text-4xl sm:text-5xl font-black tracking-tighter mb-4 font-display text-slate-900">
               Cấu hình <span className="text-emerald-600">Biến số.</span>
             </h1>
@@ -232,7 +232,7 @@ const SimulationFlow: React.FC = () => {
               Thiết lập các tham số môi trường để AI giả lập chính xác hơn.
             </p>
           </div>
-          
+
           <div className="bg-white/70 backdrop-blur-xl p-8 sm:p-12 rounded-[3.5rem] border border-slate-100 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.12)]">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
               {[
@@ -249,7 +249,7 @@ const SimulationFlow: React.FC = () => {
                       </div>
                       {slider.label}
                     </label>
-                    <motion.div 
+                    <motion.div
                       key={(data as any)[slider.id]}
                       initial={{ y: 5, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
                       className="text-[9px] font-black text-white px-4 py-1.5 bg-slate-900 rounded-lg uppercase tracking-widest shadow-lg shadow-slate-200"
@@ -257,11 +257,11 @@ const SimulationFlow: React.FC = () => {
                       {slider.labels[(data as any)[slider.id] - 1]}
                     </motion.div>
                   </div>
-                  <input 
-                    type="range" min="1" max="5" step="1" 
+                  <input
+                    type="range" min="1" max="5" step="1"
                     className={`w-full h-1.5 bg-slate-100 rounded-full appearance-none cursor-pointer ${slider.color}`}
                     value={(data as any)[slider.id]}
-                    onChange={(e) => setData({...data, [slider.id]: parseInt(e.target.value)})}
+                    onChange={(e) => setData({ ...data, [slider.id]: parseInt(e.target.value) })}
                   />
                   <div className="flex justify-between px-1">
                     <span className="text-[8px] font-bold text-slate-300 uppercase tracking-tighter">{slider.labels[0]}</span>
@@ -277,12 +277,12 @@ const SimulationFlow: React.FC = () => {
                   </div>
                   Yếu tố khác (Khách quan/Chủ quan)
                 </label>
-                <textarea 
+                <textarea
                   id="otherFactors"
                   className="w-full h-24 p-5 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-medium outline-none focus:ring-2 focus:ring-blue-100 focus:bg-white transition-all resize-none"
                   placeholder="Nhập thêm các yếu tố khác ảnh hưởng đến quyết định của bạn..."
                   value={data.otherFactors}
-                  onChange={(e) => setData({...data, otherFactors: e.target.value})}
+                  onChange={(e) => setData({ ...data, otherFactors: e.target.value })}
                 />
               </div>
             </div>
@@ -306,21 +306,21 @@ const SimulationFlow: React.FC = () => {
       <div className="min-h-screen bg-slate-900 flex flex-col font-sans overflow-hidden scan-effect">
         <main className="flex-1 flex flex-col items-center justify-center px-6 relative">
           <div className="absolute inset-0 opacity-20">
-             <div className="w-full h-full" style={{ backgroundImage: 'radial-gradient(#2563eb 1px, transparent 1px)', backgroundSize: '60px 60px' }}></div>
+            <div className="w-full h-full" style={{ backgroundImage: 'radial-gradient(#2563eb 1px, transparent 1px)', backgroundSize: '60px 60px' }}></div>
           </div>
-          
-          <motion.div 
+
+          <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             className="relative z-10"
           >
             <div className="relative w-80 h-80 mb-20 flex items-center justify-center">
-              <svg 
+              <svg
                 viewBox="0 0 288 288"
                 className="absolute inset-0 w-full h-full -rotate-90 drop-shadow-[0_0_30px_rgba(37,99,235,0.4)]"
               >
                 <circle cx="144" cy="144" r="120" stroke="rgba(255,255,255,0.05)" strokeWidth="4" fill="none" />
-                <motion.circle 
+                <motion.circle
                   cx="144" cy="144" r="120" stroke="#2563eb" strokeWidth="8" fill="none"
                   pathLength="100"
                   strokeDasharray="100"
@@ -363,17 +363,17 @@ const SimulationFlow: React.FC = () => {
     return (
       <AnimatedBackground className="flex flex-col min-h-screen">
         <SharedHeader />
-        
+
         <header className="py-24 px-6 bg-white border-b border-slate-100 relative overflow-hidden">
           <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
-             <IconMapper name="verified" className=" text-[300px] text-slate-900" />
+            <IconMapper name="verified" className=" text-[300px] text-slate-900" />
           </div>
           <div className="max-w-6xl mx-auto flex flex-col items-center text-center">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
               className="px-6 py-2 bg-slate-900 text-white rounded-full text-[10px] font-black uppercase tracking-widest mb-12 shadow-2xl shadow-slate-200"
             >
-              Phân tích hoàn tất • Report FT-{Math.floor(Math.random()*9000)+1000}
+              Phân tích hoàn tất • Report FT-{Math.floor(Math.random() * 9000) + 1000}
             </motion.div>
             <h1 className="text-5xl md:text-8xl font-black tracking-tighter mb-12 font-display text-slate-900 leading-[0.95] max-w-5xl">
               {results.isEnterprise ? (
@@ -386,7 +386,7 @@ const SimulationFlow: React.FC = () => {
               {results.summary}
             </p>
             {(results.summary.includes('Premium') || results.isEnterprise) && (
-              <motion.button 
+              <motion.button
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 onClick={() => navigate('/premium')}
@@ -404,42 +404,38 @@ const SimulationFlow: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
                 <AnimatePresence>
                   {results.scenarios.map((scenario, idx) => (
-                    <motion.div 
+                    <motion.div
                       key={idx}
                       custom={idx}
                       variants={cardVariants}
                       initial="hidden"
                       animate="visible"
-                      className={`flex flex-col bg-white border-2 border-slate-200 rounded-[3rem] overflow-hidden group hover:border-blue-600 hover:ring-4 hover:ring-blue-600/20 hover:shadow-2xl transition-all duration-700 relative ${
-                        scenario.type === 'Positive' ? 'ring-4 ring-emerald-50/50' : 
-                        scenario.type === 'Risk' ? 'ring-4 ring-rose-50/50' : ''
-                      }`}
+                      className={`flex flex-col bg-white border-2 border-slate-200 rounded-[3rem] overflow-hidden group hover:border-blue-600 hover:ring-4 hover:ring-blue-600/20 hover:shadow-2xl transition-all duration-700 relative ${scenario.type === 'Positive' ? 'ring-4 ring-emerald-50/50' :
+                          scenario.type === 'Risk' ? 'ring-4 ring-rose-50/50' : ''
+                        }`}
                     >
-                      <div className={`p-10 border-b border-slate-50 ${
-                        scenario.type === 'Positive' ? 'bg-emerald-50/30' : 
-                        scenario.type === 'Neutral' ? 'bg-blue-50/30' : 
-                        'bg-rose-50/30'
-                      }`}>
+                      <div className={`p-10 border-b border-slate-50 ${scenario.type === 'Positive' ? 'bg-emerald-50/30' :
+                          scenario.type === 'Neutral' ? 'bg-blue-50/30' :
+                            'bg-rose-50/30'
+                        }`}>
                         <div className="flex justify-between items-center mb-8">
-                          <span className={`px-5 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border ${
-                            scenario.type === 'Positive' ? 'bg-white text-emerald-600 border-emerald-100 shadow-sm' :
-                            scenario.type === 'Neutral' ? 'bg-white text-blue-600 border-blue-100 shadow-sm' :
-                            'bg-white text-rose-600 border-rose-100 shadow-sm'
-                          }`}>
+                          <span className={`px-5 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border ${scenario.type === 'Positive' ? 'bg-white text-emerald-600 border-emerald-100 shadow-sm' :
+                              scenario.type === 'Neutral' ? 'bg-white text-blue-600 border-blue-100 shadow-sm' :
+                                'bg-white text-rose-600 border-rose-100 shadow-sm'
+                            }`}>
                             {scenario.type === 'Positive' ? 'Tối ưu' : scenario.type === 'Neutral' ? 'Cân bằng' : 'Rủi ro cao'}
                           </span>
-                          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center bg-white shadow-sm ${
-                            scenario.type === 'Positive' ? 'text-emerald-500' : 
-                            scenario.type === 'Neutral' ? 'text-blue-500' : 
-                            'text-rose-500'
-                          }`}>
+                          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center bg-white shadow-sm ${scenario.type === 'Positive' ? 'text-emerald-500' :
+                              scenario.type === 'Neutral' ? 'text-blue-500' :
+                                'text-rose-500'
+                            }`}>
                             <IconMapper name={scenario.type === 'Positive' ? 'trending_up' : scenario.type === 'Neutral' ? 'equalizer' : 'warning'} className=" text-2xl font-bold" />
                           </div>
                         </div>
                         <h3 className="text-2xl font-black mb-4 group-hover:text-blue-600 transition-colors font-display tracking-tight leading-tight uppercase">{scenario.title}</h3>
                         <p className="text-sm text-slate-600 leading-relaxed min-h-[5rem] font-medium italic">"{scenario.description}"</p>
                       </div>
-                      
+
                       <div className="p-10 space-y-12 flex-grow">
                         {[
                           { label: 'Tăng trưởng sự nghiệp', val: scenario.careerGrowth, color: 'bg-blue-600' },
@@ -452,7 +448,7 @@ const SimulationFlow: React.FC = () => {
                               <p className="text-xl font-black text-slate-900">+{metric.val}%</p>
                             </div>
                             <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-                              <motion.div 
+                              <motion.div
                                 initial={{ width: 0 }}
                                 animate={{ width: `${metric.val}%` }}
                                 transition={{ duration: 1.5, delay: 0.8 + (idx * 0.2) + (mi * 0.1) }}
@@ -462,9 +458,9 @@ const SimulationFlow: React.FC = () => {
                           </div>
                         ))}
                       </div>
-                      
+
                       <div className="px-10 pb-10">
-                        <button 
+                        <button
                           onClick={() => handleDeepAnalysis(scenario)}
                           className="w-full py-5 bg-slate-900 hover:bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest transition-all rounded-2xl shadow-xl shadow-slate-200 flex items-center justify-center gap-4 group-hover:gap-6"
                         >
@@ -476,14 +472,14 @@ const SimulationFlow: React.FC = () => {
                 </AnimatePresence>
               </div>
 
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 className="p-16 bg-slate-950 rounded-[4rem] relative overflow-hidden mb-24 shadow-2xl"
               >
                 <div className="absolute top-0 right-0 p-16 opacity-5 pointer-events-none">
-                   <IconMapper name="timeline" className=" text-[250px] text-white" />
+                  <IconMapper name="timeline" className=" text-[250px] text-white" />
                 </div>
                 <div className="flex flex-col items-center mb-20 text-center">
                   <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-6">Cột mốc chiến lược</span>
@@ -502,8 +498,8 @@ const SimulationFlow: React.FC = () => {
                           <IconMapper name={item.icon} className="" />
                         </div>
                         <div className="flex flex-col">
-                           <span className="text-[9px] font-black uppercase tracking-widest text-blue-400">{item.label}</span>
-                           <span className="text-xl font-black text-white font-display">{item.time}</span>
+                          <span className="text-[9px] font-black uppercase tracking-widest text-blue-400">{item.label}</span>
+                          <span className="text-xl font-black text-white font-display">{item.time}</span>
                         </div>
                       </div>
                       <p className="text-sm text-slate-300 leading-relaxed font-medium">{item.text}</p>
@@ -513,26 +509,26 @@ const SimulationFlow: React.FC = () => {
               </motion.div>
             </>
           )}
-          
+
           <div className="flex flex-col sm:flex-row justify-center gap-8">
-             <button onClick={() => navigate('/dashboard')} className="px-16 py-6 bg-white border border-slate-200 text-slate-900 font-black text-[11px] uppercase tracking-widest hover:bg-slate-50 rounded-2xl transition-all shadow-sm">
-               Quay lại Dashboard
-             </button>
-             {!results.isEnterprise && (
-               <>
-                 <button 
+            <button onClick={() => navigate('/dashboard')} className="px-16 py-6 bg-white border border-slate-200 text-slate-900 font-black text-[11px] uppercase tracking-widest hover:bg-slate-50 rounded-2xl transition-all shadow-sm">
+              Quay lại Dashboard
+            </button>
+            {!results.isEnterprise && (
+              <>
+                {/* <button 
                    onClick={() => !isSaved && setIsSaveModalOpen(true)}
                    disabled={isSaved}
                    className={`px-16 py-6 ${isSaved ? 'bg-emerald-500' : 'bg-blue-600 hover:bg-blue-700'} text-white font-black text-[11px] uppercase tracking-widest rounded-2xl transition-all shadow-2xl shadow-blue-200 flex items-center gap-5`}
                  >
                    <IconMapper name={isSaved ? 'check_circle' : 'save'} className=" text-xl" /> 
                    {isSaved ? 'Đã lưu vào lịch sử' : 'Lưu vào lịch sử'}
-                 </button>
-                 <button className="px-16 py-6 bg-slate-900 text-white font-black text-[11px] uppercase tracking-widest hover:bg-slate-800 rounded-2xl transition-all shadow-2xl shadow-slate-200 flex items-center gap-5">
-                   <IconMapper name="download" className=" text-xl" /> Xuất chiến lược (.PDF)
-                 </button>
-               </>
-             )}
+                 </button> */}
+                <button className="px-16 py-6 bg-slate-900 text-white font-black text-[11px] uppercase tracking-widest hover:bg-slate-800 rounded-2xl transition-all shadow-2xl shadow-slate-200 flex items-center gap-5">
+                  <IconMapper name="download" className=" text-xl" /> Xuất chiến lược (.PDF)
+                </button>
+              </>
+            )}
           </div>
         </main>
         <SharedFooter />
@@ -540,17 +536,17 @@ const SimulationFlow: React.FC = () => {
         <AnimatePresence>
           {isSaveModalOpen && (
             <div className="fixed inset-0 z-[200] flex items-center justify-center p-6">
-              <motion.div 
-                initial={{ opacity: 0 }} 
-                animate={{ opacity: 1 }} 
-                exit={{ opacity: 0 }} 
-                onClick={() => setIsSaveModalOpen(false)} 
-                className="absolute inset-0 bg-slate-900/80 backdrop-blur-md" 
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setIsSaveModalOpen(false)}
+                className="absolute inset-0 bg-slate-900/80 backdrop-blur-md"
               />
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.9, y: 30 }} 
-                animate={{ opacity: 1, scale: 1, y: 0 }} 
-                exit={{ opacity: 0, scale: 0.9, y: 30 }} 
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 30 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 30 }}
                 className="relative w-full max-w-[480px] bg-white rounded-[3rem] p-10 sm:p-14 shadow-[0_100px_150px_-50px_rgba(0,0,0,0.5)] border border-slate-100 overflow-hidden"
               >
                 <div className="text-center mb-10">
@@ -561,9 +557,9 @@ const SimulationFlow: React.FC = () => {
                   <p className="text-slate-600 text-sm font-medium leading-relaxed mb-8">
                     Nhập tên cho nhóm kịch bản này để dễ dàng tìm kiếm trong lịch sử.
                   </p>
-                  
+
                   <div className="relative">
-                    <input 
+                    <input
                       type="text"
                       value={folderName}
                       onChange={(e) => setFolderName(e.target.value)}
@@ -575,13 +571,13 @@ const SimulationFlow: React.FC = () => {
                 </div>
 
                 <div className="flex flex-col gap-4">
-                  <button 
+                  <button
                     onClick={handleSaveToHistory}
                     className="w-full py-6 bg-blue-600 text-white font-black text-[12px] uppercase tracking-widest rounded-2xl hover:bg-blue-700 shadow-2xl shadow-blue-100 transition-all flex items-center justify-center gap-4"
                   >
                     LƯU NGAY <IconMapper name="save" className=" text-xl" />
                   </button>
-                  <button 
+                  <button
                     onClick={() => setIsSaveModalOpen(false)}
                     className="w-full py-6 bg-white border border-slate-200 text-slate-400 font-black text-[10px] uppercase tracking-widest rounded-2xl hover:bg-slate-50 transition-all"
                   >

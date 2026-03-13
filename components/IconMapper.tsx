@@ -84,5 +84,5 @@ export const IconMapper: React.FC<IconMapperProps> = ({ name, className, weight 
   const PhosphorName = materialToPhosphor[name] || 'Lightning';
   const IconComponent = (PhosphorIcons as any)[PhosphorName];
   if (!IconComponent) return null;
-  return <IconComponent className={className} weight={weight} />;
+  return <IconComponent size={20} className={className} weight={weight} />;
 };
