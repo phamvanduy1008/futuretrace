@@ -81,7 +81,7 @@ const CommunityPage: React.FC = () => {
             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
             className="inline-flex items-center px-6 py-2 rounded-full bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest mb-10 border border-blue-100 shadow-sm"
           >
-            FutureTrace Research Network
+            Mạng lưới nghiên cứu FutureTrace
           </motion.div>
           <motion.h1 
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
@@ -104,18 +104,22 @@ const CommunityPage: React.FC = () => {
           </motion.p>
         </header>
 
-        {/* Filters */}
         <div className="flex flex-wrap items-center justify-center gap-6 mb-20">
-          {['all', 'positive', 'neutral', 'risk'].map((f) => (
+          {[
+            { id: 'all', label: 'Tất cả báo cáo' },
+            { id: 'positive', label: 'Tích cực' },
+            { id: 'neutral', label: 'Ổn định' },
+            { id: 'risk', label: 'Rủi ro' }
+          ].map((f) => (
             <button
-              key={f} onClick={() => setFilter(f)}
+              key={f.id} onClick={() => setFilter(f.id)}
               className={`px-10 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border ${
-                filter === f 
+                filter === f.id 
                   ? 'bg-slate-900 text-white border-slate-900 shadow-2xl scale-105' 
                   : 'bg-white text-slate-400 border-slate-100 hover:border-slate-300 shadow-[0_10px_30px_-5px_rgba(0,0,0,0.05)]'
               }`}
             >
-              {f === 'all' ? 'Tất cả báo cáo' : f}
+              {f.label}
             </button>
           ))}
         </div>
@@ -124,7 +128,7 @@ const CommunityPage: React.FC = () => {
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-24 space-y-8">
             <div className="w-20 h-20 border-t-4 border-b-4 border-blue-600 rounded-full animate-spin"></div>
-            <p className="text-xs font-black text-slate-400 uppercase tracking-widest animate-pulse">Đang tải quỹ đạo từ Research Network...</p>
+            <p className="text-xs font-black text-slate-400 uppercase tracking-widest animate-pulse">Đang tải quỹ đạo từ mạng lưới nghiên cứu...</p>
           </div>
         ) : error ? (
           <div className="py-24 text-center border-2 border-dashed border-rose-200 rounded-[3.5rem] bg-rose-50/30">
@@ -143,9 +147,8 @@ const CommunityPage: React.FC = () => {
               {posts.map((post, idx) => (
                 <motion.article
                   layout initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ delay: idx * 0.05 }}
-                  key={post.id} className="bg-white border border-slate-100 rounded-[3.5rem] p-10 sm:p-14 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.1)] hover:shadow-[0_60px_120px_-30px_rgba(0,0,0,0.15)] hover:-translate-y-2 transition-all group relative overflow-hidden"
+                  key={post.id} className="bg-white border-2 border-slate-100 rounded-[3.5rem] p-10 sm:p-14 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.1)] hover:shadow-2xl hover:ring-4 hover:ring-blue-600/30 hover:border-blue-600 hover:-translate-y-2 transition-all group relative overflow-hidden"
                 >
-                  <div className="absolute top-0 left-0 w-2 h-full bg-blue-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   <div className="flex flex-col md:flex-row gap-14">
                     {/* Metric Sidebar */}
                     <div className="md:w-32 flex md:flex-col gap-8 items-center shrink-0 pt-2">
@@ -177,10 +180,11 @@ const CommunityPage: React.FC = () => {
                           </div>
                         </div>
                         <span className={`px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border shadow-sm ${
-                          post.type === 'Positive' ? 'text-emerald-600 bg-emerald-50 border-emerald-100' :
-                          post.type === 'Risk' ? 'text-rose-600 bg-rose-50 border-rose-100' : 'text-blue-600 bg-blue-50 border-blue-100'
+                          post.type === 'Positive' || post.type === 'positive' ? 'text-emerald-600 bg-emerald-50 border-emerald-100' :
+                          post.type === 'Risk' || post.type === 'risk' ? 'text-rose-600 bg-rose-50 border-rose-100' : 'text-blue-600 bg-blue-50 border-blue-100'
                         }`}>
-                          {post.category}
+                          {post.type === 'Positive' || post.type === 'positive' ? 'Tích cực' :
+                           post.type === 'Risk' || post.type === 'risk' ? 'Rủi ro' : 'Ổn định'}
                         </span>
                       </div>
 

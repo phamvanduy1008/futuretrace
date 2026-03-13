@@ -214,7 +214,7 @@ const ScenarioDetailPage: React.FC = () => {
                 { label: 'Hạnh phúc', val: displayHappiness, icon: 'sentiment_satisfied', color: 'text-emerald-600' },
                 { label: 'Tin cậy', val: scenario.reliability || 95, icon: 'verified', color: 'text-amber-600' }
               ].map((m, i) => (
-                <div key={i} className="bg-white p-6 sm:p-8 lg:p-10 rounded-[2rem] sm:rounded-[2.5rem] border border-slate-100 shadow-[0_15px_30px_-5px_rgba(0,0,0,0.05)] hover:shadow-[0_25px_50px_-10px_rgba(0,0,0,0.08)] transition-all text-center">
+                <div key={i} className="bg-white p-6 sm:p-8 lg:p-10 rounded-[2rem] sm:rounded-[2.5rem] border-2 border-slate-100 shadow-[0_15px_30px_-5px_rgba(0,0,0,0.05)] hover:border-blue-600 hover:ring-4 hover:ring-blue-600/10 transition-all text-center">
                   <div className="w-12 h-12 sm:w-16 sm:h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-6 shadow-inner border border-slate-100">
                     <IconMapper name={m.icon} className={` ${m.color} text-2xl sm:text-3xl`} />
                   </div>
@@ -229,14 +229,17 @@ const ScenarioDetailPage: React.FC = () => {
               {scenario.deepAnalysis?.swot.map((item: any, i: number) => (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.1 }}
-                  key={i} className="bg-white p-8 lg:p-10 rounded-[2rem] sm:rounded-[3rem] border border-slate-100 shadow-[0_15px_40px_-10px_rgba(0,0,0,0.06)] hover:shadow-[0_30px_60px_-12px_rgba(0,0,0,0.1)] transition-all"
+                  key={i} className="bg-white p-8 lg:p-10 rounded-[2rem] sm:rounded-[3rem] border-2 border-slate-100 shadow-[0_15px_40px_-10px_rgba(0,0,0,0.06)] hover:border-blue-600 hover:ring-4 hover:ring-blue-600/10 transition-all"
                 >
                   <span className={`px-4 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest inline-block mb-6 border ${item.type === 'S' || item.type === 'Strengths' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
                       item.type === 'W' || item.type === 'Weaknesses' ? 'bg-rose-50 text-rose-600 border-rose-100' :
                         item.type === 'O' || item.type === 'Opportunities' ? 'bg-blue-50 text-blue-600 border-blue-100' :
                           'bg-amber-50 text-amber-600 border-amber-100'
                     }`}>
-                    {item.label}
+                    {item.type === 'S' || item.type === 'Strengths' ? 'Thế mạnh' :
+                     item.type === 'W' || item.type === 'Weaknesses' ? 'Điểm yếu' :
+                     item.type === 'O' || item.type === 'Opportunities' ? 'Cơ hội' :
+                     'Thách thức'}
                   </span>
                   <p className="text-base sm:text-lg font-bold text-slate-800 leading-relaxed italic">"{item.value}"</p>
                 </motion.div>
@@ -245,8 +248,8 @@ const ScenarioDetailPage: React.FC = () => {
 
             {/* Comments Section - Redesigned (Compact & Minimal) */}
             {(state?.fromCommunity || isSaved) && (
-              <section className="bg-white/60 backdrop-blur-xl p-8 sm:p-10 lg:p-12 rounded-[2.5rem] sm:rounded-[4rem] border border-white/80 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.03)] mt-8 relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-1 h-full bg-blue-600/10"></div>
+              <section className="bg-white/60 backdrop-blur-xl p-8 sm:p-10 lg:p-12 rounded-[2.5rem] sm:rounded-[4rem] border-2 border-white/80 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.03)] hover:border-blue-600/50 hover:ring-4 hover:ring-blue-600/10 transition-all mt-8 relative overflow-hidden">
+
                  
                  <div className="flex items-center justify-between mb-10">
                    <h3 className="text-[11px] font-black uppercase tracking-widest text-slate-900 flex items-center gap-4">

@@ -212,7 +212,7 @@ const HistoryPage: React.FC = () => {
                       });
                     }
                   }}
-                  className={`group bg-white border ${item.isFolder ? "border-blue-100 bg-blue-50/10" : "border-slate-100"} p-6 sm:p-8 hover:border-blue-600/30 hover:bg-slate-50 transition-all cursor-pointer rounded-2xl relative overflow-hidden`}
+                  className={`group bg-white border-2 ${item.isFolder ? "border-blue-100 bg-blue-50/10" : "border-slate-100"} p-6 sm:p-8 hover:border-blue-600 hover:ring-4 hover:ring-blue-600/20 transition-all cursor-pointer rounded-2xl relative overflow-hidden`}
                 >
                   {item.isFolder && (
                     <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
@@ -226,7 +226,10 @@ const HistoryPage: React.FC = () => {
                         <span
                           className={`${item.isFolder ? "text-blue-600" : "text-slate-600"}`}
                         >
-                          {item.isFolder ? "THƯ MỤC MÔ PHỎNG" : item.category}
+                          {item.isFolder ? "THƯ MỤC MÔ PHỎNG" : 
+                           (item.category === 'Positive' || item.category === 'positive' || item.category === 'Success') ? 'Tích cực' :
+                           (item.category === 'Risk' || item.category === 'risk') ? 'Rủi ro' : 
+                           (item.category === 'Neutral' || item.category === 'neutral') ? 'Ổn định' : item.category}
                         </span>
                         <span className="w-1 h-1 bg-slate-200 rounded-full hidden sm:block"></span>
                         <span>{item.date}</span>

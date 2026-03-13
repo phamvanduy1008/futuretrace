@@ -32,7 +32,7 @@ const LandingPage: React.FC = () => {
             className="max-w-5xl font-black mb-12 tracking-tight text-slate-900 font-display"
           >
             <span className="block text-5xl md:text-8xl mb-4 md:mb-6 leading-tight">Dự báo tương lai</span>
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-500 block text-4xl md:text-7xl leading-normal pb-4">bằng dữ liệu mô phỏng.</span>
+            <span className="text-blue-600 block text-4xl md:text-7xl leading-normal pb-4">bằng dữ liệu mô phỏng.</span>
           </motion.h1>
 
           <motion.p
@@ -53,7 +53,7 @@ const LandingPage: React.FC = () => {
             <motion.button
               whileHover={{ scale: 1.02, boxShadow: "0 20px 40px -10px rgba(37,99,235,0.3)" }}
               whileTap={{ scale: 0.98 }}
-              onClick={() => navigate('/register')}
+              onClick={() => navigate('/simulate')}
               className="bg-slate-900 hover:bg-blue-600 text-white px-12 py-5 font-black rounded-2xl shadow-2xl flex items-center gap-3 text-xs uppercase tracking-widest transition-colors"
             >
               Chạy mô phỏng đầu tiên

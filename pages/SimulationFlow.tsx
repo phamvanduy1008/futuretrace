@@ -129,7 +129,7 @@ const SimulationFlow: React.FC = () => {
               initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
               className="px-6 py-2 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-widest mb-6 border border-blue-100"
             >
-              Temporal Simulation v4.2
+              Mô phỏng đa thời gian v4.2
             </motion.div>
             <h1 className="text-4xl sm:text-6xl font-black mb-4 font-display tracking-tighter text-slate-900 leading-none">
               Nhập biến số <span className="text-blue-600">đầu vào.</span>
@@ -223,7 +223,7 @@ const SimulationFlow: React.FC = () => {
 
           <div className="mb-10 text-center">
              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-600 text-[10px] font-black uppercase tracking-widest mb-4">
-               Context Standardization
+               Chuẩn hóa bối cảnh hệ thống
              </div>
             <h1 className="text-4xl sm:text-5xl font-black tracking-tighter mb-4 font-display text-slate-900">
               Cấu hình <span className="text-emerald-600">Biến số.</span>
@@ -410,9 +410,9 @@ const SimulationFlow: React.FC = () => {
                       variants={cardVariants}
                       initial="hidden"
                       animate="visible"
-                      className={`flex flex-col bg-white border border-slate-200 rounded-[3rem] overflow-hidden group hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] transition-all duration-700 relative ${
-                        scenario.type === 'Positive' ? 'ring-4 ring-emerald-50' : 
-                        scenario.type === 'Risk' ? 'ring-4 ring-rose-50' : ''
+                      className={`flex flex-col bg-white border-2 border-slate-200 rounded-[3rem] overflow-hidden group hover:border-blue-600 hover:ring-4 hover:ring-blue-600/20 hover:shadow-2xl transition-all duration-700 relative ${
+                        scenario.type === 'Positive' ? 'ring-4 ring-emerald-50/50' : 
+                        scenario.type === 'Risk' ? 'ring-4 ring-rose-50/50' : ''
                       }`}
                     >
                       <div className={`p-10 border-b border-slate-50 ${
@@ -486,7 +486,7 @@ const SimulationFlow: React.FC = () => {
                    <IconMapper name="timeline" className=" text-[250px] text-white" />
                 </div>
                 <div className="flex flex-col items-center mb-20 text-center">
-                  <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-6">Strategic Milestones</span>
+                  <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-6">Cột mốc chiến lược</span>
                   <h3 className="text-4xl font-black text-white font-display uppercase tracking-tight">Timeline lộ trình tích hợp</h3>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-10 relative z-10">

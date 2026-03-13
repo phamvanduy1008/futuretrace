@@ -73,7 +73,7 @@ const DashboardPage: React.FC = () => {
             <div className="flex items-center gap-2 text-[9px] font-black text-blue-600 uppercase tracking-widest mb-4">
               RESEARCH NETWORK <IconMapper name="chevron_right" className=" text-[10px]" /> TERMINAL v0.8
             </div>
-            <h1 className="text-4xl sm:text-6xl font-black tracking-tight font-display text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-500 leading-normal pb-2 uppercase italic pt-2">Trung tâm Phân tích</h1>
+            <h1 className="text-4xl sm:text-6xl font-black tracking-tight font-display text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-500 leading-normal pb-2 uppercase italic pt-2 pr-6">Trung tâm Phân tích</h1>
             <p className="text-slate-600 mt-4 text-lg font-medium italic">"Xin chào {user?.name || 'Jane'}, hôm nay bạn muốn định lượng tương lai nào?"</p>
           </motion.div>
 
@@ -124,7 +124,7 @@ const DashboardPage: React.FC = () => {
                 <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mb-8 shadow-xl shadow-blue-500/30">
                   <IconMapper name="add_circle" className=" text-white text-4xl font-bold" />
                 </div>
-                <h2 className="text-3xl sm:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400 mb-4 font-display uppercase tracking-tight italic leading-normal pt-2">Khởi tạo Mô phỏng Mới</h2>
+                <h2 className="text-3xl sm:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400 mb-4 font-display uppercase tracking-tight italic leading-normal pt-2 pr-6">Khởi tạo Mô phỏng Mới</h2>
                 <p className="text-slate-400 text-xl max-w-md leading-relaxed font-medium italic opacity-80">Kích hoạt Temporal Matrix Engine để dự báo quỹ đạo 5-10 năm dựa trên biến số hiện tại.</p>
               </div>
               <div className="mt-12 flex items-center gap-4 text-blue-400 font-black text-[11px] uppercase tracking-widest">
@@ -144,7 +144,7 @@ const DashboardPage: React.FC = () => {
               <div className="w-14 h-14 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center mb-8 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors shadow-sm">
                 <IconMapper name="history" className=" text-3xl font-bold" />
               </div>
-              <h2 className="text-2xl font-black mb-3 font-display uppercase tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-500 italic leading-normal pt-1">Lịch sử</h2>
+              <h2 className="text-2xl font-black mb-3 font-display uppercase tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-500 italic leading-normal pt-1 pr-6">Lịch sử</h2>
               <p className="text-slate-600 text-sm leading-relaxed font-medium italic">Truy xuất dữ liệu từ các kịch bản nghiên cứu đã lưu trữ.</p>
             </div>
             <div className="mt-8 pt-8 border-t border-slate-50 flex justify-between items-center">
