@@ -1219,7 +1219,7 @@
   border-bottom: 1px solid #edf2fa;
 }
 
-.ft-settings-group-card .ft-setting-row > div:first-child {
+.ft-settings-group-card .ft-setting-row>div:first-child {
   min-width: 0;
 }
 
