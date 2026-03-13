@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { generatePremiumAnalysis, pivotPremiumAnalysis } from '../services/geminiService';
 import { PremiumAnalysisReport, SimulationData, ProgressItem } from '../types';
+import { apiFetch } from '../services/apiClient';
 import { saveProgress, getProgressByScenarioId } from '../data/mockDatabase';
 import SharedHeader from '../components/SharedHeader';
 import SharedFooter from '../components/SharedFooter';
@@ -74,14 +75,8 @@ const PremiumAnalysisPage: React.FC = () => {
   const updateBackendProgress = async (newIndex: number, newReport?: any) => {
     if (!progressId) return;
     try {
-      const token = localStorage.getItem("token");
-      const apiBase = (import.meta as any).env.VITE_API_BASE_URL || 'http://localhost:5000/api';
-      await fetch(`${apiBase}/premium/progress/${progressId}`, {
+      await apiFetch(`/premium/progress/${progressId}`, {
         method: "PUT",
-        headers: { 
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}` 
-        },
         body: JSON.stringify({
           completedMilestones: Array.from({ length: newIndex }, (_, i) => i),
           report: newReport || undefined
