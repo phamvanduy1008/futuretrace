@@ -89,7 +89,7 @@ const PremiumPage: React.FC = () => {
     <AnimatedBackground className="flex flex-col font-sans">
       <SharedHeader />
 
-      <main className="flex-1 max-w-[1440px] mx-auto w-full px-6 py-20 sm:py-32">
+      <main className="flex-1 max-w-[1440px] mx-auto w-full px-6 py-20 sm:py-32 mt-[-60px]" >
         <header className="text-center mb-24 max-w-3xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -102,7 +102,7 @@ const PremiumPage: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-4xl sm:text-7xl font-black tracking-tighter mb-8 font-display text-slate-900 leading-[0.9]"
+            className="text-3xl uppercase italic  leading-[1.6] sm:leading-[1.3] mb-12 sm:text-6xl font-black mb-8 font-display text-slate-900 leading-[0.9]"
           >
             Định lượng tương lai <br /> <span className="text-blue-600">ở cấp độ cao nhất.</span>
           </motion.h1>

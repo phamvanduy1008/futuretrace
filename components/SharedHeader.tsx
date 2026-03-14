@@ -10,7 +10,7 @@ const SharedHeader: React.FC = () => {
   const [searchParams] = useSearchParams();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(() => !!localStorage.getItem('token'));
   const [searchValue, setSearchValue] = useState("");
   const user = getCurrentUser();
 

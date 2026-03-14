@@ -29,9 +29,9 @@ const LandingPage: React.FC = () => {
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2 }}
-            className="max-w-5xl font-black mb-12 tracking-tight text-slate-900 font-display"
+            className="max-w-5xl uppercase italic font-black mb-12 tracking-tight text-slate-900 font-display"
           >
-            <span className="block text-5xl md:text-8xl mb-4 md:mb-6 leading-tight">Dự báo tương lai</span>
+            <span className="block text-5xl md:text-7xl mb-4 md:mb-6 leading-tight">Dự báo tương lai</span>
             <span className="text-blue-600 block text-4xl md:text-7xl leading-normal pb-4">bằng dữ liệu mô phỏng.</span>
           </motion.h1>
 

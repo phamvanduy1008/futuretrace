@@ -211,7 +211,7 @@ const ProgressPage: React.FC = () => {
             <div className="flex items-center gap-2 text-[9px] font-black text-blue-600 uppercase tracking-widest mb-4">
               BẢNG ĐIỀU KHIỂN <IconMapper name="chevron_right" className=" text-[10px]" /> TIẾN TRÌNH CỦA TÔI
             </div>
-            <h1 className="text-3xl sm:text-5xl font-black tracking-tight mb-4 font-display text-slate-900 leading-[1.8] uppercase italic">Theo dõi Quỹ đạo Thực thi</h1>
+            <h1 className="text-3xl sm:text-6xl font-black tracking-tight mb-4 font-display text-slate-900 leading-[1.8] uppercase italic">Theo dõi Quỹ đạo Thực thi</h1>
             <p className="text-slate-600 text-sm sm:text-lg leading-relaxed max-w-2xl font-medium italic">
               "Quản lý các cột mốc và điều chỉnh chiến lược dựa trên tiến độ thực tế của bạn."
             </p>
@@ -273,60 +273,58 @@ const ProgressPage: React.FC = () => {
         </div>
 
         <aside className="lg:col-span-4 mt-8 lg:mt-0">
-           <AnimatePresence mode='wait'>
-             <motion.div 
-               key={selectedIdx}
-               initial={{ opacity: 0, scale: 0.95 }}
-               animate={{ opacity: 1, scale: 1 }}
-               exit={{ opacity: 0, scale: 1.05 }}
-               className="bg-white border border-slate-200 rounded-[3rem] overflow-hidden shadow-[0_50px_100px_-20px_rgba(0,0,0,0.12)] lg:sticky lg:top-32"
-             >
-                <div className="p-10 sm:p-12 border-b border-slate-100 bg-slate-50/50">
-                  <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest block mb-4">CHI TIẾT TIẾN TRÌNH</span>
-                  <h2 className="text-2xl sm:text-4xl font-black text-slate-900 font-display leading-[1.6] sm:leading-[1.4] mb-12 uppercase italic">{selectedProgress.title}</h2>
-                </div>
-                
-                <div className="p-10 sm:p-12 space-y-12">
-                   <div className="space-y-6">
-                      <div className="flex items-center justify-between">
-                        <h4 className="text-[10px] font-black text-slate-900 uppercase tracking-widest flex items-center gap-3">
-                           <IconMapper name="list_alt" className=" text-blue-600 text-xl" /> CÁC CỘT MỐC TIẾP THEO
-                        </h4>
-                        <button 
-                          onClick={() => setIsPivotModalOpen(true)}
-                          className="flex items-center gap-2 text-[9px] font-black text-amber-600 hover:text-amber-700 uppercase tracking-widest transition-colors bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-100"
-                        >
-                          <IconMapper name="psychology" className=" text-sm" /> ĐIỀU CHỈNH LỘ TRÌNH
-                        </button>
-                      </div>
+          <AnimatePresence mode='wait'>
+            <motion.div
+              key={selectedIdx}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 1.05 }}
+              className="bg-white border border-slate-200 rounded-[3rem] overflow-hidden shadow-[0_50px_100px_-20px_rgba(0,0,0,0.12)] lg:sticky lg:top-32"
+            >
+              <div className="p-10 sm:p-12 border-b border-slate-100 bg-slate-50/50">
+                <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest block mb-4">CHI TIẾT TIẾN TRÌNH</span>
+                <h2 className="text-2xl sm:text-4xl font-black text-slate-900 font-display leading-[1.6] sm:leading-[1.4] mb-12 uppercase italic">{selectedProgress.title}</h2>
+              </div>
 
-                      <div className="space-y-4">
-                        {selectedProgress.report.milestones.map((m, idx) => {
-                          const status = getMilestoneStatus(selectedProgress, idx);
-                          return (
-                            <div key={idx} className={`p-6 rounded-3xl border flex items-center gap-6 transition-all ${
-                              status === 'Đã hoàn thành' 
-                                ? 'bg-emerald-50/50 border-emerald-100 opacity-60' 
-                                : status === 'Đang tiến hành'
-                                ? 'bg-amber-50 border-amber-200 ring-1 ring-amber-500/20 shadow-md'
-                                : 'bg-slate-50 border-slate-100'
-                            }`}>
-                              <div className="flex flex-col flex-1 min-w-0">
-                                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{m.month}</span>
-                                <span className={`text-base font-black break-words leading-snug ${status === 'Đã hoàn thành' ? 'text-emerald-700 line-through' : 'text-slate-900'}`}>{m.event}</span>
-                              </div>
-                              <div className={`w-12 h-12 rounded-2xl flex-shrink-0 flex items-center justify-center border transition-all ${
-                                status === 'Đã hoàn thành' ? 'bg-emerald-500 text-white border-emerald-500 shadow-lg shadow-emerald-200' :
-                                status === 'Đang tiến hành' ? 'bg-amber-500 text-white border-amber-500 animate-pulse shadow-lg shadow-amber-200' :
+              <div className="p-10 sm:p-12 space-y-12">
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-[10px] font-black text-slate-900 uppercase tracking-widest flex items-center gap-3">
+                      <IconMapper name="list_alt" className=" text-blue-600 text-xl" /> CÁC CỘT MỐC TIẾP THEO
+                    </h4>
+                    <button
+                      onClick={() => setIsPivotModalOpen(true)}
+                      className="flex items-center gap-2 text-[9px] font-black text-amber-600 hover:text-amber-700 uppercase tracking-widest transition-colors bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-100"
+                    >
+                      <IconMapper name="psychology" className=" text-sm" /> ĐIỀU CHỈNH LỘ TRÌNH
+                    </button>
+                  </div>
+
+                  <div className="space-y-4">
+                    {selectedProgress.report.milestones.map((m, idx) => {
+                      const status = getMilestoneStatus(selectedProgress, idx);
+                      return (
+                        <div key={idx} className={`p-6 rounded-3xl border flex items-center gap-6 transition-all ${status === 'Đã hoàn thành'
+                            ? 'bg-emerald-50/50 border-emerald-100 opacity-60'
+                            : status === 'Đang tiến hành'
+                              ? 'bg-amber-50 border-amber-200 ring-1 ring-amber-500/20 shadow-md'
+                              : 'bg-slate-50 border-slate-100'
+                          }`}>
+                          <div className="flex flex-col flex-1 min-w-0">
+                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{m.month}</span>
+                            <span className={`text-base font-black break-words leading-snug ${status === 'Đã hoàn thành' ? 'text-emerald-700 line-through' : 'text-slate-900'}`}>{m.event}</span>
+                          </div>
+                          <div className={`w-12 h-12 rounded-2xl flex-shrink-0 flex items-center justify-center border transition-all ${status === 'Đã hoàn thành' ? 'bg-emerald-500 text-white border-emerald-500 shadow-lg shadow-emerald-200' :
+                              status === 'Đang tiến hành' ? 'bg-amber-500 text-white border-amber-500 animate-pulse shadow-lg shadow-amber-200' :
                                 'bg-slate-100 text-slate-400 border-slate-200'
-                              }`}>
-                                <IconMapper name={status === 'Đã hoàn thành' ? 'check_circle' : status === 'Đang tiến hành' ? 'pending' : 'circle'} className=" text-2xl" />
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                   </div>
+                            }`}>
+                            <IconMapper name={status === 'Đã hoàn thành' ? 'check_circle' : status === 'Đang tiến hành' ? 'pending' : 'circle'} className=" text-2xl" />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
 
                 <button
                   onClick={() => navigate('/premium-analysis', {
@@ -348,104 +346,104 @@ const ProgressPage: React.FC = () => {
       </main>
 
       {/* Pivot Modal */}
-   {/* Pivot Modal */}
-<AnimatePresence>
-  {isPivotModalOpen && (
-    <div className="fixed inset-0 z-[250] flex items-center justify-center p-6">
-      
-      {/* Overlay */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        onClick={() => !isPivoting && setIsPivotModalOpen(false)}
-        className="absolute inset-0 bg-slate-950/80 backdrop-blur-md"
-      />
+      {/* Pivot Modal */}
+      <AnimatePresence>
+        {isPivotModalOpen && (
+          <div className="fixed inset-0 z-[250] flex items-center justify-center p-6">
 
-      {/* Modal */}
-      <motion.div
-        onClick={(e) => e.stopPropagation()}
-        initial={{ opacity: 0, scale: 0.95, y: 30 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.95, y: 30 }}
-        className="relative w-full max-w-xl bg-white rounded-[3rem] shadow-2xl border border-slate-100 overflow-hidden"
-      >
-        
-        {/* Header Gradient */}
-        <div className="h-2 bg-gradient-to-r from-amber-400 via-orange-500 to-amber-600"></div>
+            {/* Overlay */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => !isPivoting && setIsPivotModalOpen(false)}
+              className="absolute inset-0 bg-slate-950/80 backdrop-blur-md"
+            />
 
-        <div className="p-10 sm:p-12">
-
-          {/* Header */}
-          <div className="flex items-start gap-6 mb-10">
-            <div className="w-16 h-16 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center shrink-0 shadow-inner border border-amber-100">
-              <IconMapper name="psychology" className="text-3xl" />
-            </div>
-
-            <div>
-              <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tighter mb-2 italic">
-                Điều chỉnh lộ trình
-              </h3>
-
-              <p className="text-slate-500 text-sm font-medium leading-relaxed">
-                AI sẽ tái cấu trúc tương lai dựa trên phản hồi của bạn.
-              </p>
-            </div>
-          </div>
-
-          {/* Info Box */}
-          <div className="bg-blue-50/50 border border-blue-100 rounded-2xl p-6 mb-8 flex gap-4">
-            <IconMapper name="info" className="text-blue-500 text-xl shrink-0 mt-0.5" />
-            <p className="text-[11px] text-blue-700 font-medium leading-relaxed italic">
-              Hệ thống sẽ giữ lại các cột mốc đã hoàn thành và thiết kế lại kịch bản từ thời điểm hiện tại
-              trở đi dựa trên ý kiến mới của bạn.
-            </p>
-          </div>
-
-          {/* Textarea */}
-          <textarea
-            className="w-full h-40 p-6 bg-slate-50 border border-slate-200 rounded-3xl text-sm focus:ring-4 focus:ring-blue-50 focus:border-blue-600 outline-none resize-none transition-all mb-8 font-medium italic shadow-inner"
-            placeholder="Ví dụ: Tôi thấy bước tiếp theo quá mạo hiểm, tôi muốn chuyển hướng sang ổn định tài chính trước..."
-            value={pivotFeedback}
-            onChange={(e) => setPivotFeedback(e.target.value)}
-            disabled={isPivoting}
-          />
-
-          {/* Buttons */}
-          <div className="flex flex-col gap-4">
-
-            <button
-              onClick={handlePivot}
-              disabled={!pivotFeedback.trim() || isPivoting}
-              className="w-full py-5 bg-slate-900 text-white font-black text-[11px] uppercase tracking-widest rounded-2xl hover:bg-amber-600 disabled:opacity-20 transition-all shadow-xl flex items-center justify-center gap-3"
+            {/* Modal */}
+            <motion.div
+              onClick={(e) => e.stopPropagation()}
+              initial={{ opacity: 0, scale: 0.95, y: 30 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 30 }}
+              className="relative w-full max-w-xl bg-white rounded-[3rem] shadow-2xl border border-slate-100 overflow-hidden"
             >
-              {isPivoting ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  ĐANG TÁI CẤU TRÚC...
-                </>
-              ) : (
-                <>
-                  CẬP NHẬT LỘ TRÌNH MỚI
-                  <IconMapper name="bolt" className="text-lg" />
-                </>
-              )}
-            </button>
 
-            <button
-              onClick={() => setIsPivotModalOpen(false)}
-              disabled={isPivoting}
-              className="w-full py-5 bg-white border border-slate-200 text-slate-400 font-black text-[10px] uppercase tracking-widest rounded-2xl hover:bg-slate-50 transition-all"
-            >
-              Hủy bỏ
-            </button>
+              {/* Header Gradient */}
+              <div className="h-2 bg-gradient-to-r from-amber-400 via-orange-500 to-amber-600"></div>
 
+              <div className="p-10 sm:p-12">
+
+                {/* Header */}
+                <div className="flex items-start gap-6 mb-10">
+                  <div className="w-16 h-16 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center shrink-0 shadow-inner border border-amber-100">
+                    <IconMapper name="psychology" className="text-3xl" />
+                  </div>
+
+                  <div>
+                    <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tighter mb-2 italic">
+                      Điều chỉnh lộ trình
+                    </h3>
+
+                    <p className="text-slate-500 text-sm font-medium leading-relaxed">
+                      AI sẽ tái cấu trúc tương lai dựa trên phản hồi của bạn.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Info Box */}
+                <div className="bg-blue-50/50 border border-blue-100 rounded-2xl p-6 mb-8 flex gap-4">
+                  <IconMapper name="info" className="text-blue-500 text-xl shrink-0 mt-0.5" />
+                  <p className="text-[11px] text-blue-700 font-medium leading-relaxed italic">
+                    Hệ thống sẽ giữ lại các cột mốc đã hoàn thành và thiết kế lại kịch bản từ thời điểm hiện tại
+                    trở đi dựa trên ý kiến mới của bạn.
+                  </p>
+                </div>
+
+                {/* Textarea */}
+                <textarea
+                  className="w-full h-40 p-6 bg-slate-50 border border-slate-200 rounded-3xl text-sm focus:ring-4 focus:ring-blue-50 focus:border-blue-600 outline-none resize-none transition-all mb-8 font-medium italic shadow-inner"
+                  placeholder="Ví dụ: Tôi thấy bước tiếp theo quá mạo hiểm, tôi muốn chuyển hướng sang ổn định tài chính trước..."
+                  value={pivotFeedback}
+                  onChange={(e) => setPivotFeedback(e.target.value)}
+                  disabled={isPivoting}
+                />
+
+                {/* Buttons */}
+                <div className="flex flex-col gap-4">
+
+                  <button
+                    onClick={handlePivot}
+                    disabled={!pivotFeedback.trim() || isPivoting}
+                    className="w-full py-5 bg-slate-900 text-white font-black text-[11px] uppercase tracking-widest rounded-2xl hover:bg-amber-600 disabled:opacity-20 transition-all shadow-xl flex items-center justify-center gap-3"
+                  >
+                    {isPivoting ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        ĐANG TÁI CẤU TRÚC...
+                      </>
+                    ) : (
+                      <>
+                        CẬP NHẬT LỘ TRÌNH MỚI
+                        <IconMapper name="bolt" className="text-lg" />
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    onClick={() => setIsPivotModalOpen(false)}
+                    disabled={isPivoting}
+                    className="w-full py-5 bg-white border border-slate-200 text-slate-400 font-black text-[10px] uppercase tracking-widest rounded-2xl hover:bg-slate-50 transition-all"
+                  >
+                    Hủy bỏ
+                  </button>
+
+                </div>
+              </div>
+            </motion.div>
           </div>
-        </div>
-      </motion.div>
-    </div>
-  )}
-</AnimatePresence>
+        )}
+      </AnimatePresence>
       <SharedFooter />
     </AnimatedBackground>
   );

@@ -221,7 +221,7 @@ const ScenarioDetailPage: React.FC = () => {
               <motion.h1
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-4xl sm:text-6xl font-black font-display text-slate-900 leading-[1.6] sm:leading-[1.3] mb-12"
+                className="text-4xl uppercase italic  sm:text-6xl font-black font-display text-slate-900 leading-[1.6] sm:leading-[1.3] mb-12"
               >
                 {scenario.title}
               </motion.h1>
@@ -239,7 +239,7 @@ const ScenarioDetailPage: React.FC = () => {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className="bg-slate-950 p-8 sm:p-10 lg:p-12 rounded-[2.5rem] sm:rounded-[3.5rem] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.3)] flex flex-col items-center justify-center min-w-[240px] sm:min-w-[280px] border border-slate-800 relative group overflow-hidden"
+              className="bg-slate-950 p-8 mb-[65px] sm:p-10 lg:p-12 rounded-[2.5rem] sm:rounded-[3.5rem] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.3)] flex flex-col items-center justify-center min-w-[240px] sm:min-w-[280px] border border-slate-800 relative group overflow-hidden"
             >
               <div className="absolute inset-0 bg-blue-600/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
               <span className="text-5xl sm:text-6xl font-black text-blue-500 mb-2 relative z-10">
@@ -308,15 +308,14 @@ const ScenarioDetailPage: React.FC = () => {
                   className="bg-white p-8 lg:p-10 rounded-[2rem] sm:rounded-[3rem] border-2 border-slate-100 shadow-[0_15px_40px_-10px_rgba(0,0,0,0.06)] hover:border-blue-600 hover:ring-4 hover:ring-blue-600/10 transition-all"
                 >
                   <span
-                    className={`px-4 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest inline-block mb-6 border ${
-                      item.type === "S" || item.type === "Strengths"
-                        ? "bg-emerald-50 text-emerald-600 border-emerald-100"
-                        : item.type === "W" || item.type === "Weaknesses"
-                          ? "bg-rose-50 text-rose-600 border-rose-100"
-                          : item.type === "O" || item.type === "Opportunities"
-                            ? "bg-blue-50 text-blue-600 border-blue-100"
-                            : "bg-amber-50 text-amber-600 border-amber-100"
-                    }`}
+                    className={`px-4 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest inline-block mb-6 border ${item.type === "S" || item.type === "Strengths"
+                      ? "bg-emerald-50 text-emerald-600 border-emerald-100"
+                      : item.type === "W" || item.type === "Weaknesses"
+                        ? "bg-rose-50 text-rose-600 border-rose-100"
+                        : item.type === "O" || item.type === "Opportunities"
+                          ? "bg-blue-50 text-blue-600 border-blue-100"
+                          : "bg-amber-50 text-amber-600 border-amber-100"
+                      }`}
                   >
                     {item.type === "S" || item.type === "Strengths"
                       ? "Thế mạnh"
@@ -337,35 +336,35 @@ const ScenarioDetailPage: React.FC = () => {
             {(state?.fromCommunity || isSaved) && (
               <section className="bg-white/60 backdrop-blur-xl p-8 sm:p-10 lg:p-12 rounded-[2.5rem] sm:rounded-[4rem] border-2 border-white/80 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.03)] hover:border-blue-600/50 hover:ring-4 hover:ring-blue-600/10 transition-all mt-8 relative overflow-hidden">
 
-                 
-                 <div className="flex items-center justify-between mb-10">
-                   <h3 className="text-[11px] font-black uppercase tracking-widest text-slate-900 flex items-center gap-4">
-                     <IconMapper name="forum" className=" text-blue-600 bg-blue-50/50 p-2 rounded-xl text-xl" />
-                     Cộng đồng thảo luận ({comments.length})
-                   </h3>
-                 </div>
-                 
-                 {/* Input Area */}
-                 <div className="flex gap-5 mb-10 pb-10 border-b border-slate-100/60">
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-slate-900 flex items-center justify-center shrink-0 border-2 border-white shadow-lg font-black text-white text-[10px]">ME</div>
-                    <form onSubmit={handlePostComment} className="flex-1">
-                      <textarea 
-                        value={newComment}
-                        onChange={(e) => setNewComment(e.target.value)}
-                        className="w-full p-5 bg-slate-50/30 border border-slate-100 rounded-2xl text-sm font-medium outline-none focus:bg-white focus:ring-4 focus:ring-blue-500/5 focus:border-blue-200 transition-all shadow-inner h-24 placeholder:text-slate-300 resize-none"
-                        placeholder="Chia sẻ góc nhìn của bạn..."
-                      />
-                      <div className="flex justify-end mt-3">
-                        <button 
-                          type="submit"
-                          disabled={!newComment.trim()}
-                          className="px-6 py-3 bg-slate-900 text-white font-black text-[9px] uppercase tracking-widest rounded-xl hover:bg-blue-600 transition-all disabled:opacity-20 shadow-xl flex items-center gap-2 group"
-                        >
-                          GỬI Ý KIẾN <IconMapper name="arrow_forward" className=" text-sm group-hover:translate-x-1 transition-transform" />
-                        </button>
-                      </div>
-                    </form>
-                 </div>
+
+                <div className="flex items-center justify-between mb-10">
+                  <h3 className="text-[11px] font-black uppercase tracking-widest text-slate-900 flex items-center gap-4">
+                    <IconMapper name="forum" className=" text-blue-600 bg-blue-50/50 p-2 rounded-xl text-xl" />
+                    Cộng đồng thảo luận ({comments.length})
+                  </h3>
+                </div>
+
+                {/* Input Area */}
+                <div className="flex gap-5 mb-10 pb-10 border-b border-slate-100/60">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-slate-900 flex items-center justify-center shrink-0 border-2 border-white shadow-lg font-black text-white text-[10px]">ME</div>
+                  <form onSubmit={handlePostComment} className="flex-1">
+                    <textarea
+                      value={newComment}
+                      onChange={(e) => setNewComment(e.target.value)}
+                      className="w-full p-5 bg-slate-50/30 border border-slate-100 rounded-2xl text-sm font-medium outline-none focus:bg-white focus:ring-4 focus:ring-blue-500/5 focus:border-blue-200 transition-all shadow-inner h-24 placeholder:text-slate-300 resize-none"
+                      placeholder="Chia sẻ góc nhìn của bạn..."
+                    />
+                    <div className="flex justify-end mt-3">
+                      <button
+                        type="submit"
+                        disabled={!newComment.trim()}
+                        className="px-6 py-3 bg-slate-900 text-white font-black text-[9px] uppercase tracking-widest rounded-xl hover:bg-blue-600 transition-all disabled:opacity-20 shadow-xl flex items-center gap-2 group"
+                      >
+                        GỬI Ý KIẾN <IconMapper name="arrow_forward" className=" text-sm group-hover:translate-x-1 transition-transform" />
+                      </button>
+                    </div>
+                  </form>
+                </div>
 
                 {/* Comments List */}
                 {isCommentsLoading ? (
@@ -408,17 +407,17 @@ const ScenarioDetailPage: React.FC = () => {
                                   </span>
                                 </div>
                                 <p className="text-slate-600 text-sm sm:text-base font-medium leading-relaxed italic pr-12">"{comment.content}"</p>
-                                
-                                <button 
+
+                                <button
                                   onClick={async () => {
                                     try {
                                       const res = await communityService.toggleCommentLike(id!, comment.id);
                                       setComments(prev => prev.map(c => {
                                         if (c.id === comment.id) {
-                                          return { 
-                                            ...c, 
-                                            isLiked: res.liked, 
-                                            likes: res.liked ? (c.likes || 0) + 1 : (c.likes || 1) - 1 
+                                          return {
+                                            ...c,
+                                            isLiked: res.liked,
+                                            likes: res.liked ? (c.likes || 0) + 1 : (c.likes || 1) - 1
                                           };
                                         }
                                         return c;
@@ -427,9 +426,8 @@ const ScenarioDetailPage: React.FC = () => {
                                       console.error(err);
                                     }
                                   }}
-                                  className={`absolute top-5 right-5 flex items-center gap-1.5 px-2 py-1 rounded-lg transition-all ${
-                                    comment.isLiked ? 'bg-rose-50 text-rose-500' : 'text-slate-300 hover:text-rose-400'
-                                  }`}
+                                  className={`absolute top-5 right-5 flex items-center gap-1.5 px-2 py-1 rounded-lg transition-all ${comment.isLiked ? 'bg-rose-50 text-rose-500' : 'text-slate-300 hover:text-rose-400'
+                                    }`}
                                 >
                                   <IconMapper
                                     name="favorite"
@@ -467,79 +465,79 @@ const ScenarioDetailPage: React.FC = () => {
           {/* Right Column: Sprint & Actions */}
           <div className="lg:col-span-5 space-y-8 lg:space-y-12">
             <section className="bg-slate-950 p-10 sm:p-12 lg:p-14 rounded-[2.5rem] sm:rounded-[3.5rem] text-white shadow-[0_40px_80px_-20px_rgba(0,0,0,0.4)] relative overflow-hidden">
-               <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none">
-                  <IconMapper name="sprint" className=" text-[150px] sm:text-[200px] text-white" />
-               </div>
-               <h3 className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-blue-400 mb-10 sm:mb-14 relative z-10">Chiến thuật cơ bản</h3>
-               <div className="space-y-10 sm:space-y-14 relative z-10">
-                 {scenario.deepAnalysis?.sprint90.map((phase: any, i: number) => (
-                   <div key={i} className="flex gap-8 sm:gap-10 group">
-                      <div className="flex flex-col items-center shrink-0">
-                         <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-blue-600/20 border border-blue-600/40 flex items-center justify-center text-[10px] sm:text-xs font-black text-blue-400 shadow-lg shadow-blue-900/40">
-                           {i + 1}
-                         </div>
-                         {i < 2 && <div className="w-px h-full bg-slate-800 mt-6 shadow-[0_0_10px_rgba(37,99,235,0.2)]"></div>}
+              <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none">
+                <IconMapper name="sprint" className=" text-[150px] sm:text-[200px] text-white" />
+              </div>
+              <h3 className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-blue-400 mb-10 sm:mb-14 relative z-10">Chiến thuật cơ bản</h3>
+              <div className="space-y-10 sm:space-y-14 relative z-10">
+                {scenario.deepAnalysis?.sprint90.map((phase: any, i: number) => (
+                  <div key={i} className="flex gap-8 sm:gap-10 group">
+                    <div className="flex flex-col items-center shrink-0">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-blue-600/20 border border-blue-600/40 flex items-center justify-center text-[10px] sm:text-xs font-black text-blue-400 shadow-lg shadow-blue-900/40">
+                        {i + 1}
                       </div>
-                      <div className="pb-4 sm:pb-6">
-                        <h4 className="text-[11px] sm:text-sm font-black uppercase tracking-widest text-white mb-6 sm:mb-8">
-                          {phase.phase}
-                        </h4>
-                        <ul className="space-y-4 sm:space-y-6">
-                          {phase.tasks.map((task: string, ti: number) => (
-                            <li key={ti} className="flex items-start gap-4 text-slate-400 text-sm font-medium leading-relaxed">
-                              <span className="w-2 h-2 rounded-full bg-blue-600 mt-2 shrink-0 shadow-[0_0_10px_rgba(37,99,235,0.5)]"></span>
-                              {task}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                   </div>
-                 ))}
-               </div>
+                      {i < 2 && <div className="w-px h-full bg-slate-800 mt-6 shadow-[0_0_10px_rgba(37,99,235,0.2)]"></div>}
+                    </div>
+                    <div className="pb-4 sm:pb-6">
+                      <h4 className="text-[11px] sm:text-sm font-black uppercase tracking-widest text-white mb-6 sm:mb-8">
+                        {phase.phase}
+                      </h4>
+                      <ul className="space-y-4 sm:space-y-6">
+                        {phase.tasks.map((task: string, ti: number) => (
+                          <li key={ti} className="flex items-start gap-4 text-slate-400 text-sm font-medium leading-relaxed">
+                            <span className="w-2 h-2 rounded-full bg-blue-600 mt-2 shrink-0 shadow-[0_0_10px_rgba(37,99,235,0.5)]"></span>
+                            {task}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </section>
 
             <div className="flex flex-col gap-4 sm:gap-6 pt-2">
-               {/* 1. Nút Phân tích - Shown for visitors OR in history mode */}
-               {!(state.fromCommunity && isOwner) && (
-                 existingProgress ? (
-                   <motion.button 
-                     whileHover={{ scale: 1.02, boxShadow: '0 30px 60px -15px rgba(37,99,235,0.25)' }}
-                     whileTap={{ scale: 0.98 }}
-                     onClick={() => navigate(`/progress?id=${existingProgress.id}`)} 
-                     className="w-full py-6 bg-gradient-to-br from-blue-500 to-blue-700 text-white font-black text-[10px] uppercase tracking-widest rounded-[1.5rem] sm:rounded-[2rem] shadow-[0_20px_40px_-10px_rgba(37,99,235,0.2)] flex items-center justify-center gap-4 relative overflow-hidden group"
-                   >
-                     VÀO TIẾN TRÌNH <IconMapper name="trending_up" className=" text-xl" />
-                   </motion.button>
-                 ) : (
-                   <motion.button 
-                     whileHover={{ scale: 1.02, boxShadow: '0 30px 60px -15px rgba(245,158,11,0.25)' }}
-                     whileTap={{ scale: 0.98 }}
-                     onClick={handlePremiumClick} 
-                     className="w-full py-6 bg-gradient-to-br from-amber-400 to-amber-600 text-white font-black text-[10px] uppercase tracking-widest rounded-[1.5rem] sm:rounded-[2rem] shadow-[0_20px_40px_-10px_rgba(245,158,11,0.2)] flex items-center justify-center gap-4 relative overflow-hidden group"
-                   >
-                     <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
-                     KỊCH BẢN CHI TIẾT <IconMapper name="workspace_premium" className=" text-xl" />
-                   </motion.button>
-                 )
-               )}
+              {/* 1. Nút Phân tích - Shown for visitors OR in history mode */}
+              {!(state.fromCommunity && isOwner) && (
+                existingProgress ? (
+                  <motion.button
+                    whileHover={{ scale: 1.02, boxShadow: '0 30px 60px -15px rgba(37,99,235,0.25)' }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => navigate(`/progress?id=${existingProgress.id}`)}
+                    className="w-full py-6 bg-gradient-to-br from-blue-500 to-blue-700 text-white font-black text-[10px] uppercase tracking-widest rounded-[1.5rem] sm:rounded-[2rem] shadow-[0_20px_40px_-10px_rgba(37,99,235,0.2)] flex items-center justify-center gap-4 relative overflow-hidden group"
+                  >
+                    VÀO TIẾN TRÌNH <IconMapper name="trending_up" className=" text-xl" />
+                  </motion.button>
+                ) : (
+                  <motion.button
+                    whileHover={{ scale: 1.02, boxShadow: '0 30px 60px -15px rgba(245,158,11,0.25)' }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={handlePremiumClick}
+                    className="w-full py-6 bg-gradient-to-br from-amber-400 to-amber-600 text-white font-black text-[10px] uppercase tracking-widest rounded-[1.5rem] sm:rounded-[2rem] shadow-[0_20px_40px_-10px_rgba(245,158,11,0.2)] flex items-center justify-center gap-4 relative overflow-hidden group"
+                  >
+                    <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+                    KỊCH BẢN CHI TIẾT <IconMapper name="workspace_premium" className=" text-xl" />
+                  </motion.button>
+                )
+              )}
 
-               {/* 2. Nút Xuất bản (Chỉ hiện nếu đang ở xem từ lịch sử) */}
-               {!state.fromCommunity && (
-                 <button onClick={() => setIsModalOpen(true)} className="w-full py-6 bg-slate-900 text-white font-black text-[10px] uppercase tracking-widest rounded-[1.5rem] sm:rounded-[2rem] hover:bg-blue-600 transition-all shadow-xl flex items-center justify-center gap-4 group">
-                   XUẤT BẢN <IconMapper name="share" className=" text-xl group-hover:rotate-12 transition-transform" />
-                 </button>
-               )}
+              {/* 2. Nút Xuất bản (Chỉ hiện nếu đang ở xem từ lịch sử) */}
+              {!state.fromCommunity && (
+                <button onClick={() => setIsModalOpen(true)} className="w-full py-6 bg-slate-900 text-white font-black text-[10px] uppercase tracking-widest rounded-[1.5rem] sm:rounded-[2rem] hover:bg-blue-600 transition-all shadow-xl flex items-center justify-center gap-4 group">
+                  XUẤT BẢN <IconMapper name="share" className=" text-xl group-hover:rotate-12 transition-transform" />
+                </button>
+              )}
 
-               {/* 3. Nút Xóa bài đăng (Chỉ hiện nếu là chủ sở hữu và đang xem từ cộng đồng) */}
-               {state.fromCommunity && isOwner && (
-                 <button onClick={handleDeletePost} className="w-full py-6 bg-rose-50 border border-rose-100 text-rose-600 font-black text-[10px] uppercase tracking-widest rounded-[1.5rem] sm:rounded-[2rem] hover:bg-rose-600 hover:text-white transition-all shadow-sm flex items-center justify-center gap-4">
-                   XÓA BÀI ĐĂNG <IconMapper name="delete" className=" text-xl" />
-                 </button>
-               )}
-               
-               <button onClick={() => navigate(state.fromCommunity ? '/community' : '/history')} className="w-full py-6 bg-white border border-slate-200 text-slate-400 font-black text-[10px] uppercase tracking-widest rounded-[1.5rem] sm:rounded-[2rem] hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm text-center">
-                 {state.fromCommunity ? 'QUAY LẠI CỘNG ĐỒNG' : 'QUAY LẠI LỊCH SỬ'}
-               </button>
+              {/* 3. Nút Xóa bài đăng (Chỉ hiện nếu là chủ sở hữu và đang xem từ cộng đồng) */}
+              {state.fromCommunity && isOwner && (
+                <button onClick={handleDeletePost} className="w-full py-6 bg-rose-50 border border-rose-100 text-rose-600 font-black text-[10px] uppercase tracking-widest rounded-[1.5rem] sm:rounded-[2rem] hover:bg-rose-600 hover:text-white transition-all shadow-sm flex items-center justify-center gap-4">
+                  XÓA BÀI ĐĂNG <IconMapper name="delete" className=" text-xl" />
+                </button>
+              )}
+
+              <button onClick={() => navigate(state.fromCommunity ? '/community' : '/history')} className="w-full py-6 bg-white border border-slate-200 text-slate-400 font-black text-[10px] uppercase tracking-widest rounded-[1.5rem] sm:rounded-[2rem] hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm text-center">
+                {state.fromCommunity ? 'QUAY LẠI CỘNG ĐỒNG' : 'QUAY LẠI LỊCH SỬ'}
+              </button>
             </div>
           </div>
         </div>
@@ -660,8 +658,8 @@ const ScenarioDetailPage: React.FC = () => {
                     </p>
                   </div>
                   <div className="space-y-8">
-                    <div className="flex flex-col gap-3"><label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-2">Tên báo cáo chính thức</label><input required value={saveForm.title} onChange={(e) => setSaveForm({...saveForm, title: e.target.value})} className="w-full h-14 px-6 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:bg-white focus:border-blue-600 transition-all font-bold text-slate-900 shadow-inner" placeholder="Ví dụ: Lộ trình sự nghiệp 2024" /></div>
-                    <label className="flex items-center justify-between cursor-pointer p-5 rounded-2xl border border-slate-100 bg-slate-50 hover:bg-white transition-all group"><div className="flex items-center gap-4"><IconMapper name="visibility_off" className=" text-xl text-amber-500" /><span className="text-[10px] font-black text-slate-900 uppercase tracking-widest">Đăng ẩn danh</span></div><input type="checkbox" checked={saveForm.isAnonymous} onChange={(e) => setSaveForm({...saveForm, isAnonymous: e.target.checked})} className="w-6 h-6 rounded-lg text-amber-500 border-slate-200" /></label>
+                    <div className="flex flex-col gap-3"><label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-2">Tên báo cáo chính thức</label><input required value={saveForm.title} onChange={(e) => setSaveForm({ ...saveForm, title: e.target.value })} className="w-full h-14 px-6 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:bg-white focus:border-blue-600 transition-all font-bold text-slate-900 shadow-inner" placeholder="Ví dụ: Lộ trình sự nghiệp 2024" /></div>
+                    <label className="flex items-center justify-between cursor-pointer p-5 rounded-2xl border border-slate-100 bg-slate-50 hover:bg-white transition-all group"><div className="flex items-center gap-4"><IconMapper name="visibility_off" className=" text-xl text-amber-500" /><span className="text-[10px] font-black text-slate-900 uppercase tracking-widest">Đăng ẩn danh</span></div><input type="checkbox" checked={saveForm.isAnonymous} onChange={(e) => setSaveForm({ ...saveForm, isAnonymous: e.target.checked })} className="w-6 h-6 rounded-lg text-amber-500 border-slate-200" /></label>
                   </div>
                   <button
                     type="submit"

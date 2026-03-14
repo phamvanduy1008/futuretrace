@@ -133,9 +133,9 @@ const HistoryPage: React.FC = () => {
       <main className="flex-1 max-w-[1200px] mx-auto w-full px-4 sm:px-8 py-10 sm:py-16">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-16 gap-6">
           <div className="space-y-3">
-            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight font-display text-slate-900">
-              Lịch sử Quyết định
+            <h1 className="text-3xl sm:text-6xl font-black tracking-tight mb-4 font-display text-slate-900 leading-[1.8] uppercase italic">Lịch sử Quyết định
             </h1>
+
             <p className="text-slate-600 text-sm sm:text-lg max-w-2xl leading-relaxed font-medium">
               Kho lưu trữ bảo mật các kịch bản mô phỏng đa thời gian đã thực
               thi.
@@ -152,11 +152,10 @@ const HistoryPage: React.FC = () => {
         <div className="flex items-center gap-8 mb-10 border-b border-slate-100 pb-0">
           <button
             onClick={() => setActiveTab("all")}
-            className={`pb-4 text-xs font-black uppercase tracking-widest transition-all relative ${
-              activeTab === "all"
-                ? "text-blue-600"
-                : "text-slate-400 hover:text-slate-600"
-            }`}
+            className={`pb-4 text-xs font-black uppercase tracking-widest transition-all relative ${activeTab === "all"
+              ? "text-blue-600"
+              : "text-slate-400 hover:text-slate-600"
+              }`}
           >
             Toàn bộ lịch sử
             {activeTab === "all" && (
@@ -168,11 +167,10 @@ const HistoryPage: React.FC = () => {
           </button>
           <button
             onClick={() => setActiveTab("saved")}
-            className={`pb-4 text-xs font-black uppercase tracking-widest transition-all relative ${
-              activeTab === "saved"
-                ? "text-blue-600"
-                : "text-slate-400 hover:text-slate-600"
-            }`}
+            className={`pb-4 text-xs font-black uppercase tracking-widest transition-all relative ${activeTab === "saved"
+              ? "text-blue-600"
+              : "text-slate-400 hover:text-slate-600"
+              }`}
           >
             Đã lưu
             {activeTab === "saved" && (
@@ -229,7 +227,7 @@ const HistoryPage: React.FC = () => {
                     onClick={() => {
                       if (item.isFolder) {
                         toggleFolder(
-                          { stopPropagation: () => {} } as any,
+                          { stopPropagation: () => { } } as any,
                           item.id,
                         );
                       } else {
@@ -258,14 +256,14 @@ const HistoryPage: React.FC = () => {
                             {item.isFolder
                               ? "THƯ MỤC MÔ PHỎNG"
                               : item.category === "Positive" ||
-                                  item.category === "positive" ||
-                                  item.category === "Success"
+                                item.category === "positive" ||
+                                item.category === "Success"
                                 ? "Tích cực"
                                 : item.category === "Risk" ||
-                                    item.category === "risk"
+                                  item.category === "risk"
                                   ? "Rủi ro"
                                   : item.category === "Neutral" ||
-                                      item.category === "neutral"
+                                    item.category === "neutral"
                                     ? "Ổn định"
                                     : item.category}
                           </span>
@@ -322,11 +320,10 @@ const HistoryPage: React.FC = () => {
                         <div className="flex items-center gap-2">
                           <button
                             onClick={(e) => handleSave(e, item)}
-                            className={`w-10 h-10 rounded-xl transition-all flex items-center justify-center shadow-sm ${
-                              item.isSaved
-                                ? "bg-blue-600 text-white shadow-blue-200"
-                                : "bg-slate-50 text-slate-400 hover:bg-blue-50 hover:text-blue-600"
-                            }`}
+                            className={`w-10 h-10 rounded-xl transition-all flex items-center justify-center shadow-sm ${item.isSaved
+                              ? "bg-blue-600 text-white shadow-blue-200"
+                              : "bg-slate-50 text-slate-400 hover:bg-blue-50 hover:text-blue-600"
+                              }`}
                             title={item.isSaved ? "Bỏ lưu" : "Lưu kịch bản"}
                           >
                             <IconMapper
@@ -361,7 +358,7 @@ const HistoryPage: React.FC = () => {
                         exit={{ opacity: 0, scaleY: 0 }}
                         style={{ transformOrigin: "top" }}
                         transition={{ duration: 0.25 }}
-                        className="ml-8 sm:ml-16 space-y-3 border-l-2 border-blue-100 pl-6 sm:pl-10 overflow-hidden mb-6"
+                        className="ml-8 mt-[12px] sm:ml-16 space-y-3 border-l-2 border-blue-100 pl-6 sm:pl-10 overflow-hidden mb-6"
                       >
                         {item.scenarios?.map((sub: any) => (
                           <div
@@ -436,11 +433,10 @@ const HistoryPage: React.FC = () => {
                   <button
                     key={number}
                     onClick={() => paginate(number)}
-                    className={`w-10 h-10 rounded-xl text-[10px] font-black transition-all ${
-                      currentPage === number
-                        ? "bg-slate-900 text-white shadow-lg"
-                        : "text-slate-400 hover:bg-slate-50 hover:text-slate-900"
-                    }`}
+                    className={`w-10 h-10 rounded-xl text-[10px] font-black transition-all ${currentPage === number
+                      ? "bg-slate-900 text-white shadow-lg"
+                      : "text-slate-400 hover:bg-slate-50 hover:text-slate-900"
+                      }`}
                   >
                     {number}
                   </button>

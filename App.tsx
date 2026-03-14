@@ -126,7 +126,10 @@ const App: React.FC = () => {
           element={isAuthenticated ? <PaymentResultPage /> : <Navigate to="/login" />}
         />
 
-        <Route path="/admin/*" element={<AdminApp />} />
+        <Route
+          path="/admin/*"
+          element={isAuthenticated ? <Navigate to="/dashboard" /> : <AdminApp />}
+        />
 
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>

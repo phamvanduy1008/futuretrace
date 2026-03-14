@@ -65,7 +65,7 @@ const CommunityPage: React.FC = () => {
       console.error(err);
     }
   };
-  
+
   const paginate = (pageNumber: number) => {
     setCurrentPage(pageNumber);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -74,30 +74,30 @@ const CommunityPage: React.FC = () => {
   return (
     <AnimatedBackground className="flex flex-col font-sans">
       <SharedHeader />
-      
+
       <main className="flex-1 max-w-[1100px] mx-auto w-full px-6 py-12 sm:py-24">
         <header className="mb-24 text-center">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
             className="inline-flex items-center px-6 py-2 rounded-full bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest mb-10 border border-blue-100 shadow-sm"
           >
             Mạng lưới nghiên cứu FutureTrace
           </motion.div>
-          <motion.h1 
+          <motion.h1
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-            className="text-4xl sm:text-7xl font-black text-slate-900 leading-[1.6] sm:leading-[1.4] mb-12 mb-10 font-display text-slate-900 leading-none uppercase italic"
+            className="text-4xl sm:text-6xl font-black text-slate-900 leading-[1.6] sm:leading-[1.4] mb-12 mb-10 font-display text-slate-900 leading-none uppercase italic"
           >
             {query ? (
               <>Kết quả cho: <br /><span className="text-blue-600">"{query}"</span></>
             ) : (
-              <>Cộng đồng <br /> <span className="text-blue-600">Nghiên cứu Tương lai.</span></>
+              <><span className="sm:text-7xl">Cộng đồng</span> <br /> <span className="text-blue-600">Nghiên cứu Tương lai.</span></>
             )}
           </motion.h1>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
             className="text-xl text-slate-600 font-medium max-w-2xl mx-auto leading-relaxed"
           >
-            {query 
+            {query
               ? `Hệ thống tìm thấy một số quỹ đạo nghiên cứu phù hợp với yêu cầu của bạn.`
               : "Khám phá các quỹ đạo tương lai được chia sẻ bởi cộng đồng chuyên gia. Học hỏi từ các mô phỏng Monte Carlo thực tế."
             }
@@ -113,11 +113,10 @@ const CommunityPage: React.FC = () => {
           ].map((f) => (
             <button
               key={f.id} onClick={() => setFilter(f.id)}
-              className={`px-10 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border ${
-                filter === f.id 
-                  ? 'bg-slate-900 text-white border-slate-900 shadow-2xl scale-105' 
-                  : 'bg-white text-slate-400 border-slate-100 hover:border-slate-300 shadow-[0_10px_30px_-5px_rgba(0,0,0,0.05)]'
-              }`}
+              className={`px-10 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border ${filter === f.id
+                ? 'bg-slate-900 text-white border-slate-900 shadow-2xl scale-105'
+                : 'bg-white text-slate-400 border-slate-100 hover:border-slate-300 shadow-[0_10px_30px_-5px_rgba(0,0,0,0.05)]'
+                }`}
             >
               {f.label}
             </button>
@@ -132,14 +131,14 @@ const CommunityPage: React.FC = () => {
           </div>
         ) : error ? (
           <div className="py-24 text-center border-2 border-dashed border-rose-200 rounded-[3.5rem] bg-rose-50/30">
-             <IconMapper name="error_outline" className=" text-6xl text-rose-200 mb-8" />
-             <p className="text-rose-600 font-black uppercase text-sm tracking-widest">{error}</p>
-             <button 
+            <IconMapper name="error_outline" className=" text-6xl text-rose-200 mb-8" />
+            <p className="text-rose-600 font-black uppercase text-sm tracking-widest">{error}</p>
+            <button
               onClick={() => fetchPosts()}
               className="mt-8 text-rose-600 text-[11px] font-black uppercase tracking-widest hover:underline bg-rose-50 px-8 py-3 rounded-xl border border-rose-100 transition-all"
-             >
-               Thử lại
-             </button>
+            >
+              Thử lại
+            </button>
           </div>
         ) : (
           <div className="space-y-12 mb-24">
@@ -153,13 +152,13 @@ const CommunityPage: React.FC = () => {
                     {/* Metric Sidebar */}
                     <div className="md:w-32 flex md:flex-col gap-8 items-center shrink-0 pt-2">
                       <div className="flex flex-col items-center">
-                         <span className="text-3xl font-black text-slate-900">{post.roi}%</span>
-                         <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-1">ROI Dự báo</span>
+                        <span className="text-3xl font-black text-slate-900">{post.roi}%</span>
+                        <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-1">ROI Dự báo</span>
                       </div>
                       <div className="w-px md:w-16 h-8 md:h-px bg-slate-100"></div>
                       <div className="flex flex-col items-center">
-                         <span className="text-3xl font-black text-blue-600">{post.reliability}%</span>
-                         <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-1">Tin cậy</span>
+                        <span className="text-3xl font-black text-blue-600">{post.reliability}%</span>
+                        <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-1">Tin cậy</span>
                       </div>
                     </div>
 
@@ -175,30 +174,29 @@ const CommunityPage: React.FC = () => {
                             <img src={post.authorAvatar} className="w-12 h-12 rounded-2xl border-2 border-white shadow-xl" alt={post.author || 'Avatar'} />
                           )}
                           <div>
-                             <p className="text-[11px] font-black text-slate-900 uppercase tracking-widest">{post.author}</p>
-                             <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{post.date}</p>
+                            <p className="text-[11px] font-black text-slate-900 uppercase tracking-widest">{post.author}</p>
+                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{post.date}</p>
                           </div>
                         </div>
-                        <span className={`px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border shadow-sm ${
-                          post.type === 'Positive' || post.type === 'positive' ? 'text-emerald-600 bg-emerald-50 border-emerald-100' :
+                        <span className={`px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border shadow-sm ${post.type === 'Positive' || post.type === 'positive' ? 'text-emerald-600 bg-emerald-50 border-emerald-100' :
                           post.type === 'Risk' || post.type === 'risk' ? 'text-rose-600 bg-rose-50 border-rose-100' : 'text-blue-600 bg-blue-50 border-blue-100'
-                        }`}>
+                          }`}>
                           {post.type === 'Positive' || post.type === 'positive' ? 'Tích cực' :
-                           post.type === 'Risk' || post.type === 'risk' ? 'Rủi ro' : 'Ổn định'}
+                            post.type === 'Risk' || post.type === 'risk' ? 'Rủi ro' : 'Ổn định'}
                         </span>
                       </div>
 
                       <h2 onClick={() => navigate(`/detail/${post.id}`, { state: { scenario: post, fromCommunity: true } })} className="text-3xl sm:text-4xl font-black font-display text-slate-900 hover:text-blue-600 cursor-pointer transition-colors leading-tight uppercase tracking-tighter italic">
                         {post.title}
                       </h2>
-                      
+
                       <p className="text-slate-600 font-medium leading-relaxed italic text-base sm:text-lg opacity-80">
                         "{post.desc}"
                       </p>
 
                       <div className="flex items-center justify-between pt-10 border-t border-slate-50">
                         <div className="flex items-center gap-10">
-                          <button 
+                          <button
                             onClick={(e) => handleLike(e, post.id)}
                             className="flex items-center gap-3 group/btn"
                           >
@@ -211,7 +209,7 @@ const CommunityPage: React.FC = () => {
                           </button>
                         </div>
                         <button onClick={() => navigate(`/detail/${post.id}`, { state: { scenario: post, fromCommunity: true } })} className="flex items-center gap-3 text-[11px] font-black text-blue-600 uppercase tracking-widest hover:translate-x-3 transition-all group">
-                           Báo cáo đầy đủ <IconMapper name="arrow_forward" className="text-xl group-hover:scale-125 transition-transform" />
+                          Báo cáo đầy đủ <IconMapper name="arrow_forward" className="text-xl group-hover:scale-125 transition-transform" />
                         </button>
                       </div>
                     </div>
@@ -222,14 +220,14 @@ const CommunityPage: React.FC = () => {
 
             {posts.length === 0 && (
               <div className="py-24 text-center border-2 border-dashed border-slate-200 rounded-[3.5rem] bg-white shadow-xl">
-                 <IconMapper name="search_off" className=" text-6xl text-slate-100 mb-8" />
-                 <p className="text-slate-400 font-black uppercase text-xs tracking-widest">Hệ thống không tìm thấy quỹ đạo phù hợp</p>
-                 <button 
+                <IconMapper name="search_off" className=" text-6xl text-slate-100 mb-8" />
+                <p className="text-slate-400 font-black uppercase text-xs tracking-widest">Hệ thống không tìm thấy quỹ đạo phù hợp</p>
+                <button
                   onClick={() => { setFilter('all'); navigate('/community'); }}
                   className="mt-8 text-blue-600 text-[11px] font-black uppercase tracking-widest hover:underline bg-blue-50 px-8 py-3 rounded-xl border border-blue-100 transition-all"
-                 >
-                   Xóa bộ lọc tìm kiếm
-                 </button>
+                >
+                  Xóa bộ lọc tìm kiếm
+                </button>
               </div>
             )}
           </div>
@@ -238,31 +236,30 @@ const CommunityPage: React.FC = () => {
         {/* Pagination Controls */}
         {!isLoading && totalPages > 1 && (
           <nav className="flex items-center justify-center gap-6">
-            <button 
+            <button
               onClick={() => currentPage > 1 && paginate(currentPage - 1)}
               disabled={currentPage === 1}
               className="w-14 h-14 rounded-2xl border border-slate-100 bg-white flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-200 disabled:opacity-30 disabled:pointer-events-none transition-all shadow-[0_10px_30px_-5px_rgba(0,0,0,0.05)] hover:shadow-xl"
             >
               <IconMapper name="chevron_left" className="" />
             </button>
-            
+
             <div className="flex items-center gap-3 bg-white p-2.5 rounded-[2rem] border border-slate-100 shadow-[0_10px_30px_-5px_rgba(0,0,0,0.05)]">
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
                 <button
                   key={number}
                   onClick={() => paginate(number)}
-                  className={`w-11 h-11 rounded-xl text-[10px] font-black transition-all ${
-                    currentPage === number 
-                      ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/20 scale-110' 
-                      : 'text-slate-400 hover:bg-slate-50 hover:text-slate-900'
-                  }`}
+                  className={`w-11 h-11 rounded-xl text-[10px] font-black transition-all ${currentPage === number
+                    ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/20 scale-110'
+                    : 'text-slate-400 hover:bg-slate-50 hover:text-slate-900'
+                    }`}
                 >
                   {number}
                 </button>
               ))}
             </div>
 
-            <button 
+            <button
               onClick={() => currentPage < totalPages && paginate(currentPage + 1)}
               disabled={currentPage === totalPages}
               className="w-14 h-14 rounded-2xl border border-slate-100 bg-white flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-200 disabled:opacity-30 disabled:pointer-events-none transition-all shadow-[0_10px_30px_-5px_rgba(0,0,0,0.05)] hover:shadow-xl"
