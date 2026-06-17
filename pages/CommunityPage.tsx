@@ -98,8 +98,8 @@ const CommunityPage: React.FC = () => {
             className="text-xl text-slate-600 font-medium max-w-2xl mx-auto leading-relaxed"
           >
             {query
-              ? `Hệ thống tìm thấy một số quỹ đạo nghiên cứu phù hợp với yêu cầu của bạn.`
-              : "Khám phá các quỹ đạo tương lai được chia sẻ bởi cộng đồng chuyên gia. Học hỏi từ các mô phỏng Monte Carlo thực tế."
+              ? `Hệ thống tìm thấy một số kịch bản phù hợp với yêu cầu của bạn.`
+              : "Khám phá các lộ trình tương lai được chia sẻ bởi cộng đồng. Học hỏi từ các kịch bản mô phỏng thực tế."
             }
           </motion.p>
         </header>
@@ -127,7 +127,7 @@ const CommunityPage: React.FC = () => {
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-24 space-y-8">
             <div className="w-20 h-20 border-t-4 border-b-4 border-blue-600 rounded-full animate-spin"></div>
-            <p className="text-xs font-black text-slate-400 uppercase tracking-widest animate-pulse">Đang tải quỹ đạo từ mạng lưới nghiên cứu...</p>
+            <p className="text-xs font-black text-slate-400 uppercase tracking-widest animate-pulse">Đang tải kịch bản từ mạng lưới...</p>
           </div>
         ) : error ? (
           <div className="py-24 text-center border-2 border-dashed border-rose-200 rounded-[3.5rem] bg-rose-50/30">
@@ -153,7 +153,7 @@ const CommunityPage: React.FC = () => {
                     <div className="md:w-32 flex md:flex-col gap-8 items-center shrink-0 pt-2">
                       <div className="flex flex-col items-center">
                         <span className="text-3xl font-black text-slate-900">{post.roi}%</span>
-                        <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-1">ROI Dự báo</span>
+                        <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-1">Hiệu quả tài chính (ROI) dự báo</span>
                       </div>
                       <div className="w-px md:w-16 h-8 md:h-px bg-slate-100"></div>
                       <div className="flex flex-col items-center">
@@ -221,7 +221,7 @@ const CommunityPage: React.FC = () => {
             {posts.length === 0 && (
               <div className="py-24 text-center border-2 border-dashed border-slate-200 rounded-[3.5rem] bg-white shadow-xl">
                 <IconMapper name="search_off" className=" text-6xl text-slate-100 mb-8" />
-                <p className="text-slate-400 font-black uppercase text-xs tracking-widest">Hệ thống không tìm thấy quỹ đạo phù hợp</p>
+                <p className="text-slate-400 font-black uppercase text-xs tracking-widest">Hệ thống không tìm thấy kịch bản phù hợp</p>
                 <button
                   onClick={() => { setFilter('all'); navigate('/community'); }}
                   className="mt-8 text-blue-600 text-[11px] font-black uppercase tracking-widest hover:underline bg-blue-50 px-8 py-3 rounded-xl border border-blue-100 transition-all"

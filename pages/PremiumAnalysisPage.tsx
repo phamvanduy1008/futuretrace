@@ -159,7 +159,7 @@ const PremiumAnalysisPage: React.FC = () => {
           </div>
         </div>
         <h2 className="text-xl font-black uppercase tracking-widest mb-4 text-amber-500">Phân tích Chuyên sâu Premium</h2>
-        <p className="text-slate-600 text-[10px] font-black uppercase tracking-widest animate-pulse">Hệ thống đang giả lập lộ trình phức hợp...</p>
+        <p className="text-slate-600 text-[10px] font-black uppercase tracking-widest animate-pulse">Hệ thống đang mô phỏng lộ trình chi tiết...</p>
       </AnimatedBackground>
     );
   }
@@ -197,7 +197,7 @@ const PremiumAnalysisPage: React.FC = () => {
                <IconMapper name="auto_awesome" className=" text-[180px] text-slate-900" />
             </div>
             <h3 className="text-[10px] font-black uppercase tracking-widest text-blue-600 mb-6 flex items-center gap-3">
-               <IconMapper name="history_edu" className=" text-lg" /> Diễn biến chi tiết (Narrative)
+               <IconMapper name="history_edu" className=" text-lg" /> Diễn biến kịch bản chi tiết
             </h3>
             <p className="text-lg text-slate-700 leading-relaxed font-medium italic opacity-90 text-justify hyphens-auto">
               {report.detailedNarrative}
@@ -209,7 +209,7 @@ const PremiumAnalysisPage: React.FC = () => {
            {/* Milestones & Timeline */}
            <div className="lg:col-span-8 space-y-10">
               <section className="bg-slate-950 p-10 sm:p-14 rounded-[3rem] text-white shadow-2xl relative overflow-hidden">
-                <h3 className="text-[10px] font-black uppercase tracking-widest text-amber-400 mb-12">Cột mốc chiến lược (Milestones)</h3>
+                <h3 className="text-[10px] font-black uppercase tracking-widest text-amber-400 mb-12">Cột mốc quan trọng (Cột mốc)</h3>
                 <div className="space-y-0">
                   {report.milestones.map((m, i) => {
                     const status = getMilestoneStatus(i);
@@ -281,7 +281,7 @@ const PremiumAnalysisPage: React.FC = () => {
 
               <section className="bg-white p-10 sm:p-14 rounded-[3rem] border border-slate-100 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.05)]">
                  <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-900 mb-10 flex items-center gap-3">
-                   <IconMapper name="alt_route" className=" text-blue-600" /> Điểm xoay chiến lược (Pivot Points)
+                   <IconMapper name="alt_route" className=" text-blue-600" /> Phương án dự phòng (Điểm điều chỉnh)
                  </h3>
                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                     {report.strategicPivotPoints.map((p, i) => (
@@ -426,7 +426,7 @@ const PremiumAnalysisPage: React.FC = () => {
               </div>
             </div>
             <h2 className="text-xl font-black uppercase tracking-widest mb-4 text-blue-500">Đang điều chỉnh lộ trình</h2>
-            <p className="text-slate-600 text-[10px] font-black uppercase tracking-widest animate-pulse">AI đang phân tích feedback và tối ưu các cột mốc tiếp theo...</p>
+            <p className="text-slate-600 text-[10px] font-black uppercase tracking-widest animate-pulse">AI đang phân tích phản hồi và tối ưu các cột mốc tiếp theo...</p>
           </div>
         )}
       </AnimatePresence>
@@ -527,7 +527,7 @@ const PremiumAnalysisPage: React.FC = () => {
                 <div className="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-2xl mb-8">
                   <IconMapper name="info" className=" text-amber-600 text-lg shrink-0 mt-0.5" />
                   <p className="text-[11px] text-amber-700 font-bold leading-relaxed">
-                    Các cột mốc bạn đã hoàn thành sẽ được giữ nguyên. Chỉ các cột mốc chưa thực hiện mới được tái cơ cấu.
+                    Các cột mốc bạn đã hoàn thành sẽ được giữ nguyên. Chỉ các cột mốc chưa thực hiện mới được điều chỉnh.
                   </p>
                 </div>
 

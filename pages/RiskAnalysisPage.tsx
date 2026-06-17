@@ -21,9 +21,9 @@ const RiskAnalysisPage: React.FC = () => {
             <div className="flex items-center gap-2 text-[9px] font-black text-blue-600 uppercase tracking-widest mb-4">
               BẢNG ĐIỀU KHIỂN <IconMapper name="chevron_right" className=" text-[10px]" /> GIÁM SÁT RỦI RO
             </div>
-            <h1 className="text-3xl sm:text-5xl font-black tracking-tight mb-4 font-display text-slate-900 leading-tight">Giám sát Véc-tơ Đe dọa</h1>
+            <h1 className="text-3xl sm:text-5xl font-black tracking-tight mb-4 font-display text-slate-900 leading-tight">Đánh giá các Nguy cơ Rủi ro</h1>
             <p className="text-slate-600 text-sm sm:text-lg leading-relaxed max-w-2xl font-medium">
-              Hệ thống AI liên tục phân tích các yếu tố gây mất ổn định tiềm tàng trong quỹ đạo của bạn.
+              Hệ thống AI liên tục phân tích các yếu tố rủi ro tiềm ẩn trong lộ trình phát triển của bạn.
             </p>
           </motion.div>
 
@@ -57,7 +57,16 @@ const RiskAnalysisPage: React.FC = () => {
                 </div>
                 <div className="space-y-4 pt-4 border-t border-slate-50">
                    <div className="flex justify-between text-[10px] font-black uppercase text-slate-400">
-                     <span>XÁC SUẤT XẢY RA</span>
+                     <span className="flex items-center gap-1.5">
+                       XÁC SUẤT XẢY RA
+                       <span className="group/tooltip relative inline-block">
+                         <IconMapper name="help" className="text-slate-300 hover:text-blue-600 cursor-help text-[12px] mb-0.5" />
+                         <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-3 bg-slate-900 text-white text-[10px] rounded-xl shadow-xl opacity-0 group-hover/tooltip:opacity-100 transition-all duration-300 pointer-events-none z-50 normal-case tracking-normal font-medium leading-relaxed border border-slate-800 block text-center">
+                           Tỷ lệ phần trăm dự báo rủi ro này có thể xảy ra trong thực tế lộ trình của bạn.
+                           <span className="absolute top-full left-1/2 -translate-x-1/2 border-[6px] border-transparent border-t-slate-900 block"></span>
+                         </span>
+                       </span>
+                     </span>
                      <span className="text-blue-600">{risk.prob}%</span>
                    </div>
                    <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden shadow-inner">
@@ -90,11 +99,25 @@ const RiskAnalysisPage: React.FC = () => {
                 
                 <div className="p-10 sm:p-12 space-y-12">
                    <div className="grid grid-cols-2 gap-6 bg-slate-950 p-10 rounded-[2.5rem] border border-slate-800 shadow-2xl">
-                      <div className="text-center">
+                      <div className="text-center relative pt-4 pb-2 px-2">
+                         <span className="absolute top-2 right-2 group/tooltip inline-block">
+                           <IconMapper name="help" className="text-slate-600 hover:text-blue-500 cursor-help text-[12px] mb-1 transition-colors" />
+                           <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-3 bg-slate-900 text-white text-[10px] rounded-xl shadow-xl opacity-0 group-hover/tooltip:opacity-100 transition-all duration-200 pointer-events-none normal-case tracking-normal font-medium leading-relaxed border border-slate-800 block text-center z-50">
+                             Điểm số từ 1-10 đánh giá mức độ nguy hại của rủi ro đối với sự nghiệp/tài chính.
+                             <span className="absolute top-full left-1/2 -translate-x-1/2 border-[6px] border-transparent border-t-slate-900 block"></span>
+                           </span>
+                         </span>
                          <span className="text-5xl font-black text-blue-500 block mb-2">{selectedRisk.score}</span>
                          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">CHỈ SỐ RỦI RO</p>
                       </div>
-                      <div className="text-center border-l border-white/10">
+                      <div className="text-center border-l border-white/10 relative pt-4 pb-2 px-2">
+                         <span className="absolute top-2 right-2 group/tooltip inline-block">
+                           <IconMapper name="help" className="text-slate-600 hover:text-blue-500 cursor-help text-[12px] mb-1 transition-colors" />
+                           <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-3 bg-slate-900 text-white text-[10px] rounded-xl shadow-xl opacity-0 group-hover/tooltip:opacity-100 transition-all duration-200 pointer-events-none normal-case tracking-normal font-medium leading-relaxed border border-slate-800 block text-center z-50">
+                             Ước tính thiệt hại tài chính hoặc cơ hội nếu rủi ro này xảy ra mà không có phương án ứng phó.
+                             <span className="absolute top-full left-1/2 -translate-x-1/2 border-[6px] border-transparent border-t-slate-900 block"></span>
+                           </span>
+                         </span>
                          <span className="text-2xl font-black text-white block mb-2">{selectedRisk.loss}</span>
                          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">DỰ BÁO TỔN THẤT</p>
                       </div>
@@ -102,10 +125,10 @@ const RiskAnalysisPage: React.FC = () => {
 
                    <section className="space-y-6">
                       <h4 className="text-[10px] font-black text-slate-900 uppercase tracking-widest flex items-center gap-3">
-                         <IconMapper name="psychology" className=" text-blue-600 text-xl" /> PHƯƠNG ÁN XỬ LÝ AI
+                         <IconMapper name="psychology" className=" text-blue-600 text-xl" /> KHUYẾN NGHỊ TỪ AI
                       </h4>
                       <div className="p-8 border border-slate-100 rounded-[2rem] bg-slate-50/70 text-base text-slate-600 leading-relaxed font-medium italic shadow-inner">
-                        "Cần can thiệp vào cấu trúc tài sản hiện tại và thiết lập các điểm dừng rủi ro (stop-loss) trong giai đoạn tiếp theo để đảm bảo tính thanh khoản."
+                        "Cần can thiệp vào tài chính hiện tại và thiết lập các giới hạn rủi ro (cắt lỗ) trong giai đoạn tiếp theo để đảm bảo an toàn tài chính."
                       </div>
                    </section>
 

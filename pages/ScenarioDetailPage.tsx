@@ -269,14 +269,21 @@ const ScenarioDetailPage: React.FC = () => {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className="bg-slate-950 p-8 mb-[65px] sm:p-10 lg:p-12 rounded-[2.5rem] sm:rounded-[3.5rem] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.3)] flex flex-col items-center justify-center min-w-[240px] sm:min-w-[280px] border border-slate-800 relative group overflow-hidden"
+              className="bg-slate-950 p-8 mb-[65px] sm:p-10 lg:p-12 rounded-[2.5rem] sm:rounded-[3.5rem] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.3)] flex flex-col items-center justify-center min-w-[240px] sm:min-w-[280px] border border-slate-800 relative"
             >
-              <div className="absolute inset-0 bg-blue-600/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <span className="absolute top-4 right-4 z-20 group/tooltip inline-block">
+                <IconMapper name="help" className="text-slate-600 hover:text-blue-400 cursor-help text-[16px] transition-colors" />
+                <span className="absolute bottom-full right-0 mb-2 w-64 p-3 bg-slate-900 text-white text-[10px] rounded-xl shadow-xl opacity-0 group-hover/tooltip:opacity-100 transition-all duration-200 pointer-events-none normal-case tracking-normal font-medium leading-relaxed border border-slate-800 block text-center z-50">
+                  Tỷ suất hoàn vốn dự kiến sau {state.context?.timeHorizon || 5} năm từ quyết định này, được AI tính toán dựa trên mức đầu tư tài chính và nỗ lực cá nhân của bạn.
+                  <span className="absolute top-full right-2 border-[6px] border-transparent border-t-slate-900 block"></span>
+                </span>
+              </span>
+              <div className="absolute inset-0 bg-blue-600/5 rounded-[2.5rem] sm:rounded-[3.5rem] opacity-0 group-hover:opacity-100 transition-opacity"></div>
               <span className="text-5xl sm:text-6xl font-black text-blue-500 mb-2 relative z-10">
                 {displayRoi}%
               </span>
               <span className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest relative z-10">
-                DỰ BÁO ROI 5 NĂM
+                HIỆU QUẢ TÀI CHÍNH DỰ BÁO (ROI) 5 NĂM
               </span>
             </motion.div>
           </div>
@@ -293,24 +300,34 @@ const ScenarioDetailPage: React.FC = () => {
                   val: displayCareer,
                   icon: "trending_up",
                   color: "text-blue-600",
+                  tooltip: "Mức độ tăng trưởng về trình độ chuyên môn, chức vụ và cơ hội việc làm mới."
                 },
                 {
                   label: "Hạnh phúc",
                   val: displayHappiness,
                   icon: "sentiment_satisfied",
                   color: "text-emerald-600",
+                  tooltip: "Đánh giá mức độ hài lòng với cuộc sống, cân bằng tinh thần và sức khỏe tâm lý."
                 },
                 {
                   label: "Tin cậy",
                   val: scenario.reliability || 95,
                   icon: "verified",
                   color: "text-amber-600",
+                  tooltip: "Độ tin cậy của mô hình dự báo AI dựa trên lượng dữ liệu thực tế thu thập được."
                 },
               ].map((m, i) => (
                 <div
                   key={i}
-                  className="bg-white p-6 sm:p-8 lg:p-10 rounded-[2rem] sm:rounded-[2.5rem] border-2 border-slate-100 shadow-[0_15px_30px_-5px_rgba(0,0,0,0.05)] hover:border-blue-600 hover:ring-4 hover:ring-blue-600/10 transition-all text-center"
+                  className="bg-white p-6 sm:p-8 lg:p-10 rounded-[2rem] sm:rounded-[2.5rem] border-2 border-slate-100 shadow-[0_15px_30px_-5px_rgba(0,0,0,0.05)] hover:border-blue-600 hover:ring-4 hover:ring-blue-600/10 transition-all text-center relative"
                 >
+                  <span className="absolute top-4 right-4 group/tooltip inline-block">
+                    <IconMapper name="help" className="text-slate-300 hover:text-blue-600 cursor-help text-[14px] transition-colors" />
+                    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-3 bg-slate-900 text-white text-[10px] rounded-xl shadow-xl opacity-0 group-hover/tooltip:opacity-100 transition-all duration-200 pointer-events-none normal-case tracking-normal font-medium leading-relaxed border border-slate-800 block text-center z-50">
+                      {m.tooltip}
+                      <span className="absolute top-full left-1/2 -translate-x-1/2 border-[6px] border-transparent border-t-slate-900 block"></span>
+                    </span>
+                  </span>
                   <div className="w-12 h-12 sm:w-16 sm:h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-6 shadow-inner border border-slate-100">
                     <IconMapper
                       name={m.icon}
@@ -554,7 +571,7 @@ const ScenarioDetailPage: React.FC = () => {
               {/* 2. Nút Xuất bản (Chỉ hiện nếu đang ở xem từ lịch sử) */}
               {!state.fromCommunity && (
                 <button onClick={() => setIsModalOpen(true)} className="w-full py-6 bg-slate-900 text-white font-black text-[10px] uppercase tracking-widest rounded-[1.5rem] sm:rounded-[2rem] hover:bg-blue-600 transition-all shadow-xl flex items-center justify-center gap-4 group">
-                  XUẤT BẢN <IconMapper name="share" className=" text-xl group-hover:rotate-12 transition-transform" />
+                  CHIA SẺ CỘNG ĐỒNG <IconMapper name="share" className=" text-xl group-hover:rotate-12 transition-transform" />
                 </button>
               )}
 
@@ -681,14 +698,14 @@ const ScenarioDetailPage: React.FC = () => {
                 >
                   <div className="text-center mb-10">
                     <h3 className="text-2xl font-black text-slate-900 font-display uppercase tracking-tighter mb-3">
-                      Xuất bản báo cáo
+                      Chia sẻ lên cộng đồng
                     </h3>
                     <p className="text-slate-400 text-[9px] font-black uppercase tracking-widest">
-                      Hệ thống bảo mật dữ liệu AES-256
+                      Dữ liệu được bảo mật an toàn
                     </p>
                   </div>
                   <div className="space-y-8">
-                    <div className="flex flex-col gap-3"><label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-2">Tên báo cáo chính thức</label><input required value={saveForm.title} onChange={(e) => setSaveForm({ ...saveForm, title: e.target.value })} className="w-full h-14 px-6 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:bg-white focus:border-blue-600 transition-all font-bold text-slate-900 shadow-inner" placeholder="Ví dụ: Lộ trình sự nghiệp 2024" /></div>
+                    <div className="flex flex-col gap-3"><label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-2">Tên kịch bản chia sẻ</label><input required value={saveForm.title} onChange={(e) => setSaveForm({ ...saveForm, title: e.target.value })} className="w-full h-14 px-6 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:bg-white focus:border-blue-600 transition-all font-bold text-slate-900 shadow-inner" placeholder="Ví dụ: Lộ trình sự nghiệp 2024" /></div>
                     <label className="flex items-center justify-between cursor-pointer p-5 rounded-2xl border border-slate-100 bg-slate-50 hover:bg-white transition-all group"><div className="flex items-center gap-4"><IconMapper name="visibility_off" className=" text-xl text-amber-500" /><span className="text-[10px] font-black text-slate-900 uppercase tracking-widest">Đăng ẩn danh</span></div><input type="checkbox" checked={saveForm.isAnonymous} onChange={(e) => setSaveForm({ ...saveForm, isAnonymous: e.target.checked })} className="w-6 h-6 rounded-lg text-amber-500 border-slate-200" /></label>
                   </div>
                   <button
@@ -696,7 +713,7 @@ const ScenarioDetailPage: React.FC = () => {
                     disabled={isSaving}
                     className="w-full py-6 bg-slate-900 text-white font-black text-[11px] uppercase tracking-widest rounded-[1.5rem] hover:bg-blue-600 shadow-xl transition-all disabled:opacity-50 flex items-center justify-center gap-3"
                   >
-                    {isSaving ? "Đang mã hóa..." : "Xác nhận & Xuất bản"}
+                    {isSaving ? "Đang chia sẻ..." : "Xác nhận & Chia sẻ"}
                   </button>
                 </form>
               )}

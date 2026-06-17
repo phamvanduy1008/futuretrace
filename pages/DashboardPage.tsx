@@ -72,15 +72,15 @@ const DashboardPage: React.FC = () => {
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-20 px-2">
           <motion.div variants={itemVariants}>
             <div className="flex items-center gap-2 text-[9px] font-black text-blue-600 uppercase tracking-widest mb-4">
-              RESEARCH NETWORK{" "}
+              MẠNG LƯỚI KHÁM PHÁ{" "}
               <IconMapper name="chevron_right" className=" text-[10px]" />{" "}
-              TERMINAL v0.8
+              LỘ TRÌNH v0.8
             </div>
             <h1 className="text-4xl sm:text-6xl font-black tracking-tight font-display text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-500 leading-normal pb-2 uppercase italic pt-2 pr-6">
               Trung tâm Phân tích
             </h1>
             <p className="text-slate-600 mt-4 text-lg font-medium italic">
-              "Xin chào {user?.name || "Jane"}, hôm nay bạn muốn định lượng
+              "Xin chào {user?.name || "Jane"}, hôm nay bạn muốn mô phỏng
               tương lai nào?"
             </p>
           </motion.div>
@@ -145,8 +145,8 @@ const DashboardPage: React.FC = () => {
                   Khởi tạo Mô phỏng Mới
                 </h2>
                 <p className="text-slate-400 text-xl max-w-md leading-relaxed font-medium italic opacity-80">
-                  Kích hoạt Temporal Matrix Engine để dự báo quỹ đạo 5-10 năm
-                  dựa trên biến số hiện tại.
+                  Kích hoạt hệ thống mô phỏng kịch bản để dự báo lộ trình phát triển
+                  dựa trên chỉ số hiện tại.
                 </p>
               </div>
               <div className="mt-12 flex items-center gap-4 text-blue-400 font-black text-[11px] uppercase tracking-widest">
@@ -208,10 +208,10 @@ const DashboardPage: React.FC = () => {
                 <div className="w-2 h-8 bg-blue-600 rounded-full"></div>
                 <div>
                   <h3 className="text-xl font-black text-slate-900 uppercase tracking-tighter italic">
-                    Trung tâm Điều hành Temporal
+                    Bảng theo dõi lộ trình
                   </h3>
                   <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">
-                    Trích xuất kịch bản mới nhất từ Ma trận xác suất
+                    Trích xuất kịch bản mới nhất từ Hệ thống phân tích kịch bản
                   </p>
                 </div>
               </div>
@@ -256,17 +256,31 @@ const DashboardPage: React.FC = () => {
                           {recentSimulations[0].title}
                         </h4>
                         <div className="flex items-center gap-6 mt-6">
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 relative">
                             <IconMapper name="fingerprint" className="text-blue-600 text-lg" />
-                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
                               FT-IDENT: {recentSimulations[0].id.slice(-6).toUpperCase()}
+                              <span className="group/tooltip relative inline-block">
+                                <IconMapper name="help" className="text-slate-400 hover:text-blue-600 cursor-help text-[12px]" />
+                                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-3 bg-slate-900 text-white text-[10px] rounded-xl shadow-xl opacity-0 group-hover/tooltip:opacity-100 transition-all duration-200 pointer-events-none z-50 normal-case tracking-normal font-medium leading-relaxed border border-slate-800 block text-center">
+                                  Mã định danh duy nhất của kịch bản mô phỏng để tra cứu lịch sử.
+                                  <span className="absolute top-full left-1/2 -translate-x-1/2 border-[6px] border-transparent border-t-slate-900 block"></span>
+                                </span>
+                              </span>
                             </span>
                           </div>
                           <div className="h-4 w-px bg-slate-200"></div>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 relative">
                             <IconMapper name="verified" className="text-emerald-500 text-lg" />
-                            <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">
+                            <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest flex items-center gap-1">
                               Tỉ lệ khớp 98.4%
+                              <span className="group/tooltip relative inline-block">
+                                <IconMapper name="help" className="text-slate-400 hover:text-blue-600 cursor-help text-[12px]" />
+                                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-3 bg-slate-900 text-white text-[10px] rounded-xl shadow-xl opacity-0 group-hover/tooltip:opacity-100 transition-all duration-200 pointer-events-none z-50 normal-case tracking-normal font-medium leading-relaxed border border-slate-800 block text-center">
+                                  Mức độ tin cậy và sự trùng khớp của kịch bản so với dữ liệu thực tế.
+                                  <span className="absolute top-full left-1/2 -translate-x-1/2 border-[6px] border-transparent border-t-slate-900 block"></span>
+                                </span>
+                              </span>
                             </span>
                           </div>
                         </div>
@@ -281,7 +295,7 @@ const DashboardPage: React.FC = () => {
                 <div className="p-10 sm:p-8 bg-slate-50/50">
                   <div className="mb-10 flex items-center justify-between">
                     <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] italic">
-                      Lộ trình đa phân cực (Matrix Nodes)
+                      Các hướng đi dự kiến (Kịch bản)
                     </h5>
                     <div className="flex gap-2">
                       <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
@@ -312,7 +326,7 @@ const DashboardPage: React.FC = () => {
                              <IconMapper name={scenario.type === 'Positive' ? 'trending_up' : scenario.type === 'Risk' ? 'warning' : 'equalizer'} className="text-xl" />
                            </div>
                            <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest bg-slate-50 px-3 py-1 rounded-md">
-                             NODE 0{idx + 1}
+                             KỊCH BẢN 0{idx + 1}
                            </span>
                         </div>
 
@@ -325,7 +339,16 @@ const DashboardPage: React.FC = () => {
 
                         <div className="space-y-4 pt-6 border-t border-slate-50">
                           <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-widest text-slate-400">
-                            <span>Hạnh phúc</span>
+                            <span className="flex items-center gap-1.5">
+                              Hạnh phúc
+                              <span className="group/tooltip relative inline-block">
+                                <IconMapper name="help" className="text-slate-300 hover:text-blue-600 cursor-help text-[12px] mb-0.5" />
+                                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-3 bg-slate-900 text-white text-[10px] rounded-xl shadow-xl opacity-0 group-hover/tooltip:opacity-100 transition-all duration-200 pointer-events-none z-50 normal-case tracking-normal font-medium leading-relaxed border border-slate-800 block text-center">
+                                  Đánh giá mức độ hài lòng với cuộc sống, cân bằng tinh thần và sức khỏe tâm lý.
+                                  <span className="absolute top-full left-1/2 -translate-x-1/2 border-[6px] border-transparent border-t-slate-900 block"></span>
+                                </span>
+                              </span>
+                            </span>
                             <span className="text-slate-900">+{scenario.metrics.happiness}%</span>
                           </div>
                           <div className="h-1 w-full bg-slate-50 rounded-full overflow-hidden">
@@ -355,7 +378,7 @@ const DashboardPage: React.FC = () => {
               className="text-6xl text-slate-100 mb-6 block mx-auto"
             />
             <p className="text-slate-400 font-black uppercase tracking-widest text-[11px] mb-8">
-              Chưa có quỹ đạo kịch bản nghiên cứu nào
+              Chưa có lộ trình kịch bản nào
             </p>
             <button
               onClick={() => navigate("/simulate")}
