@@ -206,6 +206,7 @@ const SimulationFlow: React.FC = () => {
             <div className="relative group">
               <div className="absolute -inset-2 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-[2.5rem] blur-xl opacity-10 group-focus-within:opacity-20 transition duration-1000"></div>
               <textarea
+                id="tour-decision-textarea"
                 className="relative w-full h-[320px] p-10 bg-white/70 backdrop-blur-xl border border-slate-200 rounded-[2.5rem] text-lg leading-relaxed focus:ring-4 focus:ring-blue-50 focus:border-blue-600 outline-none resize-none transition-all shadow-2xl shadow-slate-100/50 font-medium text-slate-800"
                 placeholder="Ví dụ: Em là học sinh lớp 12 khối D01, đang phân vân giữa chọn học ngành Ngôn ngữ Anh tại ĐH Ngoại thương hay đi du học Úc ngành Quản trị Khách sạn..."
                 maxLength={1000}
@@ -217,7 +218,7 @@ const SimulationFlow: React.FC = () => {
               </div>
             </div>
 
-            <div className="space-y-4">
+            <div id="tour-decision-hints" className="space-y-4">
               <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                 Chọn biểu mẫu mẫu chi tiết (Bạn chỉ cần chỉnh sửa các thông tin trong dấu ngoặc vuông [...]):
               </p>
@@ -268,6 +269,7 @@ const SimulationFlow: React.FC = () => {
 
             <div className="flex flex-col sm:flex-row items-center justify-end gap-8 pt-4">
               <button
+                id="tour-decision-btn"
                 onClick={handleNextStep}
                 disabled={!data.decision.trim()}
                 className="w-full sm:w-auto bg-slate-900 hover:bg-blue-600 disabled:bg-slate-100 disabled:text-slate-400 text-white font-black py-6 px-14 rounded-2xl shadow-2xl shadow-slate-200 transition-all flex items-center justify-center gap-4 text-xs uppercase tracking-widest"
@@ -335,7 +337,7 @@ const SimulationFlow: React.FC = () => {
             </p>
           </div>
 
-          <div className="bg-white/70 backdrop-blur-xl p-8 sm:p-12 rounded-[3.5rem] border border-slate-100 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.12)]">
+          <div id="tour-sliders-container" className="bg-white/70 backdrop-blur-xl p-8 sm:p-12 rounded-[3.5rem] border border-slate-100 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.12)]">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
               {[
                 { id: 'stress', label: 'Áp lực hiện tại', icon: 'psychology_alt', labels: ['Thấp', 'Nhẹ', 'Trung bình', 'Cao', 'Cực hạn'], color: 'accent-blue-600', tooltip: 'Đánh giá mức độ căng thẳng hiện tại của bạn. Áp lực cao có thể làm giảm mạnh chỉ số Hạnh phúc trong kịch bản.' },
