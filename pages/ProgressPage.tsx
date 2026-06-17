@@ -9,6 +9,18 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { apiFetch } from '../services/apiClient';
 import { IconMapper } from '../components/IconMapper';
 
+const syncRemainingToken = (remainingToken?: number) => {
+  if (typeof remainingToken !== 'number') return;
+  const storedUser = localStorage.getItem('user');
+  if (!storedUser) return;
+  try {
+    const user = JSON.parse(storedUser);
+    localStorage.setItem('user', JSON.stringify({ ...user, token: remainingToken }));
+  } catch {
+    // Ignore malformed local user data.
+  }
+};
+
 const ProgressPage: React.FC = () => {
   const [progressList, setProgressList] = useState<ProgressItem[]>([]);
   const [selectedIdx, setSelectedIdx] = useState(0);
@@ -100,6 +112,12 @@ const ProgressPage: React.FC = () => {
           timeframe: item.timeframe
         })
       });
+      const responseData = await res.json().catch(() => ({}));
+      (res as any).json = async () => responseData;
+      if (!res.ok) {
+        throw new Error(responseData.message || 'Không thể điều chỉnh lộ trình.');
+      }
+      syncRemainingToken(responseData.remainingToken);
 
       if (!res.ok) {
         throw new Error('Không thể điều chỉnh lộ trình.');

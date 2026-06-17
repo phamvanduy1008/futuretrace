@@ -131,12 +131,13 @@ const ScenarioDetailPage: React.FC = () => {
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
   const [isCheckingTier, setIsCheckingTier] = useState(false);
   const [timeframe, setTimeframe] = useState(12);
+  const PREMIUM_ANALYSIS_COST = 10000;
 
   const handlePremiumClick = async () => {
     setIsCheckingTier(true);
     try {
       const user = await getUserProfile();
-      if (user?.tier !== 'premium_demo') {
+      if ((user?.token || 0) < PREMIUM_ANALYSIS_COST) {
         setIsUpgradeModalOpen(true);
       } else {
         setIsTimeframeModalOpen(true);
@@ -145,7 +146,7 @@ const ScenarioDetailPage: React.FC = () => {
       console.error("Error checking tier:", err);
       // Fallback to local check if API fails
       const localUser = getCurrentUser();
-      if (localUser?.tier !== 'premium_demo') {
+      if ((localUser?.token || 0) < PREMIUM_ANALYSIS_COST) {
         setIsUpgradeModalOpen(true);
       } else {
         setIsTimeframeModalOpen(true);

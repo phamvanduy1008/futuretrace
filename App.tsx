@@ -130,6 +130,11 @@ const App: React.FC = () => {
           />
 
           <Route
+            path="/profile"
+            element={isAuthenticated ? <ProfilePage /> : <Navigate to="/login" />}
+          />
+
+          <Route
             path="/admin/*"
             element={isAuthenticated ? <Navigate to="/dashboard" /> : <AdminApp />}
           />
