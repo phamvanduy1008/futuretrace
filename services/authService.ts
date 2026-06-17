@@ -82,3 +82,48 @@ export const getUserProfile = async () => {
   const data = await response.json();
   return normalizeUser(data);
 };
+
+export const updateProfile = async (profileData: { full_name?: string, avatar_url?: string, bio?: string }) => {
+  const token = localStorage.getItem('token');
+  if (!token) throw new Error('No token found');
+
+  const response = await fetch(`${API_BASE_URL}/api/auth/profile`, {
+    method: 'PUT',
+    headers: { 
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}` 
+    },
+    body: JSON.stringify(profileData),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Cập nhật thông tin thất bại');
+  }
+
+  const data = await response.json();
+  const user = normalizeUser(data);
+  localStorage.setItem('user', JSON.stringify(user));
+  return user;
+};
+
+export const changePassword = async (currentPassword: string, newPassword: string) => {
+  const token = localStorage.getItem('token');
+  if (!token) throw new Error('No token found');
+
+  const response = await fetch(`${API_BASE_URL}/api/auth/password`, {
+    method: 'PUT',
+    headers: { 
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}` 
+    },
+    body: JSON.stringify({ currentPassword, newPassword }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Đổi mật khẩu thất bại');
+  }
+
+  return response.json();
+};
