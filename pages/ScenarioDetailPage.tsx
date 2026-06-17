@@ -7,6 +7,7 @@ import SharedFooter from "../components/SharedFooter";
 import { SimulationData, Comment } from "../types";
 import { communityService } from "../services/communityService";
 import { getCurrentUser, getUserProfile } from "../services/authService";
+import { apiGetSimulation } from "../services/api";
 import { IconMapper } from "../components/IconMapper";
 
 const ScenarioDetailPage: React.FC = () => {
@@ -87,9 +88,38 @@ const ScenarioDetailPage: React.FC = () => {
     }
   }, [state, navigate, id, loadComments]);
 
-  if (!state.scenario) return null;
+  const [scenario, setScenario] = useState<any>(state.scenario);
+  const [isLoadingFull, setIsLoadingFull] = useState(false);
 
-  const { scenario } = state;
+  useEffect(() => {
+    if (state.scenario) {
+      setScenario(state.scenario);
+    }
+  }, [state.scenario]);
+
+  useEffect(() => {
+    const fetchFullData = async () => {
+      if (id && scenario && !scenario.deepAnalysis && !state.fromCommunity) {
+        setIsLoadingFull(true);
+        try {
+          const fullData = await apiGetSimulation(id);
+          if (fullData.scenarios) {
+            const sub = fullData.scenarios.find((s: any) => String(s.id) === String(id) || String(s._id) === String(id)) || fullData.scenarios[0];
+            if (sub) setScenario((prev: any) => ({ ...prev, ...sub }));
+          } else {
+            setScenario((prev: any) => ({ ...prev, ...fullData }));
+          }
+        } catch (err) {
+          console.error("Error fetching full scenario data", err);
+        } finally {
+          setIsLoadingFull(false);
+        }
+      }
+    };
+    fetchFullData();
+  }, [id, scenario?.deepAnalysis, state.fromCommunity]);
+
+  if (!scenario) return null;
 
   const displayRoi = scenario.roi ?? scenario.metrics?.roi ?? 0;
   const displayCareer = scenario.careerGrowth ?? scenario.metrics?.career ?? 0;

@@ -295,7 +295,7 @@ const DashboardPage: React.FC = () => {
                       <motion.div
                         key={idx}
                         whileHover={{ y: -5 }}
-                        onClick={() => navigate(`/detail/${recentSimulations[0].id}`, { state: { scenario: scenario } })}
+                        onClick={() => navigate(`/detail/${scenario.id || recentSimulations[0].id}`, { state: { scenario: scenario } })}
                         className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all relative overflow-hidden group/card cursor-pointer"
                       >
                         <div className={`absolute top-0 right-0 w-24 h-24 -mr-12 -mt-12 rounded-full blur-2xl opacity-10 transition-opacity group-hover/card:opacity-30 ${

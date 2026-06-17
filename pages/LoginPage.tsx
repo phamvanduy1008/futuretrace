@@ -47,7 +47,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
               Chào mừng trở lại
             </h1>
             <p className="text-slate-600 font-medium">
-              Đăng nhập để tiếp tục nghiên cứu quyết định
+              Đăng nhập để bắt đầu định hướng tương lai
             </p>
           </div>
 
@@ -129,7 +129,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
               </button>
 
               <p className="text-center text-[10px] font-black text-slate-400 uppercase tracking-widest pt-6 border-t border-slate-50">
-                BẠN CHƯA CÓ ID NGHIÊN CỨU?{" "}
+                BẠN CHƯA CÓ TÀI KHOẢN?{" "}
                 <button
                   type="button"
                   onClick={() => navigate("/register")}

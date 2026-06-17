@@ -41,7 +41,7 @@ const RegisterPage: React.FC = () => {
               <IconMapper name="person_add" className=" text-4xl font-bold" />
             </div>
             <h1 className="text-3xl font-black mb-3 font-display tracking-tight text-slate-900">
-              Khởi tạo ID nghiên cứu
+              ĐĂNG KÝ TÀI KHOẢN
             </h1>
             <p className="text-slate-600 font-medium">
               Bắt đầu hành trình định lượng các quỹ đạo tương lai.
@@ -101,7 +101,7 @@ const RegisterPage: React.FC = () => {
 
               <div>
                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-6 ml-1">
-                  Xác định vai trò phân tích
+                  Bạn là ?
                 </label>
                 <div className="grid grid-cols-2 gap-5">
                   <label className="relative cursor-pointer group">
@@ -116,7 +116,7 @@ const RegisterPage: React.FC = () => {
                     <div className="flex flex-col items-center justify-center p-10 border-2 border-slate-50 rounded-3xl transition-all peer-checked:border-blue-600 peer-checked:bg-blue-50/50 hover:border-slate-200 bg-white">
                       <IconMapper name="school" className=" text-4xl mb-4 text-slate-300 group-hover:text-blue-600 transition-colors" />
                       <span className="text-[10px] font-black uppercase tracking-widest text-slate-600 peer-checked:text-blue-600">
-                        Học thuật
+                        Học sinh cấp 3
                       </span>
                     </div>
                   </label>
@@ -132,7 +132,7 @@ const RegisterPage: React.FC = () => {
                     <div className="flex flex-col items-center justify-center p-10 border-2 border-slate-50 rounded-3xl transition-all peer-checked:border-blue-600 peer-checked:bg-blue-50/50 hover:border-slate-200 bg-white">
                       <IconMapper name="work" className=" text-4xl mb-4 text-slate-300 group-hover:text-blue-600 transition-colors" />
                       <span className="text-[10px] font-black uppercase tracking-widest text-slate-600 peer-checked:text-blue-600">
-                        Chuyên gia
+                        Sinh viên đại học
                       </span>
                     </div>
                   </label>
@@ -169,12 +169,12 @@ const RegisterPage: React.FC = () => {
                 {loading ? (
                   <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                 ) : (
-                  "Tạo tài khoản ID ngay"
+                  "Tạo tài khoản ngay"
                 )}
               </button>
 
               <p className="text-center text-[10px] font-black text-slate-400 uppercase tracking-widest pt-6 border-t border-slate-50">
-                ĐÃ CÓ ID NGHIÊN CỨU?{" "}
+                ĐÃ CÓ TÀI KHOẢN?{" "}
                 <button
                   type="button"
                   onClick={() => navigate("/login")}
