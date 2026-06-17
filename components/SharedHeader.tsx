@@ -3,10 +3,12 @@ import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getCurrentUser, logout } from '../services/authService';
 import { IconMapper } from './IconMapper';
+import { useTour } from './GuideTour';
 
 const SharedHeader: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { startTour } = useTour();
   const [searchParams] = useSearchParams();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -92,6 +94,7 @@ const SharedHeader: React.FC = () => {
                 {navItems.map((item) => (
                   <button
                     key={item.path}
+                    id={`tour-nav-${item.path.replace('/', '')}`}
                     onClick={() => navigate(item.path)}
                     className={`text-[11px] font-black uppercase tracking-widest transition-all ${
                       location.pathname === item.path 
@@ -103,6 +106,7 @@ const SharedHeader: React.FC = () => {
                   </button>
                 ))}
                 <button
+                  id="tour-nav-premium"
                   onClick={() => navigate('/premium')}
                   className={`flex items-center gap-2 text-[11px] font-black uppercase tracking-widest transition-all px-4 py-1.5 rounded-full border ${
                     location.pathname === '/premium'
@@ -136,6 +140,15 @@ const SharedHeader: React.FC = () => {
                     </button>
                   )}
                 </div>
+
+                <button
+                  onClick={startTour}
+                  className="text-slate-400 hover:text-white transition-all flex items-center gap-1.5 hover:bg-slate-900 border border-transparent hover:border-slate-800 px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest"
+                  title="Xem hướng dẫn sử dụng"
+                >
+                  <IconMapper name="help" className="text-lg" />
+                  <span className="hidden xl:inline">Hướng dẫn</span>
+                </button>
 
                 <button className="text-slate-400 hover:text-white transition-colors hidden sm:block">
                   <IconMapper name="notifications" className="text-2xl" />

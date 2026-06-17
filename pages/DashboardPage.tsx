@@ -7,6 +7,7 @@ import { getCurrentUser } from "../services/authService";
 import { apiFetch } from "../services/apiClient";
 import { IconMapper } from "../components/IconMapper";
 import { AnimatedBackground } from "../components/AnimatedBackground";
+import { useTour } from "../components/GuideTour";
 
 const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
@@ -14,6 +15,18 @@ const DashboardPage: React.FC = () => {
   const [stats, setStats] = useState({ simulations: 0, reports: 0, impact: 0 });
   const [recentSimulations, setRecentSimulations] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { startTour } = useTour();
+
+  useEffect(() => {
+    // Tự động kích hoạt tour nếu người dùng chưa hoàn thành và dữ liệu đã tải xong
+    const tourCompleted = localStorage.getItem('ft_onboarding_completed');
+    if (!tourCompleted && !isLoading) {
+      const timer = setTimeout(() => {
+        startTour();
+      }, 800);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading]);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -76,7 +89,7 @@ const DashboardPage: React.FC = () => {
               <IconMapper name="chevron_right" className=" text-[10px]" />{" "}
               LỘ TRÌNH v0.8
             </div>
-            <h1 className="text-4xl sm:text-6xl font-black tracking-tight font-display text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-500 leading-normal pb-2 uppercase italic pt-2 pr-6">
+            <h1 id="tour-welcome-title" className="text-4xl sm:text-6xl font-black tracking-tight font-display text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-500 leading-normal pb-2 uppercase italic pt-2 pr-6">
               Trung tâm Phân tích
             </h1>
             <p className="text-slate-600 mt-4 text-lg font-medium italic">
@@ -118,6 +131,7 @@ const DashboardPage: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 mb-16">
           <motion.button
+            id="tour-btn-simulate"
             variants={itemVariants}
             whileHover={{
               y: -8,
@@ -157,6 +171,7 @@ const DashboardPage: React.FC = () => {
           </motion.button>
 
           <motion.button
+            id="tour-btn-history"
             variants={itemVariants}
             whileHover={{
               y: -8,

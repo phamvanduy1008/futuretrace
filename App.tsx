@@ -17,6 +17,7 @@ import PaymentPage from './pages/PaymentPage';
 import PaymentResultPage from './pages/PaymentResultPage';
 import { getUserProfile, logout } from './services/authService';
 import AdminApp from './pages/admin/AdminApp';
+import { TourProvider } from './components/GuideTour';
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
@@ -76,63 +77,65 @@ const App: React.FC = () => {
 
   return (
     <HashRouter>
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
-        <Route path="/register" element={<RegisterPage />} />
+      <TourProvider>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
+          <Route path="/register" element={<RegisterPage />} />
 
-        <Route
-          path="/dashboard"
-          element={isAuthenticated ? <DashboardPage /> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/simulate"
-          element={isAuthenticated ? <SimulationFlow /> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/community"
-          element={isAuthenticated ? <CommunityPage /> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/progress"
-          element={isAuthenticated ? <ProgressPage /> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/history"
-          element={isAuthenticated ? <HistoryPage /> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/matrix"
-          element={isAuthenticated ? <ComparisonMatrixPage /> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/premium"
-          element={isAuthenticated ? <PremiumPage /> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/detail/:id"
-          element={isAuthenticated ? <ScenarioDetailPage /> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/premium-analysis"
-          element={isAuthenticated ? <PremiumAnalysisPage /> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/checkout"
-          element={isAuthenticated ? <PaymentPage /> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/payment-result"
-          element={isAuthenticated ? <PaymentResultPage /> : <Navigate to="/login" />}
-        />
+          <Route
+            path="/dashboard"
+            element={isAuthenticated ? <DashboardPage /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/simulate"
+            element={isAuthenticated ? <SimulationFlow /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/community"
+            element={isAuthenticated ? <CommunityPage /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/progress"
+            element={isAuthenticated ? <ProgressPage /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/history"
+            element={isAuthenticated ? <HistoryPage /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/matrix"
+            element={isAuthenticated ? <ComparisonMatrixPage /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/premium"
+            element={isAuthenticated ? <PremiumPage /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/detail/:id"
+            element={isAuthenticated ? <ScenarioDetailPage /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/premium-analysis"
+            element={isAuthenticated ? <PremiumAnalysisPage /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/checkout"
+            element={isAuthenticated ? <PaymentPage /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/payment-result"
+            element={isAuthenticated ? <PaymentResultPage /> : <Navigate to="/login" />}
+          />
 
-        <Route
-          path="/admin/*"
-          element={isAuthenticated ? <Navigate to="/dashboard" /> : <AdminApp />}
-        />
+          <Route
+            path="/admin/*"
+            element={isAuthenticated ? <Navigate to="/dashboard" /> : <AdminApp />}
+          />
 
-        <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </TourProvider>
     </HashRouter>
   );
 };

@@ -7,6 +7,7 @@ const materialToPhosphor: Record<string, string> = {
   'search': 'MagnifyingGlass',
   'close': 'X',
   'notifications': 'Bell',
+  'help': 'Question',
   'dashboard': 'SquaresFour',
   'model_training': 'PlayCircle',
   'groups': 'Users',
@@ -71,8 +72,7 @@ const materialToPhosphor: Record<string, string> = {
   'pending': 'ClockClockwise',
   'circle': 'Circle',
   'inbox_customize': 'Package',
-  'work': 'Briefcase',
-  'help': 'Question'
+  'work': 'Briefcase'
 };
 
 interface IconMapperProps {
