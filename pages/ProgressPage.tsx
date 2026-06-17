@@ -211,7 +211,7 @@ const ProgressPage: React.FC = () => {
             <div className="flex items-center gap-2 text-[9px] font-black text-blue-600 uppercase tracking-widest mb-4">
               BẢNG ĐIỀU KHIỂN <IconMapper name="chevron_right" className=" text-[10px]" /> TIẾN TRÌNH CỦA TÔI
             </div>
-            <h1 className="text-3xl sm:text-6xl font-black tracking-tight mb-4 font-display text-slate-900 leading-[1.8] uppercase italic">Theo dõi Quỹ đạo Thực thi</h1>
+            <h1 className="text-3xl sm:text-6xl font-black tracking-tight mb-4 font-display text-slate-900 leading-[1.8] uppercase italic">Theo dõi Tiến trình Thực tế</h1>
             <p className="text-slate-600 text-sm sm:text-lg leading-relaxed max-w-2xl font-medium italic">
               "Quản lý các cột mốc và điều chỉnh chiến lược dựa trên tiến độ thực tế của bạn."
             </p>
@@ -337,7 +337,7 @@ const ProgressPage: React.FC = () => {
                   })}
                   className="w-full py-6 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-blue-600 shadow-2xl shadow-slate-200 transition-all flex items-center justify-center gap-4 hover:gap-6 group"
                 >
-                  VÀO CHI TIẾT LỘ TRÌNH <IconMapper name="arrow_forward" className=" text-xl group-hover:scale-125 transition-transform" />
+                  XEM CHI TIẾT LỘ TRÌNH <IconMapper name="arrow_forward" className=" text-xl group-hover:scale-125 transition-transform" />
                 </button>
               </div>
             </motion.div>
@@ -386,7 +386,7 @@ const ProgressPage: React.FC = () => {
                     </h3>
 
                     <p className="text-slate-500 text-sm font-medium leading-relaxed">
-                      AI sẽ tái cấu trúc tương lai dựa trên phản hồi của bạn.
+                      AI sẽ điều chỉnh lộ trình dựa trên phản hồi của bạn.
                     </p>
                   </div>
                 </div>
@@ -420,7 +420,7 @@ const ProgressPage: React.FC = () => {
                     {isPivoting ? (
                       <>
                         <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        ĐANG TÁI CẤU TRÚC...
+                        ĐANG ĐIỀU CHỈNH LỘ TRÌNH...
                       </>
                     ) : (
                       <>

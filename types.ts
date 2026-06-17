@@ -32,6 +32,7 @@ export interface SimulationData {
   risk: number;
   academicPerformance: number; // Thêm chỉ số học lực (1-5)
   otherFactors?: string;
+  timeHorizon?: number; // Số năm dự báo (1, 3, 5, hoặc 10)
   tier: UserTier;
 }
 

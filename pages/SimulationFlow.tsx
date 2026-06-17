@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -9,6 +8,72 @@ import SharedHeader from '../components/SharedHeader';
 import SharedFooter from '../components/SharedFooter';
 import { IconMapper } from '../components/IconMapper';
 import { AnimatedBackground } from '../components/AnimatedBackground';
+
+const DECISION_TEMPLATES = [
+  {
+    id: "highschool_choice",
+    label: "Chọn ngành & Trường ĐH",
+    icon: "school",
+    content: `[BỐI CẢNH CHỌN NGÀNH & TRƯỜNG ĐH]
+- Quyết định: Phân vân giữa [Lựa chọn A: Ví dụ học ngành CNTT tại ĐH Bách Khoa] và [Lựa chọn B: Học ngành Thiết kế Đồ họa tại ĐH Mỹ thuật].
+- Hiện trạng học tập: Học sinh lớp [Lớp 11/12], khối học sở trường là [Khối A00/A01/D01...], điểm trung bình (GPA) khoảng [Điểm số].
+- Năng lực nổi trội: [Ví dụ: Tư duy logic toán tốt, thích vẽ, biết giao tiếp ngoại ngữ].
+- Ngân sách học phí: Bố mẹ có thể hỗ trợ khoảng [Số tiền] triệu/năm.
+- Định hướng nghề nghiệp mong muốn: Trở thành [Vị trí mong muốn] sau khi tốt nghiệp.
+- Lo ngại lớn nhất: [Sợ không đủ điểm chuẩn / Học phí quá cao / Ngành học không phù hợp thực tế].`
+  },
+  {
+    id: "university_career",
+    label: "Định hướng việc làm ra trường",
+    icon: "work",
+    content: `[BỐI CẢNH ĐỊNH HƯỚNG RA TRƯỜNG]
+- Quyết định: Sau khi tốt nghiệp ngành [Tên ngành hiện tại] sẽ chọn đi làm ngay ở vị trí [Lựa chọn A: Ví dụ Nhân viên Marketing tại Agency] hay học tiếp lên [Lựa chọn B: Học Thạc sĩ hoặc đổi sang ngành Quản trị nhân sự].
+- Hiện trạng học tập: Sinh viên năm [Năm 3/Năm cuối] trường [Tên trường], GPA hiện tại là [Điểm số/4.0]. Đã có kinh nghiệm [Thực tập/Làm thêm/Dự án CLB].
+- Mục tiêu 3 năm đầu ra trường: Đạt mức lương [Thu nhập kỳ vọng] triệu/tháng và thăng tiến lên [Vị trí].
+- Lo ngại lớn nhất: [Thiếu kinh nghiệm thực tế / Thị trường việc làm cạnh tranh / Sợ chọn sai hướng đi đầu đời].`
+  },
+  {
+    id: "study_abroad",
+    label: "Du học vs Học trong nước",
+    icon: "rocket_launch",
+    content: `[BỐI CẢNH DU HỌC VS TRONG NƯỚC]
+- Quyết định: Đi du học bậc [Đại học/Thạc sĩ] tại [Tên quốc gia: Ví dụ Đức, Úc, Nhật] hay học chương trình liên kết/chính quy trong nước tại [Tên trường].
+- Hiện trạng năng lực: GPA đạt [Điểm GPA], chứng chỉ ngoại ngữ đạt [Ví dụ: IELTS 6.5, JLPT N3].
+- Điều kiện tài chính: Cần tìm học bổng [Toàn phần/Bán phần] vì ngân sách gia đình chỉ tự túc được khoảng [Số tiền] triệu/năm.
+- Định hướng sau tốt nghiệp: [Muốn ở lại làm việc định cư nước ngoài / Trở về Việt Nam cống hiến].
+- Lo ngại lớn nhất: [Rủi ro trượt học bổng / Chi phí sinh hoạt đắt đỏ / Sốc văn hóa và cô đơn].`
+  },
+  {
+    id: "work_study_balance",
+    label: "Học tập vs Đi làm thêm",
+    icon: "account_balance_wallet",
+    content: `[BỐI CẢNH HỌC TẬP VS ĐI LÀM THÊM]
+- Quyết định: Dành thời gian [Số giờ] giờ/tuần để đi làm thêm [Tên việc làm thêm: Ví dụ gia sư, phục vụ, chạy grab] kiếm tiền tự trang trải hay tập trung 100% thời gian cho việc học để giành học bổng của trường.
+- Hiện trạng tài chính: [Khó khăn/Tự túc một phần], học phí mỗi kỳ là [Số tiền] triệu đồng.
+- Mục tiêu học tập: Duy trì GPA trên [GPA mong muốn] để không bị ảnh hưởng bằng tốt nghiệp.
+- Lo ngại lớn nhất: [Đi làm thêm gây kiệt sức, sụt giảm điểm số / Thiếu chi phí sinh hoạt hàng ngày nếu không đi làm].`
+  },
+  {
+    id: "relocation_hometown",
+    label: "Thành phố lớn vs Quê nhà",
+    icon: "balance",
+    content: `[BỐI CẢNH LẬP NGHIỆP XA NHÀ VS QUÊ NHÀ]
+- Quyết định: Ở lại lập nghiệp tại [Lựa chọn A: Thành phố lớn như Hà Nội, TP.HCM] hay trở về quê hương [Lựa chọn B: Tên tỉnh/thành phố quê nhà] để làm việc gần bố mẹ.
+- Hiện trạng: Sinh viên sắp tốt nghiệp, chưa có nhà riêng ở thành phố lớn, chi phí thuê nhà và ăn uống tốn khoảng [Số tiền] triệu/tháng.
+- Sự ủng hộ từ gia đình: [Bố mẹ muốn ở gần / Bố mẹ ủng hộ tự lập ở thành phố].
+- Lo ngại lớn nhất: [Chi phí đắt đỏ và áp lực cạnh tranh ở thành phố / Cơ hội việc làm hạn chế ở quê nhà].`
+  },
+  {
+    id: "student_startup",
+    label: "Dự án Khởi nghiệp sinh viên",
+    icon: "psychology",
+    content: `[BỐI CẢNH KHỞI NGHIỆP/NGHIÊN CỨU SINH VIÊN]
+- Quyết định: Thành lập nhóm khởi nghiệp dự án sinh viên [Mô hình: Ví dụ Phát triển ứng dụng học tập, kinh doanh đồ handmade online] hay tập trung tham gia Nghiên cứu Khoa học tại trường.
+- Hiện trạng nguồn lực: Số vốn ban đầu tự góp là [Số tiền] triệu đồng, có nhóm [Số người] sinh viên cùng tham gia. Có sự bảo trợ/hướng dẫn từ giảng viên [Có/Không].
+- Mục tiêu ngắn hạn: [Tham gia cuộc thi khởi nghiệp sinh viên / Công bố bài báo khoa học / Có doanh thu nhỏ].
+- Lo ngại lớn nhất: [Thiếu kiến thức thực tế / Nhóm tan vỡ vì xung đột thời gian học / Mất số vốn tích lũy].`
+  }
+];
 
 const SimulationFlow: React.FC = () => {
   const navigate = useNavigate();
@@ -32,7 +97,6 @@ const SimulationFlow: React.FC = () => {
 
   const handleNextStep = async () => {
     if (step === SimulationStep.DESCRIPTION) {
-      if (!data.decision.trim()) return;
       setStep(SimulationStep.CONTEXT);
     } else if (step === SimulationStep.CONTEXT) {
       setError(null);
@@ -129,21 +193,21 @@ const SimulationFlow: React.FC = () => {
               initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
               className="px-6 py-2 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-widest mb-6 border border-blue-100"
             >
-              Mô phỏng đa thời gian v4.2
+              Mô phỏng lộ trình tương lai v4.2
             </motion.div>
             <h1 className="text-4xl sm:text-6xl uppercase italic font-black mb-4 font-display tracking-tighter text-slate-900 leading-none">
-              Nhập biến số <span className="text-blue-600">đầu vào.</span>
+              Nhập bối cảnh <span className="text-blue-600">quyết định.</span>
             </h1>
             <p className="text-slate-500 text-lg max-w-2xl mx-auto font-medium leading-relaxed">
-              Trí tuệ nhân tạo sẽ quét các từ khóa để xây dựng cây quyết định tương lai.
+              Trí tuệ nhân tạo sẽ quét các từ khóa để xây dựng các hướng đi tương lai.
             </p>
           </div>
-          <div className="space-y-12">
+          <div className="space-y-10">
             <div className="relative group">
               <div className="absolute -inset-2 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-[2.5rem] blur-xl opacity-10 group-focus-within:opacity-20 transition duration-1000"></div>
               <textarea
-                className="relative w-full h-[320px] p-10 bg-white/70 backdrop-blur-xl border border-slate-200 rounded-[2.5rem] text-lg leading-relaxed focus:ring-4 focus:ring-blue-50 focus:border-blue-600 outline-none resize-none transition-all shadow-2xl shadow-slate-100/50 font-medium"
-                placeholder="Ví dụ: Em đang phân vân giữa việc chọn học ngành Công nghệ thông tin tại Bách Khoa hay đi du học Đức..."
+                className="relative w-full h-[320px] p-10 bg-white/70 backdrop-blur-xl border border-slate-200 rounded-[2.5rem] text-lg leading-relaxed focus:ring-4 focus:ring-blue-50 focus:border-blue-600 outline-none resize-none transition-all shadow-2xl shadow-slate-100/50 font-medium text-slate-800"
+                placeholder="Ví dụ: Em là học sinh lớp 12 khối D01, đang phân vân giữa chọn học ngành Ngôn ngữ Anh tại ĐH Ngoại thương hay đi du học Úc ngành Quản trị Khách sạn..."
                 maxLength={1000}
                 value={data.decision}
                 onChange={(e) => setData({ ...data, decision: e.target.value })}
@@ -153,18 +217,56 @@ const SimulationFlow: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-8 pt-4">
-              <div className="flex flex-wrap gap-3 justify-center sm:justify-start">
-                {["Chọn ngành IT", "Du học", "Học đại học"].map((hint) => (
-                  <button
-                    key={hint}
-                    onClick={() => setData({ ...data, decision: `Dự án: ${hint} - Em đang lên kế hoạch cho việc...` })}
-                    className="px-6 py-3 text-[10px] font-black uppercase tracking-widest bg-white border border-slate-200 text-slate-600 hover:border-blue-600 hover:text-blue-600 hover:bg-blue-50/30 transition-all rounded-2xl shadow-sm"
-                  >
-                    + {hint}
-                  </button>
-                ))}
+            <div className="space-y-4">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                Chọn biểu mẫu mẫu chi tiết (Bạn chỉ cần chỉnh sửa các thông tin trong dấu ngoặc vuông [...]):
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {DECISION_TEMPLATES.map((tmpl) => {
+                  const isActive = data.decision === tmpl.content;
+                  return (
+                    <motion.button
+                      key={tmpl.id}
+                      whileHover={{ y: -2, scale: 1.01 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => setData({ ...data, decision: tmpl.content })}
+                      className={`group flex items-center gap-3.5 p-4 rounded-2xl border text-left transition-all ${
+                        isActive
+                          ? 'border-blue-600 bg-blue-50/30 ring-1 ring-blue-600/30 shadow-md shadow-blue-500/5'
+                          : 'border-slate-200 bg-white/90 hover:border-blue-400 hover:bg-blue-50/10 shadow-sm'
+                      }`}
+                    >
+                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center border shrink-0 transition-all ${
+                        isActive
+                          ? 'bg-blue-600 text-white border-blue-600 shadow-sm shadow-blue-500/10'
+                          : 'bg-slate-50 text-blue-600 border-slate-100 group-hover:bg-blue-50'
+                      }`}>
+                        <IconMapper name={tmpl.icon} className="text-lg" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5 mb-0.5">
+                          <p className={`text-[11px] font-bold uppercase tracking-wide leading-snug transition-colors ${
+                            isActive ? 'text-blue-700' : 'text-slate-800 group-hover:text-blue-600'
+                          }`}>
+                            {tmpl.label}
+                          </p>
+                          {isActive && (
+                            <span className="w-1.5 h-1.5 bg-blue-600 rounded-full shrink-0 animate-pulse" />
+                          )}
+                        </div>
+                        <p className={`text-[9px] font-bold uppercase tracking-wider ${
+                          isActive ? 'text-blue-500' : 'text-slate-400 group-hover:text-blue-500/80'
+                        }`}>
+                          {isActive ? 'Đang áp dụng' : 'Bấm áp dụng'}
+                        </p>
+                      </div>
+                    </motion.button>
+                  );
+                })}
               </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center justify-end gap-8 pt-4">
               <button
                 onClick={handleNextStep}
                 disabled={!data.decision.trim()}
@@ -223,23 +325,23 @@ const SimulationFlow: React.FC = () => {
 
           <div className="mb-10 text-center">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-600 text-[10px] font-black uppercase tracking-widest mb-4">
-              Chuẩn hóa bối cảnh hệ thống
+              Thiết lập yếu tố ảnh hưởng
             </div>
             <h1 className="text-4xl sm:text-5xl font-black tracking-tighter mb-4 font-display text-slate-900">
-              Cấu hình <span className="text-emerald-600">Biến số.</span>
+              Cấu hình <span className="text-emerald-600">Chỉ số.</span>
             </h1>
             <p className="text-slate-500 text-lg max-w-2xl mx-auto font-medium">
-              Thiết lập các tham số môi trường để AI giả lập chính xác hơn.
+              Thiết lập các chỉ số thực tế để AI mô phỏng chính xác hơn.
             </p>
           </div>
 
           <div className="bg-white/70 backdrop-blur-xl p-8 sm:p-12 rounded-[3.5rem] border border-slate-100 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.12)]">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
               {[
-                { id: 'stress', label: 'Áp lực hiện tại', icon: 'psychology_alt', labels: ['Thấp', 'Nhẹ', 'Điều độ', 'Cao', 'Cực hạn'], color: 'accent-blue-600' },
-                { id: 'personalFinance', label: 'Tình hình tài chính cá nhân', icon: 'account_balance_wallet', labels: ['Rất yếu', 'Khó khăn', 'Ổn định', 'Dư dả', 'Thịnh vượng'], color: 'accent-emerald-600' },
-                { id: 'academicPerformance', label: 'Học lực / Năng lực chuyên môn', icon: 'school', labels: ['Yếu', 'Trung bình', 'Khá', 'Giỏi', 'Xuất sắc'], color: 'accent-amber-600' },
-                { id: 'risk', label: 'Chỉ số rủi ro', icon: 'bolt', labels: ['Cẩn trọng', 'Bảo thủ', 'Điều độ', 'Mạo hiểm', 'Quyết liệt'], color: 'accent-indigo-600' }
+                { id: 'stress', label: 'Áp lực hiện tại', icon: 'psychology_alt', labels: ['Thấp', 'Nhẹ', 'Trung bình', 'Cao', 'Cực hạn'], color: 'accent-blue-600', tooltip: 'Đánh giá mức độ căng thẳng hiện tại của bạn. Áp lực cao có thể làm giảm mạnh chỉ số Hạnh phúc trong kịch bản.' },
+                { id: 'personalFinance', label: 'Tình hình tài chính cá nhân', icon: 'account_balance_wallet', labels: ['Rất yếu', 'Khó khăn', 'Ổn định', 'Dư dả', 'Thịnh vượng'], color: 'accent-emerald-600', tooltip: 'Mức độ tự chủ và sẵn có về tài chính. Tài chính tốt giúp tăng tính ổn định và chỉ số ROI của lộ trình.' },
+                { id: 'academicPerformance', label: 'Học lực / Năng lực chuyên môn', icon: 'school', labels: ['Yếu', 'Trung bình', 'Khá', 'Giỏi', 'Xuất sắc'], color: 'accent-amber-600', tooltip: 'Năng lực học tập hoặc trình độ chuyên môn hiện tại. Điểm số cao giúp tăng trưởng sự nghiệp diễn ra nhanh hơn.' },
+                { id: 'risk', label: 'Chỉ số rủi ro', icon: 'bolt', labels: ['Cẩn trọng', 'Bảo thủ', 'Trung bình', 'Mạo hiểm', 'Quyết liệt'], color: 'accent-indigo-600', tooltip: 'Mức độ sẵn sàng đối mặt rủi ro. Chỉ số cao giúp bạn có cơ hội bứt phá lớn nhưng cũng gặp nhiều biến cố hơn.' }
               ].map((slider) => (
                 <div key={slider.id} className="space-y-6">
                   <div className="flex justify-between items-center">
@@ -247,7 +349,16 @@ const SimulationFlow: React.FC = () => {
                       <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-blue-600 border border-slate-100 shadow-sm">
                         <IconMapper name={slider.icon} className=" text-xl" />
                       </div>
-                      {slider.label}
+                      <span className="flex items-center gap-2">
+                        {slider.label}
+                        <span className="group/tooltip relative inline-block">
+                          <IconMapper name="help" className="text-slate-400 hover:text-blue-600 cursor-help text-[14px]" />
+                          <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-slate-900 text-white text-[10px] rounded-xl shadow-xl opacity-0 group-hover/tooltip:opacity-100 transition-all duration-300 pointer-events-none z-50 normal-case tracking-normal font-medium leading-relaxed border border-slate-800 block text-center">
+                            {slider.tooltip}
+                            <span className="absolute top-full left-1/2 -translate-x-1/2 border-[6px] border-transparent border-t-slate-900 block"></span>
+                          </span>
+                        </span>
+                      </span>
                     </label>
                     <motion.div
                       key={(data as any)[slider.id]}
@@ -345,7 +456,7 @@ const SimulationFlow: React.FC = () => {
               {[
                 { label: 'Phân tích từ khóa mô tả', done: loadingProgress > 30 },
                 { label: 'Mô phỏng 10,000 kịch bản', done: loadingProgress > 60 },
-                { label: 'Tính toán ROI & Emotional Index', done: loadingProgress > 85 }
+                { label: 'Tính toán Hiệu quả tài chính (ROI) & Chỉ số Hạnh phúc', done: loadingProgress > 85 }
               ].map((task, i) => (
                 <div key={i} className={`flex items-center gap-6 transition-all duration-700 ${task.done ? 'opacity-100 text-emerald-400 translate-x-4' : 'opacity-20 text-white'}`}>
                   <IconMapper name={task.done ? 'check_circle' : 'hourglass_top'} className={` text-2xl ${task.done ? 'scale-125' : ''}`} />
@@ -438,13 +549,22 @@ const SimulationFlow: React.FC = () => {
 
                       <div className="p-10 space-y-12 flex-grow">
                         {[
-                          { label: 'Tăng trưởng sự nghiệp', val: scenario.careerGrowth, color: 'bg-blue-600' },
-                          { label: 'Chỉ số Hạnh phúc', val: scenario.happiness, color: 'bg-emerald-500' },
-                          { label: 'ROI dự kiến (5 năm)', val: scenario.roi, color: 'bg-indigo-600' }
+                          { label: 'Tăng trưởng sự nghiệp', val: scenario.careerGrowth, color: 'bg-blue-600', tooltip: 'Đánh giá mức độ thăng tiến chuyên môn và cơ hội nghề nghiệp trong kịch bản.' },
+                          { label: 'Chỉ số Hạnh phúc', val: scenario.happiness, color: 'bg-emerald-500', tooltip: 'Đo lường mức độ thỏa mãn tinh thần, giảm áp lực và cân bằng cuộc sống.' },
+                          { label: `Hiệu quả tài chính dự kiến (ROI) (${data.timeHorizon || 5} năm)`, val: scenario.roi, color: 'bg-indigo-600', tooltip: `Tỷ suất hoàn vốn đầu tư từ tiền bạc và thời gian của bạn sau đúng ${data.timeHorizon || 5} năm.` }
                         ].map((metric, mi) => (
                           <div key={mi} className="space-y-4">
                             <div className="flex justify-between items-end">
-                              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{metric.label}</p>
+                              <div className="flex items-center gap-1.5">
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{metric.label}</p>
+                                <span className="group/tooltip relative inline-block">
+                                  <IconMapper name="help" className="text-slate-300 hover:text-blue-600 cursor-help text-[12px] mb-0.5" />
+                                  <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 p-3 bg-slate-900 text-white text-[10px] rounded-xl shadow-xl opacity-0 group-hover/tooltip:opacity-100 transition-all duration-300 pointer-events-none z-50 normal-case tracking-normal font-medium leading-relaxed border border-slate-800 block text-center">
+                                    {metric.tooltip}
+                                    <span className="absolute top-full left-1/2 -translate-x-1/2 border-[6px] border-transparent border-t-slate-900 block"></span>
+                                  </span>
+                                </span>
+                              </div>
                               <p className="text-xl font-black text-slate-900">+{metric.val}%</p>
                             </div>
                             <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
@@ -483,7 +603,7 @@ const SimulationFlow: React.FC = () => {
                 </div>
                 <div className="flex flex-col items-center mb-20 text-center">
                   <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-6">Cột mốc chiến lược</span>
-                  <h3 className="text-4xl font-black text-white font-display uppercase tracking-tight">Timeline lộ trình tích hợp</h3>
+                  <h3 className="text-4xl font-black text-white font-display uppercase tracking-tight">Dòng thời gian lộ trình chi tiết</h3>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-10 relative z-10">
                   {[

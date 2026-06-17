@@ -74,7 +74,7 @@ const PremiumPage: React.FC = () => {
       description: 'Giải pháp toàn diện cho tổ chức và đội ngũ.',
       features: [
         'Tất cả tính năng Premium',
-        'Phân tích ma trận đa biến tùy chỉnh',
+        'So sánh nâng cao các phương án tương lai',
         'Cố vấn AI riêng biệt cho doanh nghiệp',
         'Quản lý quyền truy cập đội ngũ',
         'Xuất báo cáo PDF/Excel chuyên nghiệp'
@@ -104,7 +104,7 @@ const PremiumPage: React.FC = () => {
             transition={{ delay: 0.1 }}
             className="text-3xl uppercase italic  leading-[1.6] sm:leading-[1.3] mb-12 sm:text-6xl font-black mb-8 font-display text-slate-900 leading-[0.9]"
           >
-            Định lượng tương lai <br /> <span className="text-blue-600">ở cấp độ cao nhất.</span>
+            Mô phỏng tương lai <br /> <span className="text-blue-600">ở cấp độ cao nhất.</span>
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
