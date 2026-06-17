@@ -5,7 +5,7 @@ import SharedHeader from '../components/SharedHeader';
 import SharedFooter from '../components/SharedFooter';
 import { AnimatedBackground } from '../components/AnimatedBackground';
 import { IconMapper } from '../components/IconMapper';
-import { getCurrentUser, updateProfile, changePassword } from '../services/authService';
+import { getCurrentUser, getUserProfile, updateProfile, changePassword, redeemInviteCode } from '../services/authService';
 
 const ProfilePage: React.FC = () => {
   const navigate = useNavigate();
@@ -23,6 +23,9 @@ const ProfilePage: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
   const [passwordMsg, setPasswordMsg] = useState({ text: '', type: '' });
+  const [inviteCodeInput, setInviteCodeInput] = useState('');
+  const [isRedeemingInvite, setIsRedeemingInvite] = useState(false);
+  const [inviteMsg, setInviteMsg] = useState({ text: '', type: '' });
 
   useEffect(() => {
     const currentUser = getCurrentUser();
@@ -32,6 +35,13 @@ const ProfilePage: React.FC = () => {
       setUser(currentUser);
       setFullName(currentUser.name || '');
       setBio(currentUser.bio || '');
+      getUserProfile()
+        .then((freshUser) => {
+          setUser(freshUser);
+          setFullName(freshUser.name || '');
+          setBio(freshUser.bio || '');
+        })
+        .catch(() => {});
     }
   }, [navigate]);
 
@@ -75,6 +85,34 @@ const ProfilePage: React.FC = () => {
       setPasswordMsg({ text: err.message || 'Lỗi khi đổi mật khẩu.', type: 'error' });
     } finally {
       setIsUpdatingPassword(false);
+    }
+  };
+
+  const handleRedeemInvite = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inviteCodeInput.trim()) return;
+    setIsRedeemingInvite(true);
+    setInviteMsg({ text: '', type: '' });
+
+    try {
+      const data = await redeemInviteCode(inviteCodeInput.trim());
+      setUser(data.user);
+      setInviteCodeInput('');
+      setInviteMsg({ text: 'Nhập mã mời thành công. Bạn đã nhận thêm 5.000 token.', type: 'success' });
+    } catch (err: any) {
+      setInviteMsg({ text: err.message || 'Không thể nhập mã mời.', type: 'error' });
+    } finally {
+      setIsRedeemingInvite(false);
+    }
+  };
+
+  const handleCopyInviteCode = async () => {
+    if (!user?.code_invite) return;
+    try {
+      await navigator.clipboard.writeText(user.code_invite);
+      setInviteMsg({ text: 'Đã sao chép mã mời.', type: 'success' });
+    } catch {
+      setInviteMsg({ text: 'Không thể sao chép mã mời tự động.', type: 'error' });
     }
   };
 
@@ -128,6 +166,57 @@ const ProfilePage: React.FC = () => {
                   {user.tier?.startsWith('premium') ? 'Thành viên Premium' : 'Thành viên Tiêu chuẩn'}
                 </span>
               </button>
+              <div className="w-full mt-8 pt-8 border-t border-slate-100 space-y-5 text-left">
+                <div className="p-5 bg-blue-50/70 border border-blue-100 rounded-2xl">
+                  <p className="text-[9px] font-black uppercase tracking-widest text-blue-500 mb-2">Token hiện có</p>
+                  <p className="text-3xl font-black text-slate-900">{Number(user.token || 0).toLocaleString('vi-VN')}</p>
+                </div>
+
+                <div className="p-5 bg-slate-50 border border-slate-100 rounded-2xl">
+                  <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-3">Mã mời của bạn</p>
+                  <div className="flex items-center gap-3">
+                    <code className="flex-1 px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-black tracking-widest text-slate-900 text-center">
+                      {user.code_invite || '--------'}
+                    </code>
+                    <button
+                      type="button"
+                      onClick={handleCopyInviteCode}
+                      className="w-11 h-11 rounded-xl bg-slate-900 text-white hover:bg-blue-600 transition-all flex items-center justify-center"
+                      title="Sao chép mã mời"
+                    >
+                      <IconMapper name="content_copy" className="text-base" />
+                    </button>
+                  </div>
+                </div>
+
+                {inviteMsg.text && (
+                  <div className={`p-4 rounded-xl text-xs font-bold flex items-center gap-2 ${inviteMsg.type === 'error' ? 'bg-rose-50 text-rose-600' : 'bg-emerald-50 text-emerald-600'}`}>
+                    <IconMapper name={inviteMsg.type === 'error' ? 'error' : 'check_circle'} />
+                    {inviteMsg.text}
+                  </div>
+                )}
+
+                {!user.invite_redeemed && (
+                  <form onSubmit={handleRedeemInvite} className="space-y-3">
+                    <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 ml-1">Nhập mã mời</label>
+                    <div className="flex gap-3">
+                      <input
+                        value={inviteCodeInput}
+                        onChange={(e) => setInviteCodeInput(e.target.value.replace(/[^A-Za-z0-9]/g, '').slice(0, 8))}
+                        className="flex-1 bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-black tracking-widest"
+                        placeholder="AbC123xY"
+                      />
+                      <button
+                        type="submit"
+                        disabled={inviteCodeInput.length !== 8 || isRedeemingInvite}
+                        className="px-5 py-3 bg-blue-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest disabled:opacity-40"
+                      >
+                        {isRedeemingInvite ? '...' : 'Nhập'}
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </div>
             </div>
           </div>
 

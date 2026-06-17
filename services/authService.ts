@@ -7,7 +7,10 @@ const normalizeUser = (user: any) => {
     name: user.full_name || user.name,
     avatar: user.avatar_url || user.avatar,
     // Ensure id is a string
-    id: user.id || user._id?.toString()
+    id: user.id || user._id?.toString(),
+    token: user.token ?? 0,
+    code_invite: user.code_invite,
+    invite_redeemed: !!user.invite_redeemed
   };
 };
 
@@ -80,7 +83,9 @@ export const getUserProfile = async () => {
   }
 
   const data = await response.json();
-  return normalizeUser(data);
+  const user = normalizeUser(data);
+  localStorage.setItem('user', JSON.stringify(user));
+  return user;
 };
 
 export const updateProfile = async (profileData: { full_name?: string, avatar_url?: string, bio?: string }) => {
@@ -126,4 +131,27 @@ export const changePassword = async (currentPassword: string, newPassword: strin
   }
 
   return response.json();
+};
+
+export const redeemInviteCode = async (codeInvite: string) => {
+  const token = localStorage.getItem('token');
+  if (!token) throw new Error('No token found');
+
+  const response = await fetch(`${API_BASE_URL}/api/auth/redeem-invite`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({ code_invite: codeInvite }),
+  });
+
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || 'Không thể nhập mã mời');
+  }
+
+  const user = normalizeUser(data.user);
+  localStorage.setItem('user', JSON.stringify(user));
+  return { ...data, user };
 };
