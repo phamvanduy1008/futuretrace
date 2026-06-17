@@ -60,9 +60,7 @@ const SharedHeader: React.FC = () => {
   ];
 
   const profileMenuItems = [
-    { label: 'Thông tin cá nhân', icon: 'person', action: () => {} },
-    { label: 'Đổi mật khẩu', icon: 'lock_reset', action: () => {} },
-    { label: 'Cài đặt', icon: 'settings', action: () => {} },
+    { label: 'Thông tin cá nhân', icon: 'person', action: () => navigate('/profile') },
     { label: 'Đăng xuất', icon: 'logout', action: handleLogout, danger: true },
   ];
 

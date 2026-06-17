@@ -15,6 +15,7 @@ import PremiumAnalysisPage from './pages/PremiumAnalysisPage';
 import ComparisonMatrixPage from './pages/ComparisonMatrixPage';
 import PaymentPage from './pages/PaymentPage';
 import PaymentResultPage from './pages/PaymentResultPage';
+import ProfilePage from './pages/ProfilePage.tsx';
 import { getUserProfile, logout } from './services/authService';
 import AdminApp from './pages/admin/AdminApp';
 import { TourProvider } from './components/GuideTour';
