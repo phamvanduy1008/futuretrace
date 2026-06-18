@@ -1,4 +1,5 @@
-﻿import React, { useEffect, useState } from 'react';
+
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import SharedHeader from '../components/SharedHeader';
 import SharedFooter from '../components/SharedFooter';
@@ -10,7 +11,6 @@ import { AnimatedBackground } from '../components/AnimatedBackground';
 const PremiumPage: React.FC = () => {
   const navigate = useNavigate();
   const [userTier, setUserTier] = useState<string>('free');
-  const [currentUser, setCurrentUser] = useState<any>(null);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -22,7 +22,6 @@ const PremiumPage: React.FC = () => {
           });
           if (res.ok) {
             const data = await res.json();
-            setCurrentUser(data);
             setUserTier(data.tier || 'free');
           }
         } catch (e) {
@@ -32,7 +31,6 @@ const PremiumPage: React.FC = () => {
     };
     fetchUser();
   }, []);
-  const isPremiumUser = userTier?.startsWith('premium');
   const plans = [
     {
       id: 'free',
@@ -51,9 +49,8 @@ const PremiumPage: React.FC = () => {
       color: 'slate'
     },
     {
-      id: 'premium-monthly',
-      planType: 'monthly',
-      name: 'Premium tháng',
+      id: 'premium',
+      name: 'Premium',
       price: '299.000đ',
       period: '/tháng',
       description: 'Tối ưu hóa chiến lược với phân tích chuyên sâu.',
@@ -61,31 +58,13 @@ const PremiumPage: React.FC = () => {
         'Không giới hạn mô phỏng',
         'Phân tích sâu kịch bản chiến lược',
         'Dự báo và hạn chế rủi ro nâng cao',
-        '30.000 token premium mỗi ngày',
+        'Tư vấn chiến thuật cơ bản',
         'Hỗ trợ AI ưu tiên xử lý'
       ],
       isPopular: true,
-      isCurrent: false,
-      buttonText: isPremiumUser ? 'Gia hạn thêm' : 'Nâng cấp ngay',
+      isCurrent: userTier === 'premium_demo',
+      buttonText: userTier === 'premium_demo' ? 'Đang sử dụng' : 'Nâng cấp ngay',
       color: 'blue'
-    },
-    {
-      id: 'premium-yearly',
-      planType: 'yearly',
-      name: 'Premium năm',
-      price: '2.870.400đ',
-      period: '/năm',
-      description: 'Tiết kiệm 20% so với thanh toán theo tháng.',
-      features: [
-        'Tất cả tính năng Premium tháng',
-        '30.000 token premium mỗi ngày',
-        'Gia hạn 12 tháng một lần',
-        'Giảm 20% chi phí so với gói tháng',
-        'Hỗ trợ AI ưu tiên xử lý'
-      ],
-      isCurrent: false,
-      buttonText: isPremiumUser ? 'Gia hạn thêm' : 'Nâng cấp ngay',
-      color: 'emerald'
     },
     {
       id: 'enterprise',
@@ -137,15 +116,7 @@ const PremiumPage: React.FC = () => {
           </motion.p>
         </header>
 
-        {isPremiumUser && currentUser?.premium_due_date && (
-          <div className="max-w-3xl mx-auto mb-10 p-5 bg-amber-50 border border-amber-100 rounded-2xl text-center">
-            <p className="text-[10px] font-black uppercase tracking-widest text-amber-600">
-              Premium đang hoạt động đến {new Date(currentUser.premium_due_date).toLocaleString('vi-VN')}
-            </p>
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {plans.map((plan, i) => (
             <motion.div
               key={plan.id}
@@ -190,9 +161,9 @@ const PremiumPage: React.FC = () => {
               </div>
 
               <button
-                disabled={plan.id === 'free' && plan.isCurrent}
+                disabled={plan.isCurrent}
                 onClick={() => {
-                  if (plan.id?.startsWith('premium')) {
+                  if (plan.id === 'premium') {
                     navigate('/checkout', { state: { plan } });
                   }
                 }}

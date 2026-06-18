@@ -72,8 +72,7 @@ const materialToPhosphor: Record<string, string> = {
   'pending': 'ClockClockwise',
   'circle': 'Circle',
   'inbox_customize': 'Package',
-  'work': 'Briefcase',
-  'content_copy': 'Copy'
+  'work': 'Briefcase'
 };
 
 interface IconMapperProps {
