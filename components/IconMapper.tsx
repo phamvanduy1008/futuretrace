@@ -72,18 +72,20 @@ const materialToPhosphor: Record<string, string> = {
   'pending': 'ClockClockwise',
   'circle': 'Circle',
   'inbox_customize': 'Package',
-  'work': 'Briefcase'
+  'work': 'Briefcase',
+  'content_copy': 'Copy'
 };
 
 interface IconMapperProps {
   name: string;
   className?: string;
   weight?: 'bold' | 'regular' | 'fill' | 'light' | 'thin' | 'duotone';
+  style?: React.CSSProperties;
 }
 
-export const IconMapper: React.FC<IconMapperProps> = ({ name, className, weight = 'bold' }) => {
+export const IconMapper: React.FC<IconMapperProps> = ({ name, className, weight = 'bold', style }) => {
   const PhosphorName = materialToPhosphor[name] || 'Lightning';
   const IconComponent = (PhosphorIcons as any)[PhosphorName];
   if (!IconComponent) return null;
-  return <IconComponent size={20} className={className} weight={weight} />;
+  return <IconComponent size={20} className={className} weight={weight} style={style} />;
 };

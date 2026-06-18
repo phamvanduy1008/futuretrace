@@ -8,13 +8,20 @@ const API_BASE_URL = (import.meta as any).env.VITE_API_BASE_URL || 'https://futu
 
 const getAuthToken = () => localStorage.getItem('token');
 
-const syncRemainingToken = (remainingToken?: number) => {
-  if (typeof remainingToken !== 'number') return;
+const syncRemainingToken = (remainingToken?: number, remainingTokenFree?: number, remainingTokenPremium?: number) => {
+  if (typeof remainingToken !== 'number' && typeof remainingTokenFree !== 'number' && typeof remainingTokenPremium !== 'number') return;
   const storedUser = localStorage.getItem('user');
   if (!storedUser) return;
   try {
     const user = JSON.parse(storedUser);
-    localStorage.setItem('user', JSON.stringify({ ...user, token: remainingToken }));
+    const token_free = typeof remainingTokenFree === 'number' ? remainingTokenFree : (user.token_free ?? 0);
+    const token_premium = typeof remainingTokenPremium === 'number' ? remainingTokenPremium : (user.token_premium ?? 0);
+    localStorage.setItem('user', JSON.stringify({
+      ...user,
+      token: typeof remainingToken === 'number' ? remainingToken : token_free + token_premium,
+      token_free,
+      token_premium
+    }));
   } catch {
     // Ignore malformed local user data.
   }
@@ -80,7 +87,7 @@ export const generatePremiumAnalysis = async (
   }
 
   const data = await response.json();
-  syncRemainingToken(data.remainingToken);
+  syncRemainingToken(data.remainingToken, data.remainingTokenFree, data.remainingTokenPremium);
   return data;
 };
 
@@ -113,6 +120,6 @@ export const pivotPremiumAnalysis = async (
   }
 
   const data = await response.json();
-  syncRemainingToken(data.remainingToken);
+  syncRemainingToken(data.remainingToken, data.remainingTokenFree, data.remainingTokenPremium);
   return data.report;
 };

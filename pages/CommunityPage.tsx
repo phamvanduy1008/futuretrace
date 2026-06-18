@@ -178,11 +178,11 @@ const CommunityPage: React.FC = () => {
                             <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{post.date}</p>
                           </div>
                         </div>
-                        <span className={`px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border shadow-sm ${post.type === 'Positive' || post.type === 'positive' ? 'text-emerald-600 bg-emerald-50 border-emerald-100' :
-                          post.type === 'Risk' || post.type === 'risk' ? 'text-rose-600 bg-rose-50 border-rose-100' : 'text-blue-600 bg-blue-50 border-blue-100'
+                        <span className={`px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border shadow-sm ${post.type === 'Positive' ? 'text-emerald-600 bg-emerald-50 border-emerald-100' :
+                          post.type === 'Risk' ? 'text-rose-600 bg-rose-50 border-rose-100' : 'text-blue-600 bg-blue-50 border-blue-100'
                           }`}>
-                          {post.type === 'Positive' || post.type === 'positive' ? 'Tích cực' :
-                            post.type === 'Risk' || post.type === 'risk' ? 'Rủi ro' : 'Ổn định'}
+                          {post.type === 'Positive' ? 'Tích cực' :
+                            post.type === 'Risk' ? 'Rủi ro' : 'Ổn định'}
                         </span>
                       </div>
 

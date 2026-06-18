@@ -1,4 +1,4 @@
-
+﻿
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import SharedHeader from '../components/SharedHeader';
@@ -11,6 +11,7 @@ import { AnimatedBackground } from '../components/AnimatedBackground';
 const PremiumPage: React.FC = () => {
   const navigate = useNavigate();
   const [userTier, setUserTier] = useState<string>('free');
+  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -23,6 +24,7 @@ const PremiumPage: React.FC = () => {
           if (res.ok) {
             const data = await res.json();
             setUserTier(data.tier || 'free');
+            setUser(data);
           }
         } catch (e) {
           console.error('Error fetching user tier:', e);
@@ -31,6 +33,7 @@ const PremiumPage: React.FC = () => {
     };
     fetchUser();
   }, []);
+  const isPremiumActive = Boolean(user?.tier?.startsWith('premium') && user?.premium_due_date && new Date(user.premium_due_date).getTime() > Date.now());
   const plans = [
     {
       id: 'free',
@@ -50,23 +53,41 @@ const PremiumPage: React.FC = () => {
     },
     {
       id: 'premium',
-      name: 'Premium',
+      name: 'Premium Tháng',
       price: '299.000đ',
       period: '/tháng',
+      planType: 'monthly',
       description: 'Tối ưu hóa chiến lược với phân tích chuyên sâu.',
       features: [
         'Không giới hạn mô phỏng',
-        'Phân tích sâu kịch bản chiến lược',
-        'Dự báo và hạn chế rủi ro nâng cao',
-        'Tư vấn chiến thuật cơ bản',
-        'Hỗ trợ AI ưu tiên xử lý'
+        'Phân tích kịch bản chiến lược sâu',
+        '30.000 token premium mỗi ngày',
+        'Ưu tiên xử lý AI',
+        'Tặng 30.000 token free khi gia hạn'
       ],
       isPopular: true,
-      isCurrent: userTier === 'premium_demo',
-      buttonText: userTier === 'premium_demo' ? 'Đang sử dụng' : 'Nâng cấp ngay',
+      isCurrent: false,
+      buttonText: userTier?.startsWith('premium') ? 'Gia hạn thêm' : 'Nâng cấp ngay',
       color: 'blue'
     },
     {
+      id: 'premium_yearly',
+      name: 'Premium Năm',
+      price: '2.870.400đ',
+      period: '/năm',
+      planType: 'yearly',
+      description: 'Tiết kiệm 20% khi thanh toán theo năm.',
+      features: [
+        'Tất cả tính năng Premium',
+        'Giảm 20% so với gói tháng',
+        '30.000 token premium mỗi ngày',
+        'Gia hạn thêm 12 tháng sau thanh toán',
+        'Tặng 30.000 token free khi gia hạn'
+      ],
+      isCurrent: false,
+      buttonText: userTier?.startsWith('premium') ? 'Gia hạn thêm' : 'Nâng cấp theo năm',
+      color: 'blue'
+    },    {
       id: 'enterprise',
       name: 'Doanh nghiệp',
       price: 'Liên hệ',
@@ -102,7 +123,7 @@ const PremiumPage: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-3xl uppercase italic  leading-[1.6] sm:leading-[1.3] mb-12 sm:text-6xl font-black mb-8 font-display text-slate-900 leading-[0.9]"
+            className="text-3xl uppercase italic leading-[1.6] sm:leading-[1.3] mb-12 sm:text-6xl font-black mb-8 font-display text-slate-900 leading-[0.9]"
           >
             Mô phỏng tương lai <br /> <span className="text-blue-600">ở cấp độ cao nhất.</span>
           </motion.h1>
@@ -114,10 +135,21 @@ const PremiumPage: React.FC = () => {
           >
             Nâng cấp lên Premium để mở khóa các phân tích kịch bản chiến lược chuyên sâu và hệ thống cảnh báo rủi ro tự động.
           </motion.p>
+          {isPremiumActive && user?.premium_due_date && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.25 }}
+              className="mt-8 inline-flex items-center gap-3 rounded-full bg-emerald-50 px-5 py-3 text-sm font-bold text-emerald-700 border border-emerald-100 shadow-sm"
+            >
+              <IconMapper name="schedule" className="text-base" />
+              Premium còn hạn đến {new Date(user.premium_due_date).toLocaleDateString('vi-VN')} {new Date(user.premium_due_date).toLocaleTimeString('vi-VN')}
+            </motion.div>
+          )}
         </header>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {plans.map((plan, i) => (
+          {plans.filter((plan) => plan.id !== 'enterprise').map((plan, i) => (
             <motion.div
               key={plan.id}
               initial={{ opacity: 0, y: 30 }}
@@ -163,7 +195,7 @@ const PremiumPage: React.FC = () => {
               <button
                 disabled={plan.isCurrent}
                 onClick={() => {
-                  if (plan.id === 'premium') {
+                  if (plan.id === 'premium' || plan.id === 'premium_yearly') {
                     navigate('/checkout', { state: { plan } });
                   }
                 }}
@@ -175,13 +207,51 @@ const PremiumPage: React.FC = () => {
                   }`}
               >
                 {plan.buttonText}
-                {!plan.isCurrent && <IconMapper name="arrow_forward" className=" text-sm" />}
+                {!plan.isCurrent && plan.id !== 'enterprise' && <IconMapper name="arrow_forward" className=" text-sm" />}
               </button>
             </motion.div>
           ))}
         </div>
 
-        <section className="mt-40 pt-20 border-t border-slate-100 text-center">
+        <div className="max-w-6xl mx-auto mt-10">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 + plans.length * 0.1 }}
+            className="relative flex flex-col p-10 rounded-[3rem] border bg-white shadow-xl border-slate-200 text-slate-900"
+          >
+            <div className="mb-8">
+              <h3 className="text-sm font-black uppercase tracking-widest mb-6 text-indigo-500">Doanh nghiệp</h3>
+              <div className="flex items-baseline gap-2 mb-4 flex-wrap">
+                <span className="text-4xl font-black font-display tracking-tighter">Liên hệ</span>
+              </div>
+              <p className="text-sm font-medium leading-relaxed text-slate-600">
+                Giải pháp toàn diện cho tổ chức và đội ngũ.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
+              {plans.find((plan) => plan.id === 'enterprise')?.features.map((feature, idx) => (
+                <div key={idx} className="flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                    <IconMapper name="check_circle" className="text-base" />
+                  </div>
+                  <p className="text-sm font-black uppercase tracking-widest leading-tight text-slate-700">{feature}</p>
+                </div>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => navigate('/contact-business')}
+              className="self-start px-8 py-4 rounded-2xl bg-indigo-600 text-white font-black uppercase tracking-widest transition hover:bg-indigo-700"
+            >
+              Liên hệ doanh nghiệp
+            </button>
+          </motion.div>
+        </div>
+
+        <section className="mt-0 pt-20 border-t border-slate-100 text-center">
           <div className="max-w-2xl mx-auto space-y-10">
             <IconMapper name="verified_user" className=" text-slate-200 text-6xl" />
             <h4 className="text-2xl font-black text-slate-900 font-display uppercase tracking-tight">Cam kết bảo mật & hiệu suất</h4>
