@@ -112,6 +112,7 @@ const PaymentPage: React.FC = () => {
       const orderData = {
         userId,
         total_price: totalPrice,
+        planType: plan.planType || 'monthly',
         paymentMethod,
         billing: { fullName, address: addressLine1, country },
       };

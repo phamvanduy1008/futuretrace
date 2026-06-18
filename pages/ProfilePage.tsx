@@ -26,6 +26,7 @@ const ProfilePage: React.FC = () => {
   const [inviteCodeInput, setInviteCodeInput] = useState('');
   const [isRedeemingInvite, setIsRedeemingInvite] = useState(false);
   const [inviteMsg, setInviteMsg] = useState({ text: '', type: '' });
+  const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
     const currentUser = getCurrentUser();
@@ -44,6 +45,11 @@ const ProfilePage: React.FC = () => {
         .catch(() => {});
     }
   }, [navigate]);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(timer);
+  }, []);
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -123,6 +129,30 @@ const ProfilePage: React.FC = () => {
     return user.name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
   };
 
+  const formatDateTime = (value?: string) => {
+    if (!value) return '--';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '--';
+    return date.toLocaleString('vi-VN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  const getPremiumCountdown = () => {
+    if (!user?.premium_due_date || !user.tier?.startsWith('premium')) return null;
+    const dueTime = new Date(user.premium_due_date).getTime();
+    const diff = Math.max(0, dueTime - now);
+    const days = Math.floor(diff / 86400000);
+    const hours = Math.floor((diff % 86400000) / 3600000);
+    const minutes = Math.floor((diff % 3600000) / 60000);
+    const seconds = Math.floor((diff % 60000) / 1000);
+    return `${days} ngày ${hours} giờ ${minutes} phút ${seconds} giây`;
+  };
+
   return (
     <AnimatedBackground className="min-h-screen bg-slate-50 font-sans selection:bg-blue-200">
       <SharedHeader />
@@ -167,10 +197,25 @@ const ProfilePage: React.FC = () => {
                 </span>
               </button>
               <div className="w-full mt-8 pt-8 border-t border-slate-100 space-y-5 text-left">
-                <div className="p-5 bg-blue-50/70 border border-blue-100 rounded-2xl">
-                  <p className="text-[9px] font-black uppercase tracking-widest text-blue-500 mb-2">Token hiện có</p>
-                  <p className="text-3xl font-black text-slate-900">{Number(user.token || 0).toLocaleString('vi-VN')}</p>
+                <div className="p-5 bg-blue-50/70 border border-blue-100 rounded-2xl space-y-4">
+                  <div>
+                    <p className="text-[9px] font-black uppercase tracking-widest text-blue-500 mb-2">Token free</p>
+                    <p className="text-3xl font-black text-slate-900">{Number(user.token_free || 0).toLocaleString('vi-VN')}</p>
+                  </div>
+                  <div className="pt-4 border-t border-blue-100">
+                    <p className="text-[9px] font-black uppercase tracking-widest text-amber-500 mb-2">Token premium hôm nay</p>
+                    <p className="text-3xl font-black text-slate-900">{Number(user.token_premium || 0).toLocaleString('vi-VN')}</p>
+                    <p className="text-[10px] font-bold text-slate-400 mt-1">Giới hạn 30.000 token mỗi ngày.</p>
+                  </div>
                 </div>
+
+                {user.tier?.startsWith('premium') && (
+                  <div className="p-5 bg-amber-50 border border-amber-100 rounded-2xl">
+                    <p className="text-[9px] font-black uppercase tracking-widest text-amber-500 mb-2">Hạn premium</p>
+                    <p className="text-sm font-black text-slate-900 mb-2">{formatDateTime(user.premium_due_date)}</p>
+                    <p className="text-[11px] font-bold text-amber-700">{getPremiumCountdown()}</p>
+                  </div>
+                )}
 
                 <div className="p-5 bg-slate-50 border border-slate-100 rounded-2xl">
                   <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-3">Mã mời của bạn</p>

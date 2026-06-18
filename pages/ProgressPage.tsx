@@ -9,13 +9,18 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { apiFetch } from '../services/apiClient';
 import { IconMapper } from '../components/IconMapper';
 
-const syncRemainingToken = (remainingToken?: number) => {
-  if (typeof remainingToken !== 'number') return;
+const syncRemainingToken = (remainingToken?: number, remainingTokens?: any) => {
+  if (typeof remainingToken !== 'number' && !remainingTokens) return;
   const storedUser = localStorage.getItem('user');
   if (!storedUser) return;
   try {
     const user = JSON.parse(storedUser);
-    localStorage.setItem('user', JSON.stringify({ ...user, token: remainingToken }));
+    localStorage.setItem('user', JSON.stringify({
+      ...user,
+      token: remainingToken ?? user.token,
+      token_free: remainingTokens?.token_free ?? user.token_free,
+      token_premium: remainingTokens?.token_premium ?? user.token_premium
+    }));
   } catch {
     // Ignore malformed local user data.
   }
@@ -117,7 +122,7 @@ const ProgressPage: React.FC = () => {
       if (!res.ok) {
         throw new Error(responseData.message || 'Không thể điều chỉnh lộ trình.');
       }
-      syncRemainingToken(responseData.remainingToken);
+      syncRemainingToken(responseData.remainingToken, responseData.remainingTokens);
 
       if (!res.ok) {
         throw new Error('Không thể điều chỉnh lộ trình.');
