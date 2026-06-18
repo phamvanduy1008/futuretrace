@@ -23,6 +23,7 @@ export interface Comment {
   content: string;
   date: string;
   likes: number;
+  isLiked?: boolean;
 }
 
 export interface SimulationData {
@@ -94,6 +95,7 @@ export interface CommunityPost extends ScenarioResult {
   category: string;
   reliability: number;
   desc: string;
+  isLiked?: boolean;
 }
 
 export interface HistoryItem extends ScenarioResult {
