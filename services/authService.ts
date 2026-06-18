@@ -2,15 +2,22 @@ const API_BASE_URL = (import.meta as any).env.VITE_API_BASE_URL || 'https://futu
 
 const normalizeUser = (user: any) => {
   if (!user) return null;
+  const tokenFree = user.token_free ?? user.token ?? 0;
+  const tokenPremium = user.token_premium ?? 0;
   return {
     ...user,
     name: user.full_name || user.name,
     avatar: user.avatar_url || user.avatar,
     // Ensure id is a string
     id: user.id || user._id?.toString(),
-    token: user.token ?? 0,
+    token: user.token ?? tokenFree + tokenPremium,
+    token_free: tokenFree,
+    token_premium: tokenPremium,
     code_invite: user.code_invite,
-    invite_redeemed: !!user.invite_redeemed
+    invite_redeemed: !!user.invite_redeemed,
+    premium_create_date: user.premium_create_date,
+    premium_due_date: user.premium_due_date,
+    premium_last_token_reset_date: user.premium_last_token_reset_date
   };
 };
 
