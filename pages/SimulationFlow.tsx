@@ -105,11 +105,7 @@ const SimulationFlow: React.FC = () => {
     risk: 3,
     academicPerformance: 3,
     otherFactors: "",
-    tier: 'free',
-    mood: "Bình thường",
-    educationLevel: "Cấp 3",
-    location: "Thành phố lớn",
-    coreValues: "Ổn định"
+    tier: 'free'
   });
 
   useEffect(() => {
@@ -139,7 +135,7 @@ const SimulationFlow: React.FC = () => {
         }));
       }
     }).catch(err => console.error("Could not fetch latest evaluation", err))
-    .finally(() => setIsFetchingEval(false));
+      .finally(() => setIsFetchingEval(false));
   }, [location.state]);
 
   const [loadingProgress, setLoadingProgress] = useState(0);
@@ -178,15 +174,15 @@ const SimulationFlow: React.FC = () => {
   };
 
   const submitClarification = () => {
-    const additionalContext = clarificationQuestions.map((q, idx) => 
+    const additionalContext = clarificationQuestions.map((q, idx) =>
       `- ${q.question}: ${clarificationAnswers[idx] || 'Bỏ qua'}`
     ).join('\\n');
-    
+
     setData(prev => ({
       ...prev,
       decision: prev.decision + '\\n\\n[THÔNG TIN BỔ SUNG TỪ NGƯỜI DÙNG]\\n' + additionalContext
     }));
-    
+
     setClarificationQuestions([]);
     setClarificationAnswers({});
     setStep(SimulationStep.PROCESSING);
@@ -235,7 +231,11 @@ const SimulationFlow: React.FC = () => {
       setTimeout(() => setStep(SimulationStep.RESULTS), 800);
     } catch (e: any) {
       clearInterval(interval);
-      setError({ message: e.message, type: 'GENERAL' });
+      if (e.code === 'INSUFFICIENT_TOKENS') {
+        setError({ message: e.message, type: 'AUTH' });
+      } else {
+        setError({ message: e.message, type: 'GENERAL' });
+      }
       setStep(SimulationStep.CONTEXT);
     } finally {
       clearInterval(interval);
@@ -319,33 +319,29 @@ const SimulationFlow: React.FC = () => {
                       whileHover={{ y: -2, scale: 1.01 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => setData({ ...data, decision: tmpl.content })}
-                      className={`group flex items-center gap-3.5 p-4 rounded-2xl border text-left transition-all ${
-                        isActive
+                      className={`group flex items-center gap-3.5 p-4 rounded-2xl border text-left transition-all ${isActive
                           ? 'border-blue-600 bg-blue-50/30 ring-1 ring-blue-600/30 shadow-md shadow-blue-500/5'
                           : 'border-slate-200 bg-white/90 hover:border-blue-400 hover:bg-blue-50/10 shadow-sm'
-                      }`}
+                        }`}
                     >
-                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center border shrink-0 transition-all ${
-                        isActive
+                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center border shrink-0 transition-all ${isActive
                           ? 'bg-blue-600 text-white border-blue-600 shadow-sm shadow-blue-500/10'
                           : 'bg-slate-50 text-blue-600 border-slate-100 group-hover:bg-blue-50'
-                      }`}>
+                        }`}>
                         <IconMapper name={tmpl.icon} className="text-lg" />
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-1.5 mb-0.5">
-                          <p className={`text-[11px] font-bold uppercase tracking-wide leading-snug transition-colors ${
-                            isActive ? 'text-blue-700' : 'text-slate-800 group-hover:text-blue-600'
-                          }`}>
+                          <p className={`text-[11px] font-bold uppercase tracking-wide leading-snug transition-colors ${isActive ? 'text-blue-700' : 'text-slate-800 group-hover:text-blue-600'
+                            }`}>
                             {tmpl.label}
                           </p>
                           {isActive && (
                             <span className="w-1.5 h-1.5 bg-blue-600 rounded-full shrink-0 animate-pulse" />
                           )}
                         </div>
-                        <p className={`text-[9px] font-bold uppercase tracking-wider ${
-                          isActive ? 'text-blue-500' : 'text-slate-400 group-hover:text-blue-500/80'
-                        }`}>
+                        <p className={`text-[9px] font-bold uppercase tracking-wider ${isActive ? 'text-blue-500' : 'text-slate-400 group-hover:text-blue-500/80'
+                          }`}>
                           {isActive ? 'Đang áp dụng' : 'Bấm áp dụng'}
                         </p>
                       </div>
@@ -389,19 +385,28 @@ const SimulationFlow: React.FC = () => {
               </div>
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 relative z-10">
                 <div className="w-16 h-16 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-600 shrink-0">
-                  <IconMapper name="warning" className=" text-3xl font-bold" />
+                  <IconMapper name={error.type === 'AUTH' ? 'toll' : 'warning'} className=" text-3xl font-bold" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-sm font-black text-rose-900 uppercase tracking-widest mb-1">Cảnh báo hệ thống</h3>
+                  <h3 className="text-sm font-black text-rose-900 uppercase tracking-widest mb-1">{error.type === 'AUTH' ? 'Không đủ token' : 'Cảnh báo hệ thống'}</h3>
                   <p className="text-sm text-slate-600 font-medium leading-relaxed">{error.message}</p>
                 </div>
                 <div className="flex flex-col gap-3 w-full sm:w-auto">
-                  <button
-                    onClick={handleSelectKey}
-                    className="bg-rose-600 text-white px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-rose-700 transition-all shadow-lg shadow-rose-100 flex items-center justify-center gap-2"
-                  >
-                    Cấu hình Key
-                  </button>
+                  {error.type === 'AUTH' ? (
+                    <button
+                      onClick={() => navigate('/store')}
+                      className="bg-blue-600 text-white px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 flex items-center justify-center gap-2"
+                    >
+                      Mua thêm token
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handleSelectKey}
+                      className="bg-rose-600 text-white px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-rose-700 transition-all shadow-lg shadow-rose-100 flex items-center justify-center gap-2"
+                    >
+                      Cấu hình Key
+                    </button>
+                  )}
                   <button
                     onClick={() => { setError(null); setStep(SimulationStep.PROCESSING); startSimulation(); }}
                     className="bg-slate-900 text-white px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 transition-all flex items-center justify-center gap-2"
@@ -470,89 +475,6 @@ const SimulationFlow: React.FC = () => {
                   </div>
                 </div>
               ))}
-              
-              <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-8 pt-6 border-t border-slate-50 mt-4">
-                {/* Tâm trạng */}
-                <div className="space-y-4">
-                  <label className="flex items-center gap-4 font-black text-[10px] uppercase tracking-widest text-slate-800">
-                    <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-blue-600 border border-slate-100 shadow-sm">
-                      <IconMapper name="mood" className=" text-xl" />
-                    </div>
-                    Tâm trạng hiện tại
-                  </label>
-                  <div className="flex gap-2">
-                    {["Lạc quan", "Bình thường", "Lo lắng", "Kiệt sức"].map(mood => (
-                      <button 
-                        key={mood}
-                        onClick={() => setData({ ...data, mood: mood as any })}
-                        className={`flex-1 py-3 text-[10px] font-bold uppercase tracking-wide rounded-xl border transition-all ${data.mood === mood ? 'bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-200' : 'bg-white text-slate-500 border-slate-200 hover:border-blue-300 hover:bg-blue-50'}`}
-                      >
-                        {mood}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Giai đoạn học vấn */}
-                <div className="space-y-4">
-                  <label className="flex items-center gap-4 font-black text-[10px] uppercase tracking-widest text-slate-800">
-                    <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-blue-600 border border-slate-100 shadow-sm">
-                      <IconMapper name="menu_book" className=" text-xl" />
-                    </div>
-                    Giai đoạn học vấn
-                  </label>
-                  <select 
-                    value={data.educationLevel}
-                    onChange={(e) => setData({ ...data, educationLevel: e.target.value as any })}
-                    className="w-full px-5 py-4 bg-white border border-slate-200 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all text-slate-700"
-                  >
-                    <option value="Cấp 3">Học sinh Cấp 3</option>
-                    <option value="Đại học năm 1-2">Đại học (Năm 1 - 2)</option>
-                    <option value="Đại học năm 3-4">Đại học (Năm 3 - 4)</option>
-                    <option value="Mới ra trường">Mới ra trường (Fresher)</option>
-                  </select>
-                </div>
-                
-                {/* Khu vực sống */}
-                <div className="space-y-4">
-                  <label className="flex items-center gap-4 font-black text-[10px] uppercase tracking-widest text-slate-800">
-                    <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-blue-600 border border-slate-100 shadow-sm">
-                      <IconMapper name="location_on" className=" text-xl" />
-                    </div>
-                    Khu vực sinh sống
-                  </label>
-                  <div className="flex gap-4">
-                    {["Thành phố lớn", "Tỉnh lẻ"].map(loc => (
-                      <button 
-                        key={loc}
-                        onClick={() => setData({ ...data, location: loc as any })}
-                        className={`flex-1 py-4 text-xs font-bold rounded-xl border transition-all ${data.location === loc ? 'bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-200' : 'bg-white text-slate-500 border-slate-200 hover:border-blue-300 hover:bg-blue-50'}`}
-                      >
-                        {loc}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Core Values */}
-                <div className="space-y-4">
-                  <label className="flex items-center gap-4 font-black text-[10px] uppercase tracking-widest text-slate-800">
-                    <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-blue-600 border border-slate-100 shadow-sm">
-                      <IconMapper name="diamond" className=" text-xl" />
-                    </div>
-                    Ưu tiên lớn nhất
-                  </label>
-                  <select 
-                    value={data.coreValues}
-                    onChange={(e) => setData({ ...data, coreValues: e.target.value as any })}
-                    className="w-full px-5 py-4 bg-white border border-slate-200 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all text-slate-700"
-                  >
-                    <option value="Ổn định">Sự ổn định & An toàn</option>
-                    <option value="Thu nhập cao">Thu nhập & Tiền bạc</option>
-                    <option value="Đam mê/Cống hiến">Đam mê & Trải nghiệm</option>
-                  </select>
-                </div>
-              </div>
 
               <div className="md:col-span-2 space-y-4 pt-6 border-t border-slate-50 mt-4">
                 <label htmlFor="otherFactors" className="flex items-center gap-4 font-black text-[10px] uppercase tracking-widest text-slate-800">
@@ -581,7 +503,7 @@ const SimulationFlow: React.FC = () => {
                   <p className="text-xs text-slate-600 font-medium">Làm bài test 40 câu hỏi chuyên sâu để AI tự động cấu hình chuẩn xác nhất.</p>
                 </div>
               </div>
-              <motion.button 
+              <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => navigate('/evaluate', { state: { decisionContext: data.decision, from: 'simulate' } })}
@@ -637,11 +559,10 @@ const SimulationFlow: React.FC = () => {
                           <button
                             key={oIdx}
                             onClick={() => setClarificationAnswers(prev => ({ ...prev, [qIdx]: opt }))}
-                            className={`p-4 text-left text-sm font-medium rounded-xl border transition-all ${
-                              clarificationAnswers[qIdx] === opt 
-                                ? 'bg-amber-50 border-amber-400 text-amber-800 shadow-md ring-2 ring-amber-400/20' 
+                            className={`p-4 text-left text-sm font-medium rounded-xl border transition-all ${clarificationAnswers[qIdx] === opt
+                                ? 'bg-amber-50 border-amber-400 text-amber-800 shadow-md ring-2 ring-amber-400/20'
                                 : 'bg-white border-slate-200 text-slate-600 hover:border-amber-300 hover:bg-amber-50/50'
-                            }`}
+                              }`}
                           >
                             {opt}
                           </button>

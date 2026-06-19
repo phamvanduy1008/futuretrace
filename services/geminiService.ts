@@ -8,19 +8,15 @@ const API_BASE_URL = (import.meta as any).env.VITE_API_BASE_URL || 'https://futu
 
 const getAuthToken = () => localStorage.getItem('token');
 
-const syncRemainingToken = (remainingToken?: number, remainingTokenFree?: number, remainingTokenPremium?: number) => {
-  if (typeof remainingToken !== 'number' && typeof remainingTokenFree !== 'number' && typeof remainingTokenPremium !== 'number') return;
+const syncRemainingToken = (remainingToken?: number) => {
+  if (typeof remainingToken !== 'number') return;
   const storedUser = localStorage.getItem('user');
   if (!storedUser) return;
   try {
     const user = JSON.parse(storedUser);
-    const token_free = typeof remainingTokenFree === 'number' ? remainingTokenFree : (user.token_free ?? 0);
-    const token_premium = typeof remainingTokenPremium === 'number' ? remainingTokenPremium : (user.token_premium ?? 0);
     localStorage.setItem('user', JSON.stringify({
       ...user,
-      token: typeof remainingToken === 'number' ? remainingToken : token_free + token_premium,
-      token_free,
-      token_premium
+      token: remainingToken
     }));
   } catch {
     // Ignore malformed local user data.
@@ -53,7 +49,7 @@ export const generateSimulation = async (
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(errorData.message || 'Lỗi kết nối server AI.');
+    throwApiError(errorData, 'Lỗi kết nối server AI.');
   }
 
   const result = await response.json();
@@ -106,7 +102,7 @@ export const generatePremiumAnalysis = async (
   }
 
   const data = await response.json();
-  syncRemainingToken(data.remainingToken, data.remainingTokenFree, data.remainingTokenPremium);
+  syncRemainingToken(data.remainingToken);
   return data;
 };
 
@@ -139,6 +135,6 @@ export const pivotPremiumAnalysis = async (
   }
 
   const data = await response.json();
-  syncRemainingToken(data.remainingToken, data.remainingTokenFree, data.remainingTokenPremium);
+  syncRemainingToken(data.remainingToken);
   return data.report;
 };

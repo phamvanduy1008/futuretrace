@@ -73,7 +73,15 @@ const materialToPhosphor: Record<string, string> = {
   'circle': 'Circle',
   'inbox_customize': 'Package',
   'work': 'Briefcase',
-  'content_copy': 'Copy'
+  'content_copy': 'Copy',
+  'toll': 'Coin',
+  'change': 'ArrowsCounterClockwise',
+  'nut': 'Nut',
+  'lightning': 'Lightning',
+  'lightbulb': 'Lightbulb',
+  'diamond': 'SketchLogo',
+  'store': 'Storefront',
+  'profile': 'UserCircle'
 };
 
 interface IconMapperProps {

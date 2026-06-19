@@ -20,7 +20,7 @@ const SharedHeader: React.FC = () => {
     const token = localStorage.getItem('token');
     setIsLoggedIn(!!token);
     setIsMobileMenuOpen(false);
-    
+
     if (location.pathname === '/community') {
       setSearchValue(searchParams.get('q') || "");
     } else {
@@ -38,7 +38,7 @@ const SharedHeader: React.FC = () => {
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchValue(value);
-    
+
     if (value.trim()) {
       navigate(`/community?q=${encodeURIComponent(value)}`, { replace: location.pathname === '/community' });
     } else if (location.pathname === '/community') {
@@ -70,23 +70,23 @@ const SharedHeader: React.FC = () => {
         <div className="max-w-[1440px] mx-auto flex items-center justify-between">
           <div className="flex items-center gap-10">
             <div className="flex items-center gap-3 cursor-pointer group" onClick={() => navigate('/')}>
-               <div className="w-10 h-10 rounded-xl overflow-hidden shadow-lg shadow-blue-900/20 border border-slate-800 transition-all group-hover:scale-105 group-hover:border-blue-500/50">
-                 <img src="/logo.png" alt="Logo" className="w-full h-full object-cover" />
-               </div>
-               <div className="flex flex-col leading-none relative">
-                  <div className="absolute -inset-x-6 inset-y-0 bg-blue-600/20 blur-[24px] rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
-                 <div className="flex items-baseline relative z-10">
-                    <span className="text-2xl sm:text-3xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-white via-slate-200 to-slate-400 font-display italic pr-0.5">
-                      Future
-                    </span>
-                    <span className="text-2xl sm:text-3xl font-light tracking-tighter text-slate-500 font-display">
-                      Trace
-                    </span>
-                 </div>
-                 <span className="text-[8px] sm:text-[9px] uppercase tracking-widest text-blue-600 font-black hidden sm:block mt-1.5 relative z-10 pl-0.5">Decision Research</span>
+              <div className="w-10 h-10 rounded-xl overflow-hidden shadow-lg shadow-blue-900/20 border border-slate-800 transition-all group-hover:scale-105 group-hover:border-blue-500/50">
+                <img src="/logo.png" alt="Logo" className="w-full h-full object-cover" />
+              </div>
+              <div className="flex flex-col leading-none relative">
+                <div className="absolute -inset-x-6 inset-y-0 bg-blue-600/20 blur-[24px] rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
+                <div className="flex items-baseline relative z-10">
+                  <span className="text-2xl sm:text-3xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-white via-slate-200 to-slate-400 font-display italic pr-0.5">
+                    Future
+                  </span>
+                  <span className="text-2xl sm:text-3xl font-light tracking-tighter text-slate-500 font-display">
+                    Trace
+                  </span>
+                </div>
+                <span className="text-[8px] sm:text-[9px] uppercase tracking-widest text-blue-600 font-black hidden sm:block mt-1.5 relative z-10 pl-0.5">Decision Research</span>
               </div>
             </div>
-            
+
             {isLoggedIn && (
               <nav className="hidden lg:flex items-center gap-8">
                 {navItems.map((item) => (
@@ -94,26 +94,24 @@ const SharedHeader: React.FC = () => {
                     key={item.path}
                     id={`tour-nav-${item.path.replace('/', '')}`}
                     onClick={() => navigate(item.path)}
-                    className={`text-[11px] font-black uppercase tracking-widest transition-all ${
-                      location.pathname === item.path 
-                        ? 'text-white border-b-2 border-white pb-1' 
+                    className={`text-[11px] font-black uppercase tracking-widest transition-all ${location.pathname === item.path
+                        ? 'text-white border-b-2 border-white pb-1'
                         : 'text-slate-400 hover:text-white'
-                    }`}
+                      }`}
                   >
                     {item.label}
                   </button>
                 ))}
                 <button
-                  id="tour-nav-premium"
-                  onClick={() => navigate('/premium')}
-                  className={`flex items-center gap-2 text-[11px] font-black uppercase tracking-widest transition-all px-4 py-1.5 rounded-full border ${
-                    location.pathname === '/premium'
+                  id="tour-nav-store"
+                  onClick={() => navigate('/store')}
+                  className={`flex items-center gap-2 text-[11px] font-black uppercase tracking-widest transition-all px-4 py-1.5 rounded-full border ${location.pathname === '/store'
                       ? 'bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-600/20'
-                      : 'border-slate-200 text-amber-500 hover:border-amber-300 hover:bg-amber-50'
-                  }`}
+                      : 'border-slate-700 text-blue-400 hover:border-blue-500 hover:bg-blue-950/50'
+                    }`}
                 >
-                  <IconMapper name="workspace_premium" className=" text-sm" />
-                  Premium
+                  <IconMapper name="store" className=" text-sm" />
+                  Cửa hàng
                 </button>
               </nav>
             )}
@@ -130,7 +128,7 @@ const SharedHeader: React.FC = () => {
                     placeholder="Tìm kịch bản..."
                   />
                   {searchValue && (
-                    <button 
+                    <button
                       onClick={() => { setSearchValue(""); navigate('/community'); }}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white"
                     >
@@ -151,20 +149,20 @@ const SharedHeader: React.FC = () => {
                 <button className="text-slate-400 hover:text-white transition-colors hidden sm:block">
                   <IconMapper name="notifications" className="text-2xl" />
                 </button>
-                
-                <div 
+
+                <div
                   className="relative hidden lg:block"
                   onMouseEnter={() => setIsProfileOpen(true)}
                   onMouseLeave={() => setIsProfileOpen(false)}
                 >
-                  <motion.div 
+                  <motion.div
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     className="w-9 h-9 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-white font-black text-[10px] cursor-pointer hover:ring-4 hover:ring-blue-600/20 transition-all shadow-md"
                   >
                     {getUserInitials()}
                   </motion.div>
-                  
+
                   <AnimatePresence>
                     {isProfileOpen && (
                       <motion.div
@@ -178,7 +176,7 @@ const SharedHeader: React.FC = () => {
                           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tài khoản ID</p>
                           <p className="text-sm font-black text-slate-900 truncate">{user?.email || "guest@research.vn"}</p>
                         </div>
-                        
+
                         {profileMenuItems.map((item, index) => (
                           <button
                             key={index}
@@ -186,15 +184,13 @@ const SharedHeader: React.FC = () => {
                               item.action();
                               setIsProfileOpen(false);
                             }}
-                            className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors group ${
-                              item.danger 
-                                ? 'hover:bg-rose-50 text-rose-600' 
+                            className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors group ${item.danger
+                                ? 'hover:bg-rose-50 text-rose-600'
                                 : 'hover:bg-slate-50 text-slate-600 hover:text-slate-900'
-                            }`}
+                              }`}
                           >
-                            <IconMapper name={item.icon} className={` text-[18px] ${
-                              item.danger ? 'text-rose-400' : 'text-slate-400 group-hover:text-blue-600'
-                            }`} />
+                            <IconMapper name={item.icon} className={` text-[18px] ${item.danger ? 'text-rose-400' : 'text-slate-400 group-hover:text-blue-600'
+                              }`} />
                             <span className="text-[11px] font-black uppercase tracking-widest">{item.label}</span>
                           </button>
                         ))}
@@ -203,7 +199,7 @@ const SharedHeader: React.FC = () => {
                   </AnimatePresence>
                 </div>
 
-                <button 
+                <button
                   onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                   className="lg:hidden w-10 h-10 flex items-center justify-center rounded-xl bg-slate-900 text-white hover:bg-slate-800 transition-colors border border-slate-800 shadow-sm"
                 >
@@ -211,7 +207,7 @@ const SharedHeader: React.FC = () => {
                 </button>
               </>
             ) : (
-              <motion.button 
+              <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => navigate('/login')}
@@ -232,11 +228,11 @@ const SharedHeader: React.FC = () => {
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-[150] lg:hidden"
           >
-            <div 
+            <div
               className="absolute inset-0 bg-slate-900/20 backdrop-blur-sm"
               onClick={() => setIsMobileMenuOpen(false)}
             />
-            
+
             <motion.div
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
@@ -251,7 +247,7 @@ const SharedHeader: React.FC = () => {
                   </div>
                   <span className="font-black text-slate-900 uppercase tracking-widest text-[11px]">Menu</span>
                 </div>
-                <button 
+                <button
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-50 text-slate-400"
                 >
@@ -276,26 +272,24 @@ const SharedHeader: React.FC = () => {
                     <button
                       key={item.path}
                       onClick={() => navigate(item.path)}
-                      className={`w-full flex items-center gap-4 px-4 py-4 rounded-2xl transition-all group ${
-                        location.pathname === item.path 
-                          ? 'bg-slate-900 text-white shadow-lg shadow-slate-900/10' 
+                      className={`w-full flex items-center gap-4 px-4 py-4 rounded-2xl transition-all group ${location.pathname === item.path
+                          ? 'bg-slate-900 text-white shadow-lg shadow-slate-900/10'
                           : 'hover:bg-slate-50 text-slate-600'
-                      }`}
+                        }`}
                     >
                       <IconMapper name={item.icon} className={` text-xl ${location.pathname === item.path ? 'text-white' : 'text-slate-400 group-hover:text-blue-600'}`} />
                       <span className="text-[11px] font-black uppercase tracking-widest">{item.label}</span>
                     </button>
                   ))}
                   <button
-                    onClick={() => navigate('/premium')}
-                    className={`w-full flex items-center gap-4 px-4 py-4 rounded-2xl transition-all group ${
-                      location.pathname === '/premium'
+                    onClick={() => navigate('/store')}
+                    className={`w-full flex items-center gap-4 px-4 py-4 rounded-2xl transition-all group ${location.pathname === '/store'
                         ? 'bg-blue-600 text-white shadow-lg'
-                        : 'hover:bg-amber-50 text-amber-600 border border-transparent hover:border-amber-200'
-                    }`}
+                        : 'hover:bg-blue-50 text-blue-600 border border-transparent hover:border-blue-200'
+                      }`}
                   >
-                    <IconMapper name="workspace_premium" className=" text-xl" />
-                    <span className="text-[11px] font-black uppercase tracking-widest">Premium</span>
+                    <IconMapper name="storefront" className=" text-xl" />
+                    <span className="text-[11px] font-black uppercase tracking-widest">Cửa hàng</span>
                   </button>
                 </nav>
 
@@ -308,11 +302,10 @@ const SharedHeader: React.FC = () => {
                         onClick={() => {
                           item.action();
                         }}
-                        className={`w-full flex items-center gap-4 px-4 py-4 rounded-2xl transition-all ${
-                          item.danger 
-                            ? 'text-rose-600 hover:bg-rose-50' 
+                        className={`w-full flex items-center gap-4 px-4 py-4 rounded-2xl transition-all ${item.danger
+                            ? 'text-rose-600 hover:bg-rose-50'
                             : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-                        }`}
+                          }`}
                       >
                         <IconMapper name={item.icon} className={` text-xl ${item.danger ? 'text-rose-400' : 'text-slate-400'}`} />
                         <span className="text-[11px] font-black uppercase tracking-widest">{item.label}</span>

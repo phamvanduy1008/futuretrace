@@ -131,10 +131,9 @@ const ScenarioDetailPage: React.FC = () => {
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
   const [isCheckingTier, setIsCheckingTier] = useState(false);
   const [timeframe, setTimeframe] = useState(12);
-  const PREMIUM_ANALYSIS_COST = 10000;
+  const PREMIUM_ANALYSIS_COST = 80;
   const canPayPremiumAnalysis = (user: any) => (
-    (user?.token_premium || 0) >= PREMIUM_ANALYSIS_COST ||
-    (user?.token_free ?? user?.token ?? 0) >= PREMIUM_ANALYSIS_COST
+    (user?.token ?? 0) >= PREMIUM_ANALYSIS_COST
   );
 
   const handlePremiumClick = async () => {
@@ -769,19 +768,19 @@ const ScenarioDetailPage: React.FC = () => {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsUpgradeModalOpen(false)} className="absolute inset-0 bg-slate-950/80 backdrop-blur-md" />
             <motion.div initial={{ opacity: 0, scale: 0.9, y: 30 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 30 }} className="relative w-full max-w-md bg-white rounded-[3rem] p-10 shadow-2xl border border-slate-100 overflow-hidden">
               <div className="text-center mb-10">
-                <div className="w-20 h-20 bg-gradient-to-br from-amber-400 to-orange-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-amber-500/20 text-white">
-                  <IconMapper name="workspace_premium" className="text-4xl" />
+                <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-blue-500/20 text-white">
+                  <IconMapper name="toll" className="text-4xl" />
                 </div>
-                <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tighter mb-3 italic font-display">Nâng cấp Premium</h3>
-                <p className="text-sm font-medium text-slate-600 leading-relaxed italic">"Vui lòng nâng cấp tài khoản Premium để xem phân tích chi tiết và lộ trình hành động."</p>
+                <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tighter mb-3 italic font-display">Không đủ token</h3>
+                <p className="text-sm font-medium text-slate-600 leading-relaxed italic">"Bạn cần ít nhất {PREMIUM_ANALYSIS_COST} token để phân tích chuyên sâu. Hãy mua thêm token tại Cửa hàng."</p>
               </div>
 
               <div className="flex flex-col gap-4">
                 <button
-                  onClick={() => navigate('/premium')}
+                  onClick={() => navigate('/store')}
                   className="w-full py-5 bg-slate-900 text-white font-black text-[10px] uppercase tracking-widest rounded-2xl hover:bg-blue-600 shadow-xl transition-all flex items-center justify-center gap-3"
                 >
-                  NÂNG CẤP NGAY <IconMapper name="arrow_forward" className="text-sm" />
+                  MUA TOKEN NGAY <IconMapper name="arrow_forward" className="text-sm" />
                 </button>
                 <button
                   onClick={() => setIsUpgradeModalOpen(false)}
