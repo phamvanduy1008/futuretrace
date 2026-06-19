@@ -62,9 +62,10 @@ const LandingPage: React.FC = () => {
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
+              onClick={() => navigate('/evaluate')}
               className="px-12 py-5 font-black text-slate-900 border border-slate-200 hover:bg-slate-50 transition-colors rounded-2xl text-xs uppercase tracking-widest"
             >
-              Tài liệu kỹ thuật
+              Đánh giá chi tiết
             </motion.button>
           </motion.div>
 

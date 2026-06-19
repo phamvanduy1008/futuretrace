@@ -15,6 +15,7 @@ import PremiumAnalysisPage from './pages/PremiumAnalysisPage';
 import ComparisonMatrixPage from './pages/ComparisonMatrixPage';
 import PaymentPage from './pages/PaymentPage';
 import PaymentResultPage from './pages/PaymentResultPage';
+import EvaluationFlow from './pages/EvaluationFlow';
 import ProfilePage from './pages/ProfilePage.tsx';
 import { getUserProfile, logout } from './services/authService';
 import AdminApp from './pages/admin/AdminApp';
@@ -95,6 +96,10 @@ const App: React.FC = () => {
           <Route
             path="/community"
             element={isAuthenticated ? <CommunityPage /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/evaluate"
+            element={isAuthenticated ? <EvaluationFlow /> : <Navigate to="/login" />}
           />
           <Route
             path="/progress"
