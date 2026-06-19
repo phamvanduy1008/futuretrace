@@ -18,7 +18,7 @@ export const getEvaluationQuestions = async () => {
   return await response.json();
 };
 
-export const submitEvaluationResult = async (answers: { questionId: number, score: number }[]) => {
+export const submitEvaluationResult = async (answers: { questionId: number, selectedValue: number }[]) => {
   const token = getAuthToken();
   const response = await fetch(`${API_BASE_URL}/api/evaluations`, {
     method: 'POST',

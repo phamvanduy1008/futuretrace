@@ -177,7 +177,7 @@ const ProgressPage: React.FC = () => {
     return (
       <AnimatedBackground className="min-h-screen bg-[#f8fafc] flex flex-col font-sans">
         <SharedHeader />
-        <main className="flex-1 flex flex-col items-center justify-center p-6 text-center">
+        <main className="min-h-[800px] flex-1 flex flex-col items-center justify-center p-6 text-center">
           <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-6"></div>
           <p className="text-slate-600 font-medium tracking-widest uppercase text-sm">Đang tải dữ liệu tiến trình...</p>
         </main>

@@ -12,7 +12,7 @@ type EvaluationStep = 'loading' | 'onboarding' | 'questionnaire' | 'result';
 
 interface Answer {
   questionId: number;
-  score: number;
+  selectedValue: number;
 }
 
 const CATEGORY_NAMES: Record<CategoryType, string> = {
@@ -51,19 +51,23 @@ const EvaluationFlow: React.FC = () => {
   }, []);
 
   const handleStart = () => {
+    if (evaluationQuestions.length === 0) {
+      alert("Không tải được danh sách câu hỏi. Vui lòng tải lại trang.");
+      return;
+    }
     setStep('questionnaire');
     setCurrentQIndex(0);
     setAnswers([]);
   };
 
-  const handleSelectOption = (questionId: number, score: number) => {
+  const handleSelectOption = (questionId: number, selectedValue: number) => {
     let finalAnswers: Answer[] = [];
     
     setAnswers((prev) => {
       const existing = prev.find((a) => a.questionId === questionId);
       const newAnswers = existing 
-        ? prev.map((a) => (a.questionId === questionId ? { ...a, score } : a))
-        : [...prev, { questionId, score }];
+        ? prev.map((a) => (a.questionId === questionId ? { ...a, selectedValue } : a))
+        : [...prev, { questionId, selectedValue }];
       
       finalAnswers = newAnswers;
       return newAnswers;
@@ -253,18 +257,18 @@ const EvaluationFlow: React.FC = () => {
                   className="bg-white/70 backdrop-blur-xl border border-slate-200 rounded-[3rem] p-8 sm:p-12 shadow-2xl shadow-slate-100/50"
                 >
                   <h3 className="text-3xl font-black text-slate-900 leading-tight mb-10 font-display">
-                    {currentQuestion.text}
+                    {currentQuestion.question}
                   </h3>
 
                   <div className="flex flex-col gap-4">
                     {currentQuestion.options.map((option: any, idx: number) => {
-                      const isSelected = answers.find(a => a.questionId === currentQuestion.questionId)?.score === option.score;
+                      const isSelected = answers.find(a => a.questionId === currentQuestion.questionId)?.selectedValue === option.value;
                       return (
                         <motion.button
                           key={idx}
                           whileHover={{ scale: 1.01, x: 4 }}
                           whileTap={{ scale: 0.99 }}
-                          onClick={() => handleSelectOption(currentQuestion.questionId, option.score)}
+                          onClick={() => handleSelectOption(currentQuestion.questionId, option.value)}
                           className={`w-full p-5 rounded-2xl border-2 text-left font-bold flex items-center gap-4 ${
                             isSelected 
                               ? 'border-blue-600 bg-blue-50 text-blue-700 shadow-md shadow-blue-500/10' 

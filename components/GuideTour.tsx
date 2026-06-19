@@ -16,63 +16,63 @@ const TOUR_STEPS: TourStep[] = [
   {
     target: '#tour-nav-dashboard',
     route: '/dashboard',
-    title: 'Trang Tổng Quan 📊',
+    title: 'Trang Tổng Quan',
     content: 'Đây là trung tâm điều hành hiện tại của bạn. Nơi hiển thị thống kê tổng quan, các chỉ số hoạt động và danh sách kịch bản mô phỏng gần đây.',
     placement: 'bottom'
   },
   {
     target: '#tour-nav-simulate',
     route: '/dashboard',
-    title: 'Trang Mô Phỏng Quyết Định ⚡',
+    title: 'Trang Mô Phỏng Quyết Định',
     content: 'Click vào đây để đi thẳng tới trang nhập liệu và cấu hình tham số quyết định của bạn.',
     placement: 'bottom'
   },
   {
     target: '#tour-nav-community',
     route: '/dashboard',
-    title: 'Không Gian Cộng Đồng 👥',
+    title: 'Không Gian Cộng Đồng',
     content: 'Nơi hiển thị các kịch bản mô phỏng đã được cộng đồng chia sẻ. Bạn có thể bình luận, thả tim hoặc học hỏi từ kinh nghiệm của người khác.',
     placement: 'bottom'
   },
   {
     target: '#tour-nav-progress',
     route: '/dashboard',
-    title: 'Theo Dõi Tiến Trình 📈',
+    title: 'Theo Dõi Tiến Trình ',
     content: 'Nơi giúp bạn theo dõi việc hoàn thành các cột mốc thực tế so với kịch bản tối ưu mà AI gợi ý.',
     placement: 'bottom'
   },
   {
     target: '#tour-nav-history',
     route: '/dashboard',
-    title: 'Kho Lưu Trữ Lịch Sử 📂',
+    title: 'Kho Lưu Trữ Lịch Sử ',
     content: 'Nơi lưu trữ tất cả các quyết định và các lộ trình kịch bản bạn từng giả lập để bạn dễ dàng quản lý hoặc so sánh.',
     placement: 'bottom'
   },
   {
     target: '#tour-nav-premium',
     route: '/dashboard',
-    title: 'Mở khóa Tài khoản Premium 👑',
+    title: 'Mở khóa Tài khoản Premium ',
     content: 'Nâng cấp lên gói Premium để truy xuất báo cáo phân tích AI chuyên sâu, định lượng rủi ro đầy đủ và bản kế hoạch hành động 90 ngày.',
     placement: 'bottom'
   },
   {
     target: '#tour-btn-simulate',
     route: '/dashboard',
-    title: 'Khởi Tạo Mô Phỏng Đầu Tiên 🚀',
+    title: 'Khởi Tạo Mô Phỏng Đầu Tiên',
     content: 'Click vào thẻ lớn này để chuyển sang màn hình nhập liệu quyết định và chạy thử mô phỏng đầu tiên.',
     placement: 'top'
   },
   {
     target: '#tour-decision-textarea',
     route: '/simulate',
-    title: 'Mô tả quyết định của bạn ✍️',
+    title: 'Mô tả quyết định của bạn',
     content: 'Hãy viết chi tiết về dự định hoặc lựa chọn bạn đang băn khoăn (ví dụ: chuyển việc sang công ty nước ngoài hay tiếp tục làm công ty hiện tại). Càng chi tiết thì AI phân tích càng chính xác.',
     placement: 'top'
   },
   {
     target: '#tour-decision-hints',
     route: '/simulate',
-    title: 'Các gợi ý mẫu quyết định 💡',
+    title: 'Các gợi ý mẫu quyết định',
     content: 'Nếu chưa biết cách viết, bạn có thể click vào các gợi ý có sẵn này để điền nhanh form và tham khảo cấu trúc viết quyết định.',
     placement: 'top'
   },

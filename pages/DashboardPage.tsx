@@ -121,9 +121,7 @@ const DashboardPage: React.FC = () => {
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">
                   Cố vấn AI
                 </p>
-                <p className="text-xs font-black text-blue-600">
-                  3 Đang sẵn sàng
-                </p>
+                <p className="text-xs font-black text-blue-600">Hỗ trợ tức thì</p>
               </div>
             </div>
           </motion.div>
