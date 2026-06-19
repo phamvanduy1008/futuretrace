@@ -99,7 +99,10 @@ const materialToPhosphor: Record<string, string> = {
   'visibility': 'Eye',
   'assignment': 'ClipboardText',
   'contact_support': 'Question',
-  'storefront': 'Storefront'
+  'storefront': 'Storefront',
+    'hourglass_empty': 'HourglassLow',
+  'block': 'Prohibit',
+  
 };
 
 interface IconMapperProps {
