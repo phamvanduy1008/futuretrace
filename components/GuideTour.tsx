@@ -22,37 +22,37 @@ const TOUR_STEPS: TourStep[] = [
   },
   {
     target: '#tour-nav-simulate',
-    route: '/dashboard',
+    route: '/simulate',
     title: 'Trang Mô Phỏng Quyết Định',
     content: 'Click vào đây để đi thẳng tới trang nhập liệu và cấu hình tham số quyết định của bạn.',
     placement: 'bottom'
   },
   {
     target: '#tour-nav-community',
-    route: '/dashboard',
+    route: '/community',
     title: 'Không Gian Cộng Đồng',
     content: 'Nơi hiển thị các kịch bản mô phỏng đã được cộng đồng chia sẻ. Bạn có thể bình luận, thả tim hoặc học hỏi từ kinh nghiệm của người khác.',
     placement: 'bottom'
   },
   {
     target: '#tour-nav-progress',
-    route: '/dashboard',
+    route: '/progress',
     title: 'Theo Dõi Tiến Trình ',
     content: 'Nơi giúp bạn theo dõi việc hoàn thành các cột mốc thực tế so với kịch bản tối ưu mà AI gợi ý.',
     placement: 'bottom'
   },
   {
     target: '#tour-nav-history',
-    route: '/dashboard',
+    route: '/history',
     title: 'Kho Lưu Trữ Lịch Sử ',
     content: 'Nơi lưu trữ tất cả các quyết định và các lộ trình kịch bản bạn từng giả lập để bạn dễ dàng quản lý hoặc so sánh.',
     placement: 'bottom'
   },
-  {
-    target: '#tour-nav-premium',
-    route: '/dashboard',
-    title: 'Mở khóa Tài khoản Premium ',
-    content: 'Nâng cấp lên gói Premium để truy xuất báo cáo phân tích AI chuyên sâu, định lượng rủi ro đầy đủ và bản kế hoạch hành động 90 ngày.',
+   {
+    target: '#tour-nav-store',
+    route: '/store',
+    title: 'Siêu Thị Tri Thức ',
+    content: 'Khám phá và mua sắm các báo cáo, công cụ phân tích và mô hình AI tiên tiến để nâng cao năng lực ra quyết định của bạn.',
     placement: 'bottom'
   },
   {

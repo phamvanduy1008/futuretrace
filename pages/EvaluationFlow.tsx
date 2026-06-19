@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { mapScoreToLevel, CategoryType } from '../data/evaluationQuestions'; // still using types and helper
@@ -29,6 +29,30 @@ const CATEGORY_ICONS: Record<CategoryType, string> = {
   risk: 'bolt'
 };
 
+const getCategoryDiagnostic = (category: string, score: number) => {
+  if (category === 'stress') {
+    if (score >= 60) return "Căng thẳng ở mức cao, cần áp dụng các biện pháp thư giãn để tránh kiệt sức.";
+    if (score <= 40) return "Tâm lý thoải mái, kiểm soát áp lực cuộc sống rất tốt.";
+    return "Áp lực ở mức trung bình, trong tầm kiểm soát.";
+  }
+  if (category === 'finance') {
+    if (score >= 60) return "Tài chính vững vàng, có khả năng dự phòng rủi ro và đầu tư tốt.";
+    if (score <= 40) return "Tài chính đang gặp khó khăn hoặc thiếu các quỹ tiết kiệm.";
+    return "Tài chính ở mức ổn định, đủ trang trải nhu cầu cơ bản.";
+  }
+  if (category === 'capability') {
+    if (score >= 60) return "Năng lực chuyên môn và khả năng thích ứng cao trước thay đổi.";
+    if (score <= 40) return "Cần tích lũy thêm kỹ năng chuyên môn và phương pháp tự học.";
+    return "Năng lực ở mức khá, có thể giải quyết các thử thách quen thuộc.";
+  }
+  if (category === 'risk') {
+    if (score >= 60) return "Xu hướng mạo hiểm cao, thích đột phá nhưng cần đề phòng biến cố.";
+    if (score <= 40) return "Lựa chọn an toàn, cẩn trọng nhưng có thể bỏ lỡ cơ hội lớn.";
+    return "Chỉ số rủi ro cân bằng, biết kiểm soát hành vi bộc phát.";
+  }
+  return "";
+};
+
 const EvaluationFlow: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -39,6 +63,7 @@ const EvaluationFlow: React.FC = () => {
   const [answers, setAnswers] = useState<Answer[]>([]);
   const [evaluationQuestions, setEvaluationQuestions] = useState<any[]>([]);
   const [dbResults, setDbResults] = useState<any>(null);
+  const transitionTimeoutRef = useRef<any>(null);
 
   useEffect(() => {
     getEvaluationQuestions().then(data => {
@@ -60,34 +85,69 @@ const EvaluationFlow: React.FC = () => {
     setAnswers([]);
   };
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleSelectOption = (questionId: number, selectedValue: number) => {
-    let finalAnswers: Answer[] = [];
-    
+    if (transitionTimeoutRef.current) {
+      clearTimeout(transitionTimeoutRef.current);
+    }
+
     setAnswers((prev) => {
       const existing = prev.find((a) => a.questionId === questionId);
       const newAnswers = existing 
         ? prev.map((a) => (a.questionId === questionId ? { ...a, selectedValue } : a))
         : [...prev, { questionId, selectedValue }];
       
-      finalAnswers = newAnswers;
       return newAnswers;
     });
 
-    setTimeout(async () => {
-      if (currentQIndex < evaluationQuestions.length - 1) {
+    if (currentQIndex < evaluationQuestions.length - 1) {
+      transitionTimeoutRef.current = setTimeout(() => {
         setCurrentQIndex((prevIndex) => prevIndex + 1);
-      } else {
-        // Submit to API using newAnswers to avoid stale closure
-        try {
-          const res = await submitEvaluationResult(finalAnswers);
-          setDbResults(res.normalizedScores);
-          setStep('result');
-        } catch (error) {
-          console.error("Error submitting evaluation", error);
-          alert("Lỗi lưu kết quả, vui lòng thử lại sau.");
-        }
+      }, 400); // delay for animation
+    }
+  };
+
+  const handlePrev = () => {
+    if (transitionTimeoutRef.current) {
+      clearTimeout(transitionTimeoutRef.current);
+    }
+    if (currentQIndex > 0) {
+      setCurrentQIndex((prev) => prev - 1);
+    }
+  };
+
+  const handleNext = () => {
+    if (transitionTimeoutRef.current) {
+      clearTimeout(transitionTimeoutRef.current);
+    }
+    if (currentQIndex < evaluationQuestions.length - 1) {
+      const hasAnswered = answers.some((a) => a.questionId === currentQuestion.questionId);
+      if (hasAnswered) {
+        setCurrentQIndex((prev) => prev + 1);
       }
-    }, 400); // delay for animation
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (transitionTimeoutRef.current) {
+      clearTimeout(transitionTimeoutRef.current);
+    }
+    if (answers.length < evaluationQuestions.length) {
+      alert("Vui lòng trả lời đầy đủ tất cả các câu hỏi trước khi gửi.");
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      const res = await submitEvaluationResult(answers);
+      setDbResults(res.normalizedScores);
+      setStep('result');
+    } catch (error) {
+      console.error("Error submitting evaluation", error);
+      alert("Lỗi lưu kết quả, vui lòng thử lại sau.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const currentQuestion = evaluationQuestions[currentQIndex];
@@ -99,6 +159,19 @@ const EvaluationFlow: React.FC = () => {
 
   // Results come from DB now
   const results = dbResults;
+
+  // Find missing questions
+  const missingQuestionIndices = useMemo(() => {
+    const missing = [];
+    for (let i = 0; i < evaluationQuestions.length; i++) {
+      const q = evaluationQuestions[i];
+      const hasAnswer = answers.some(a => a.questionId === q.questionId);
+      if (!hasAnswer) {
+        missing.push(i + 1); // 1-indexed
+      }
+    }
+    return missing;
+  }, [answers, evaluationQuestions]);
 
   const pageVariants = {
     initial: { opacity: 0, y: 20 },
@@ -285,6 +358,75 @@ const EvaluationFlow: React.FC = () => {
                       );
                     })}
                   </div>
+
+                  {/* Warning for missing questions */}
+                  {missingQuestionIndices.length > 0 && currentQIndex === evaluationQuestions.length - 1 && (
+                    <div className="mt-8 p-6 bg-amber-50/50 border border-amber-100 rounded-3xl text-left">
+                      <p className="text-xs font-black text-amber-800 mb-3 flex items-center gap-2 uppercase tracking-wider">
+                        <IconMapper name="warning" className="text-amber-500 text-lg" /> 
+                        Bạn chưa trả lời {missingQuestionIndices.length} câu hỏi sau:
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {missingQuestionIndices.map((qNum) => (
+                          <button
+                            key={qNum}
+                            onClick={() => setCurrentQIndex(qNum - 1)}
+                            className="w-8 h-8 flex items-center justify-center rounded-xl bg-white border border-amber-200 text-xs font-black text-amber-700 hover:bg-amber-100 hover:border-amber-300 transition-all shadow-sm hover:scale-105"
+                          >
+                            {qNum}
+                          </button>
+                        ))}
+                      </div>
+                      <p className="text-[10px] font-bold text-slate-400 mt-3">
+                        * Click vào số câu hỏi ở trên để đi nhanh tới câu đó và điền đáp án bổ sung.
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Navigation Buttons */}
+                  <div className="flex justify-between items-center mt-10 pt-6 border-t border-slate-100">
+                    <button
+                      onClick={handlePrev}
+                      disabled={currentQIndex === 0}
+                      className={`flex items-center gap-2 px-6 py-3 rounded-xl border text-xs font-black uppercase tracking-widest transition-all ${
+                        currentQIndex === 0
+                          ? 'border-slate-100 text-slate-200 cursor-not-allowed'
+                          : 'border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50'
+                      }`}
+                    >
+                      <IconMapper name="arrow_back" className="text-lg" /> Quay lại
+                    </button>
+
+                    {currentQIndex < evaluationQuestions.length - 1 ? (
+                      <button
+                        onClick={handleNext}
+                        disabled={!answers.some(a => a.questionId === currentQuestion.questionId)}
+                        className={`flex items-center gap-2 px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
+                          !answers.some(a => a.questionId === currentQuestion.questionId)
+                            ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                            : 'bg-slate-900 text-white hover:bg-blue-600 shadow-lg shadow-slate-900/10'
+                        }`}
+                      >
+                        Tiếp theo <IconMapper name="arrow_forward" className="text-lg" />
+                      </button>
+                    ) : (
+                      <button
+                        onClick={handleSubmit}
+                        disabled={isSubmitting || answers.length < evaluationQuestions.length}
+                        className={`flex items-center gap-2 px-8 py-4 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
+                          isSubmitting || answers.length < evaluationQuestions.length
+                            ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                            : 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-500/20'
+                        }`}
+                      >
+                        {isSubmitting ? (
+                          <>Đang xử lý...</>
+                        ) : (
+                          <>Hoàn thành & Xem kết quả <IconMapper name="check" className="text-lg" /></>
+                        )}
+                      </button>
+                    )}
+                  </div>
                 </motion.div>
               </AnimatePresence>
             </motion.div>
@@ -318,28 +460,53 @@ const EvaluationFlow: React.FC = () => {
                     return (
                       <motion.div 
                         key={key} 
-                        whileHover={{ scale: 1.02, y: -4 }}
-                        className="relative overflow-hidden bg-white p-8 rounded-[2rem] border border-slate-200 shadow-sm hover:shadow-xl transition-all group"
+                        whileHover={{ scale: 1.01, y: -4 }}
+                        className="relative overflow-hidden bg-white p-7 rounded-[2rem] border-2 border-slate-100 hover:border-slate-200/80 shadow-[0_8px_30px_rgb(0,0,0,0.02)] hover:shadow-[0_20px_50px_rgba(0,0,0,0.06)] transition-all duration-300 group flex flex-col justify-between"
                       >
-                        <div className={`absolute -right-10 -top-10 w-40 h-40 rounded-full opacity-[0.15] blur-3xl transition-colors ${bgClass}`} />
+                        {/* Glowing backdrop matching status color */}
+                        <div className={`absolute -right-20 -top-20 w-44 h-44 rounded-full opacity-[0.08] blur-3xl group-hover:opacity-[0.12] transition-opacity duration-300 ${bgClass}`} />
                         
-                        <div className="flex items-center gap-4 mb-6 relative z-10">
-                          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center bg-slate-50 group-hover:scale-110 transition-transform`}>
-                            <IconMapper name={CATEGORY_ICONS[key as CategoryType]} className={`text-2xl ${colorClass}`} />
+                        <div>
+                          {/* Header */}
+                          <div className="flex items-center gap-3.5 mb-5 relative z-10">
+                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center bg-slate-50 group-hover:scale-105 transition-transform`}>
+                              <IconMapper name={CATEGORY_ICONS[key as CategoryType]} className={`text-xl ${colorClass}`} />
+                            </div>
+                            <span className="text-[10px] font-black uppercase tracking-widest text-slate-800 font-display">{name}</span>
                           </div>
-                          <span className="text-xs font-black uppercase tracking-widest text-slate-600">{name}</span>
+
+                          {/* Level and Score */}
+                          <div className="flex items-center justify-between mt-6 mb-4 relative z-10">
+                            <div>
+                              <div className="text-[9px] uppercase font-bold text-slate-400 mb-1 tracking-wider">Đánh giá</div>
+                              <span className={`inline-flex items-center px-3 py-1 rounded-lg text-xs font-black uppercase tracking-wider ${colorClass} ${bgClass} bg-opacity-10 border border-current/10`}>
+                                {level}
+                              </span>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-[9px] uppercase font-bold text-slate-400 mb-1 tracking-wider">Điểm số</div>
+                              <span className="text-xl font-black text-slate-800 font-display">
+                                {score}
+                                <span className="text-[10px] text-slate-400 font-bold tracking-normal ml-0.5">/100</span>
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Progress bar */}
+                          <div className="w-full h-2 bg-slate-50 rounded-full overflow-hidden mb-4 border border-slate-100/50">
+                            <motion.div 
+                              initial={{ width: 0 }}
+                              animate={{ width: `${score}%` }}
+                              transition={{ duration: 0.8, ease: "easeOut" }}
+                              className={`h-full ${bgClass} rounded-full`}
+                            />
+                          </div>
                         </div>
-                        
-                        <div className="flex items-end justify-between mt-8 relative z-10">
-                          <div>
-                            <div className="text-[10px] uppercase font-bold text-slate-400 mb-1 tracking-widest">Đánh giá</div>
-                            <span className={`text-3xl font-black font-display uppercase ${colorClass}`}>{level}</span>
-                          </div>
-                          <div className="text-right">
-                            <div className="text-[10px] uppercase font-bold text-slate-400 mb-1 tracking-widest">Điểm số</div>
-                            <span className="text-2xl font-bold text-slate-800">{score}<span className="text-sm text-slate-400 font-medium">/100</span></span>
-                          </div>
-                        </div>
+
+                        {/* Diagnostic text */}
+                        <p className="text-[11px] leading-relaxed text-slate-500 font-medium pt-3 border-t border-slate-100/50 mt-1">
+                          {getCategoryDiagnostic(key, score)}
+                        </p>
                       </motion.div>
                     );
                   })}
