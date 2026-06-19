@@ -1,16 +1,15 @@
 import { useMemo, useState } from 'react';
 
 export const adminNavigation = [
-  { label: 'Tổng quan', path: '/dashboard', section: 'Overview' },
-  { label: 'Người dùng', path: '/users', section: 'Users' },
-  { label: 'Mô phỏng', path: '/simulations', section: 'Research Ops' },
-  { label: 'Premium', path: '/premium-analyses', section: 'Research Ops' },
-  { label: 'Bài viết', path: '/community/posts', section: 'Community' },
-  { label: 'Kiểm duyệt', path: '/community/review', section: 'Community' },
-  { label: 'AI Logs', path: '/ai/logs', section: 'System' },
-  { label: 'Prompts', path: '/prompts', section: 'System' },
-  { label: 'Cài đặt', path: '/settings', section: 'System' },
-  { label: 'Audit Logs', path: '/audit-logs', section: 'System' },
+  { label: 'Bảng điều khiển', path: '/dashboard', section: 'Chung' },
+  { label: 'Người dùng', path: '/users', section: 'Dữ Liệu Khách Hàng' },
+  { label: 'Giao dịch', path: '/payments', section: 'Dữ Liệu Khách Hàng' },
+  { label: 'Mô phỏng', path: '/simulations', section: 'Hệ Thống Phân Tích' },
+  { label: 'Chuyên sâu', path: '/premium-analyses', section: 'Hệ Thống Phân Tích' },
+  { label: 'Bài viết', path: '/community/posts', section: 'Cộng Đồng' },
+  { label: 'Nhật ký AI', path: '/ai/logs', section: 'Cấu Hình & Kỹ Thuật' },
+  { label: 'Prompts', path: '/prompts', section: 'Cấu Hình & Kỹ Thuật' },
+  { label: 'Cài đặt', path: '/settings', section: 'Cấu Hình & Kỹ Thuật' },
 ];
 
 export function cx(...classes) {
@@ -26,7 +25,7 @@ export function formatLatency(latencyMs) {
 }
 
 export function formatCost(cost) {
-  return `$${Number(cost || 0).toFixed(3)}`;
+  return Number(cost || 0).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
 }
 
 export function formatPercent(value) {
@@ -50,11 +49,23 @@ export function AdminPageHeader({ eyebrow, title, description, actions }) {
   );
 }
 
-export function AdminCard({ title, subtitle, actions, className = '', children }) {
+const CARD_TONES = ['blue', 'indigo', 'purple', 'pink', 'rose', 'orange', 'amber', 'emerald', 'teal', 'cyan'];
+
+function getToneForString(str) {
+  if (!str) return 'neutral';
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return CARD_TONES[Math.abs(hash) % CARD_TONES.length];
+}
+
+export function AdminCard({ title, subtitle, actions, className = '', tone, children }) {
+  const finalTone = tone || (title ? getToneForString(title) : 'neutral');
   return (
     <section className={cx('ft-card', className)}>
       {(title || subtitle || actions) && (
-        <header className="ft-card__header">
+        <header className={cx('ft-card__header', `ft-card__header--${finalTone}`)}>
           <div>
             {title ? <h3>{title}</h3> : null}
             {subtitle ? <p>{subtitle}</p> : null}

@@ -128,6 +128,12 @@ export function createAdminApi({
         body: JSON.stringify({ status, reason }),
       }),
 
+    adjustUserTokens: (userId, amount, reason) =>
+      request(`/admin/users/${userId}/tokens`, {
+        method: 'POST',
+        body: JSON.stringify({ amount, reason }),
+      }),
+
     getSimulations: (params) =>
       request(`/admin/simulations?${new URLSearchParams(params).toString()}`, { method: 'GET' }),
 
@@ -147,14 +153,6 @@ export function createAdminApi({
       request(`/admin/community/posts/${postId}/status`, {
         method: 'PUT',
         body: JSON.stringify({ status, reason }),
-      }),
-
-    getModerationReports: () => request('/admin/moderation/reports', { method: 'GET' }),
-
-    resolveModerationReport: (reportId, payload) =>
-      request(`/admin/moderation/reports/${reportId}/resolve`, {
-        method: 'POST',
-        body: JSON.stringify(payload),
       }),
 
     getAiLogs: (params) =>
@@ -183,7 +181,7 @@ export function createAdminApi({
         body: JSON.stringify(payload),
       }),
 
-    getAuditLogs: (params) =>
-      request(`/admin/audit-logs?${new URLSearchParams(params).toString()}`, { method: 'GET' }),
+    getPayments: (params) =>
+      request(`/admin/payments?${new URLSearchParams(params).toString()}`, { method: 'GET' }),
   };
 }

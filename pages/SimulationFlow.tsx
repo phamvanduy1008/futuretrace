@@ -210,7 +210,7 @@ const SimulationFlow: React.FC = () => {
   const [results, setResults] = useState<PredictionResult | null>(null);
   const [error, setError] = useState<{
     message: string;
-    type: "AUTH" | "NETWORK" | "LOCAL_CONFIG" | "GENERAL";
+    type: "AUTH" | "NETWORK" | "LOCAL_CONFIG" | "GENERAL" | "OVERLOADED" | "RATE_LIMIT";
   } | null>(null);
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
   const [folderName, setFolderName] = useState("");
