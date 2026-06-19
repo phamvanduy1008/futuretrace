@@ -28,6 +28,7 @@ const throwApiError = (errorData: any, fallback: string) => {
   error.code = errorData.code;
   error.requiredToken = errorData.requiredToken;
   error.currentToken = errorData.currentToken;
+  error.type = errorData.type;
   throw error;
 };
 
@@ -69,7 +70,7 @@ export const analyzeInputReadiness = async (decision: string): Promise<any> => {
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(errorData.message || 'Lỗi kết nối server AI.');
+    throwApiError(errorData, 'Lỗi kết nối server AI.');
   }
 
   return response.json();
@@ -98,7 +99,7 @@ export const generatePremiumAnalysis = async (
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(errorData.message || 'Lỗi tạo lộ trình chuyên sâu.');
+    throwApiError(errorData, 'Lỗi tạo lộ trình chuyên sâu.');
   }
 
   const data = await response.json();
@@ -131,7 +132,7 @@ export const pivotPremiumAnalysis = async (
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(errorData.message || 'Lỗi điều chỉnh lộ trình.');
+    throwApiError(errorData, 'Lỗi điều chỉnh lộ trình.');
   }
 
   const data = await response.json();

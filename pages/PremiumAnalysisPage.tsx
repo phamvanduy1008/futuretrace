@@ -16,7 +16,7 @@ const PremiumAnalysisPage: React.FC = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [report, setReport] = useState<PremiumAnalysisReport | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<{ message: string; type?: string } | null>(null);
   const [selectedMilestone, setSelectedMilestone] = useState<any>(null);
   const [selectedMilestoneIndex, setSelectedMilestoneIndex] = useState<number | null>(null);
   const [currentMilestoneIndex, setCurrentMilestoneIndex] = useState(0);
@@ -28,39 +28,39 @@ const PremiumAnalysisPage: React.FC = () => {
 
   const { scenario, context, timeframe, existingProgress } = (location.state as any) || {};
 
+  const fetchReport = React.useCallback(async () => {
+    // If we already have the progress from state (e.g. Navigated from Progress Page)
+    // Use it immediately for an "instant" experience
+    if (existingProgress) {
+      setReport(existingProgress.report);
+      setProgressId(existingProgress.id);
+      setCurrentMilestoneIndex(existingProgress.completedMilestones?.length || 0);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    try {
+      // Backend now checks for existing record by scenario.id
+      // Scenario.id must be the real MongoDB _id or the one from the simulation
+      const data = await generatePremiumAnalysis(scenario.title, scenario.description, scenario.id, context, timeframe);
+      
+      setReport(data.report);
+      setProgressId(data.id);
+      setCurrentMilestoneIndex(data.completedMilestones?.length || 0);
+    } catch (e: any) {
+      setError({ message: e.message, type: e.type || 'GENERAL' });
+    } finally {
+      setLoading(false);
+    }
+  }, [scenario, context, timeframe, existingProgress]);
+
   useEffect(() => {
-    const fetchReport = async () => {
-      // If we already have the progress from state (e.g. Navigated from Progress Page)
-      // Use it immediately for an "instant" experience
-      if (existingProgress) {
-        setReport(existingProgress.report);
-        setProgressId(existingProgress.id);
-        setCurrentMilestoneIndex(existingProgress.completedMilestones?.length || 0);
-        setLoading(false);
-        return;
-      }
-
-      setLoading(true);
-      setError(null);
-      try {
-        // Backend now checks for existing record by scenario.id
-        // Scenario.id must be the real MongoDB _id or the one from the simulation
-        const data = await generatePremiumAnalysis(scenario.title, scenario.description, scenario.id, context, timeframe);
-        
-        setReport(data.report);
-        setProgressId(data.id);
-        setCurrentMilestoneIndex(data.completedMilestones?.length || 0);
-      } catch (e: any) {
-        setError(e.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     if (scenario) {
       fetchReport();
     }
-  }, [scenario, navigate, context, timeframe, existingProgress]);
+  }, [scenario, fetchReport]);
 
   const getMilestoneStatus = (index: number) => {
     if (index < currentMilestoneIndex) return 'Đã hoàn thành';
@@ -166,13 +166,40 @@ const PremiumAnalysisPage: React.FC = () => {
 
   if (error || !report) {
     return (
-      <AnimatedBackground className="flex flex-col font-sans">
+      <AnimatedBackground className="flex flex-col font-sans min-h-screen">
         <SharedHeader />
-        <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
-           <IconMapper name="error" className=" text-rose-500 text-6xl mb-6" />
-           <h3 className="text-2xl font-black mb-4">Lỗi trích xuất dữ liệu</h3>
-           <p className="text-slate-600 mb-8 max-w-md">{error}</p>
-           <button onClick={() => navigate(-1)} className="px-8 py-3 bg-slate-900 text-white rounded-xl font-black uppercase tracking-widest text-[10px]">Quay lại</button>
+        <div className="flex-1 flex flex-col items-center justify-center p-6 text-center max-w-lg mx-auto w-full">
+          <div className={`w-24 h-24 rounded-3xl flex items-center justify-center mb-8 shadow-xl ${
+            error?.type === 'OVERLOADED' ? 'bg-amber-50 text-amber-600 shadow-amber-500/20' :
+            error?.type === 'RATE_LIMIT' ? 'bg-rose-50 text-rose-600 shadow-rose-500/20' :
+            'bg-slate-50 text-slate-600 shadow-slate-500/10'
+          }`}>
+            <IconMapper name={
+              error?.type === 'OVERLOADED' ? 'hourglass_empty' :
+              error?.type === 'RATE_LIMIT' ? 'block' :
+              'error'
+            } className="text-5xl font-bold" />
+          </div>
+          <h3 className={`text-2xl font-black mb-4 uppercase tracking-tight font-display ${
+            error?.type === 'OVERLOADED' ? 'text-amber-900' :
+            error?.type === 'RATE_LIMIT' ? 'text-rose-900' :
+            'text-slate-900'
+          }`}>
+            {error?.type === 'OVERLOADED' ? 'Hệ thống AI quá tải' :
+             error?.type === 'RATE_LIMIT' ? 'Hết lượt sử dụng AI' :
+             'Lỗi trích xuất dữ liệu'}
+          </h3>
+          <p className="text-slate-600 mb-10 max-w-md text-sm font-medium leading-relaxed">
+            {error?.message || "Đã xảy ra lỗi không xác định. Vui lòng thử lại sau."}
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
+            <button onClick={() => navigate(-1)} className="px-8 py-4 bg-white border-2 border-slate-200 text-slate-600 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-slate-50 transition-all flex items-center justify-center gap-2">
+              Quay lại
+            </button>
+            <button onClick={() => fetchReport()} className="px-8 py-4 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-blue-600 transition-all shadow-xl flex items-center justify-center gap-2">
+              Thử lại ngay <IconMapper name="refresh" className="text-sm" />
+            </button>
+          </div>
         </div>
         <SharedFooter />
       </AnimatedBackground>

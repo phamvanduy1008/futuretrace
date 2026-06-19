@@ -81,7 +81,10 @@ const materialToPhosphor: Record<string, string> = {
   'lightbulb': 'Lightbulb',
   'diamond': 'SketchLogo',
   'store': 'Storefront',
-  'profile': 'UserCircle'
+  'profile': 'UserCircle',
+  'hourglass_empty': 'HourglassLow',
+  'block': 'Prohibit',
+  'refresh': 'ArrowClockwise'
 };
 
 interface IconMapperProps {
