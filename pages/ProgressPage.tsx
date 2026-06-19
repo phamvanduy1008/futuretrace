@@ -226,12 +226,9 @@ const ProgressPage: React.FC = () => {
       <main className="flex-1 max-w-[1440px] h-[1200px] mx-auto w-full px-4 sm:px-8 py-12 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 mb-16">
         <div className="lg:col-span-8 flex flex-col gap-10">
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
-            <div className="flex items-center gap-2 text-[9px] font-black text-blue-600 uppercase tracking-widest mb-4">
-              BẢNG ĐIỀU KHIỂN <IconMapper name="chevron_right" className=" text-[10px]" /> TIẾN TRÌNH CỦA TÔI
-            </div>
-            <h1 className="text-3xl sm:text-6xl font-black tracking-tight mb-4 font-display text-slate-900 leading-[1.8] uppercase italic">Theo dõi Tiến trình Thực tế</h1>
+            <h1 className="text-3xl sm:text-6xl font-black tracking-tight mb-4 font-display text-slate-900 leading-[1.8] uppercase italic">Theo dõi Tiến trình</h1>
             <p className="text-slate-600 text-sm sm:text-lg leading-relaxed max-w-2xl font-medium italic">
-              "Quản lý các cột mốc và điều chỉnh chiến lược dựa trên tiến độ thực tế của bạn."
+              "Quản lý cột mốc và điều chỉnh chiến lược dựa trên tiến độ thực tế của bạn."
             </p>
           </motion.div>
 
