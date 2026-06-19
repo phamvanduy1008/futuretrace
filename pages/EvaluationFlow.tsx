@@ -101,11 +101,7 @@ const EvaluationFlow: React.FC = () => {
       return newAnswers;
     });
 
-    if (currentQIndex < evaluationQuestions.length - 1) {
-      transitionTimeoutRef.current = setTimeout(() => {
-        setCurrentQIndex((prevIndex) => prevIndex + 1);
-      }, 400); // delay for animation
-    }
+
   };
 
   const handlePrev = () => {
@@ -276,19 +272,30 @@ const EvaluationFlow: React.FC = () => {
                       <IconMapper name={CATEGORY_ICONS[key as CategoryType]} className="text-2xl text-slate-400 group-hover:text-blue-600 transition-colors" />
                     </div>
                     <span className="text-xs font-black uppercase tracking-widest text-slate-700 text-center relative z-10 leading-relaxed">{name}</span>
-                    <span className="text-[10px] font-bold text-slate-400 mt-3 bg-slate-100 px-3 py-1 rounded-full relative z-10 group-hover:bg-blue-50 group-hover:text-blue-500 transition-colors">10 CÂU</span>
                   </motion.div>
                 ))}
               </div>
 
-              <motion.button
-                whileHover={{ scale: 1.02, boxShadow: "0 20px 40px -10px rgba(37,99,235,0.3)" }}
-                whileTap={{ scale: 0.98 }}
-                onClick={handleStart}
-                className="bg-slate-900 hover:bg-blue-600 text-white font-black py-6 px-16 rounded-2xl shadow-2xl flex items-center justify-center gap-4 text-xs uppercase tracking-widest mx-auto transition-colors"
-              >
-                Bắt đầu đánh giá <IconMapper name="arrow_forward" className="text-xl" />
-              </motion.button>
+              <div className="flex flex-col sm:flex-row justify-center items-center gap-4 max-w-lg mx-auto">
+                {isFromSimulate && (
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => navigate('/simulate', { state: { decisionContext: location.state?.decisionContext } })}
+                    className="w-full sm:w-auto px-12 py-6 border border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50 font-black text-[11px] uppercase tracking-widest rounded-2xl transition-all"
+                  >
+                    Quay lại
+                  </motion.button>
+                )}
+                <motion.button
+                  whileHover={{ scale: 1.02, boxShadow: "0 20px 40px -10px rgba(37,99,235,0.3)" }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleStart}
+                  className="w-full sm:w-auto bg-slate-900 hover:bg-blue-600 text-white font-black py-6 px-16 rounded-2xl shadow-2xl flex items-center justify-center gap-4 text-[11px] uppercase tracking-widest transition-all"
+                >
+                  Bắt đầu đánh giá <IconMapper name="arrow_forward" className="text-xl" />
+                </motion.button>
+              </div>
             </motion.div>
           )}
 
