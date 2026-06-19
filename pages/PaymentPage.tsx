@@ -69,7 +69,7 @@ const PaymentPage: React.FC = () => {
 
   const plan = location.state?.plan;
   if (!plan) {
-    return <Navigate to="/premium" replace />;
+    return <Navigate to="/store" replace />;
   }
 
   const getNumericPrice = (priceStr: string) => {
@@ -77,7 +77,7 @@ const PaymentPage: React.FC = () => {
   };
 
   const price = getNumericPrice(plan.price);
-  const priceVat = (price * 0.1);
+  const priceVat = price * 0.1;
   const totalPrice = price + priceVat;
 
   const isFormValid = fullName.trim() !== '' && addressLine1.trim() !== '';
@@ -113,6 +113,7 @@ const PaymentPage: React.FC = () => {
         userId,
         total_price: totalPrice,
         paymentMethod,
+        tokenAmount: plan.tokenAmount || 0,
         billing: { fullName, address: addressLine1, country },
       };
 
@@ -163,11 +164,11 @@ const PaymentPage: React.FC = () => {
         {/* Back button */}
         <motion.button
           variants={itemVariants}
-          onClick={() => navigate('/premium')}
+          onClick={() => navigate('/store')}
           className="group flex items-center gap-3 text-slate-400 hover:text-blue-600 font-black text-[10px] uppercase tracking-widest mb-12 transition-colors"
         >
           <IconMapper name="arrow_back" className="text-lg transition-transform group-hover:-translate-x-1" />
-          Quay lại chọn gói
+          Quay lại cửa hàng
         </motion.button>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 xl:gap-14">
@@ -175,7 +176,7 @@ const PaymentPage: React.FC = () => {
           <div className="lg:col-span-7 order-2 lg:order-1">
             <motion.div variants={itemVariants}>
               <div className="flex items-center gap-2 text-[9px] font-black text-blue-600 uppercase tracking-widest mb-4">
-                PREMIUM <IconMapper name="chevron_right" className="text-[10px]" /> THANH TOÁN
+                CỬA HÀNG <IconMapper name="chevron_right" className="text-[10px]" /> THANH TOÁN
               </div>
               <h1 className="text-3xl sm:text-5xl font-black tracking-tight font-display text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-500 leading-normal pb-2 uppercase italic pt-2">
                 Hoàn tất thanh toán
@@ -307,12 +308,12 @@ const PaymentPage: React.FC = () => {
             >
               {/* Plan Header */}
               <div className="flex items-center gap-4 mb-8 pb-8 border-b border-slate-100">
-                <div className="w-14 h-14 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg shadow-amber-500/20">
-                  <IconMapper name="workspace_premium" className="text-white text-3xl" />
+                <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+                  <IconMapper name="toll" className="text-white text-3xl" />
                 </div>
                 <div>
                   <h3 className="text-2xl font-black text-slate-900 font-display tracking-tight uppercase italic">{plan.name}</h3>
-                  <p className="text-xs font-bold text-slate-400 mt-1">Gói dịch vụ cao cấp</p>
+                  <p className="text-xs font-bold text-slate-400 mt-1">{plan.tokenAmount ? `${plan.tokenAmount.toLocaleString('vi-VN')} token` : 'Gói token'}</p>
                 </div>
               </div>
 
@@ -329,7 +330,7 @@ const PaymentPage: React.FC = () => {
               {/* Price Breakdown */}
               <div className="bg-slate-50 rounded-2xl p-6 space-y-4 mb-8">
                 <div className="flex justify-between text-sm">
-                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Gói {plan.period.replace('/', '')}</span>
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Giá gói token</span>
                   <span className="font-black text-slate-900">{price.toLocaleString('vi-VN')} đ</span>
                 </div>
                 <div className="flex justify-between text-sm">
@@ -371,8 +372,7 @@ const PaymentPage: React.FC = () => {
               </button>
 
               <p className="text-[9px] text-slate-400 mt-6 text-center leading-relaxed font-medium uppercase tracking-widest">
-                Gia hạn {plan.period.replace('/', '')} cho đến khi bị hủy. Bạn sẽ bị tính phí {totalPrice.toLocaleString('vi-VN')}đ
-                {plan.period}. Bằng việc tiếp tục, bạn đồng ý với Điều khoản dịch vụ.
+                Token sẽ được cộng ngay vào tài khoản sau khi thanh toán thành công. Bằng việc tiếp tục, bạn đồng ý với Điều khoản dịch vụ.
               </p>
             </motion.div>
           </div>

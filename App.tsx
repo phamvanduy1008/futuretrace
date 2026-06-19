@@ -10,7 +10,7 @@ import ProgressPage from './pages/ProgressPage';
 import HistoryPage from './pages/HistoryPage';
 import CommunityPage from './pages/CommunityPage';
 import ScenarioDetailPage from './pages/ScenarioDetailPage';
-import PremiumPage from './pages/PremiumPage';
+import StorePage from './pages/StorePage';
 import PremiumAnalysisPage from './pages/PremiumAnalysisPage';
 import ComparisonMatrixPage from './pages/ComparisonMatrixPage';
 import PaymentPage from './pages/PaymentPage';
@@ -114,8 +114,12 @@ const App: React.FC = () => {
             element={isAuthenticated ? <ComparisonMatrixPage /> : <Navigate to="/login" />}
           />
           <Route
+            path="/store"
+            element={isAuthenticated ? <StorePage /> : <Navigate to="/login" />}
+          />
+          <Route
             path="/premium"
-            element={isAuthenticated ? <PremiumPage /> : <Navigate to="/login" />}
+            element={isAuthenticated ? <Navigate to="/store" replace /> : <Navigate to="/login" />}
           />
           <Route
             path="/detail/:id"

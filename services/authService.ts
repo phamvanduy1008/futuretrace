@@ -6,14 +6,8 @@ const normalizeUser = (user: any) => {
     ...user,
     name: user.full_name || user.name,
     avatar: user.avatar_url || user.avatar,
-    // Ensure id is a string
     id: user.id || user._id?.toString(),
-    token: user.token ?? ((user.token_free ?? 0) + (user.token_premium ?? 0)),
-    token_free: user.token_free ?? user.token ?? 0,
-    token_premium: user.token_premium ?? 0,
-    premium_create_date: user.premium_create_date ?? null,
-    premium_due_date: user.premium_due_date ?? null,
-    premium_token_reset_date: user.premium_token_reset_date ?? null,
+    token: user.token ?? 0,
     code_invite: user.code_invite,
     invite_redeemed: !!user.invite_redeemed
   };
