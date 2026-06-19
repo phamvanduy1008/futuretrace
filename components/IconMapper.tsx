@@ -81,7 +81,25 @@ const materialToPhosphor: Record<string, string> = {
   'lightbulb': 'Lightbulb',
   'diamond': 'SketchLogo',
   'store': 'Storefront',
-  'profile': 'UserCircle'
+  'profile': 'UserCircle',
+  'arrow_right_alt': 'ArrowRight',
+  'credit_card': 'CreditCard',
+  'error_outline': 'WarningCircle',
+  'fingerprint': 'Fingerprint',
+  'forum': 'Chats',
+  'history_edu': 'BookOpen',
+  'info': 'Info',
+  'query_stats': 'ChartBar',
+  'radar': 'Radar',
+  'receipt_long': 'Receipt',
+  'refresh': 'ArrowsCounterClockwise',
+  'schedule': 'Clock',
+  'send': 'PaperPlaneRight',
+  'tips_and_updates': 'Sparkle',
+  'visibility': 'Eye',
+  'assignment': 'ClipboardText',
+  'contact_support': 'Question',
+  'storefront': 'Storefront'
 };
 
 interface IconMapperProps {

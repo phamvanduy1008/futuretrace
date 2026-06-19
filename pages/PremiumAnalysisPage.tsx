@@ -281,14 +281,12 @@ const PremiumAnalysisPage: React.FC = () => {
 
               <section className="bg-white p-10 sm:p-14 rounded-[3rem] border border-slate-100 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.05)]">
                  <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-900 mb-10 flex items-center gap-3">
-                   <IconMapper name="alt_route" className=" text-blue-600" /> Phương án dự phòng (Điểm điều chỉnh)
+                  Phương án dự phòng (Điểm điều chỉnh)
                  </h3>
                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                     {report.strategicPivotPoints.map((p, i) => (
                       <div key={i} className="p-8 bg-slate-50 rounded-[2rem] border border-slate-100 group hover:bg-slate-900 transition-all shadow-sm hover:shadow-xl">
-                        <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center mb-6 shadow-sm group-hover:bg-white/10">
-                           <IconMapper name="help_outline" className=" text-blue-600 group-hover:text-white text-xl" />
-                        </div>
+                      
                         <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 group-hover:text-slate-600">Nếu xảy ra:</p>
                         <p className="text-xs font-black text-slate-900 mb-4 group-hover:text-white leading-tight uppercase italic">{p.condition}</p>
                         <div className="pt-4 border-t border-slate-200 group-hover:border-white/10">
@@ -443,7 +441,7 @@ const PremiumAnalysisPage: React.FC = () => {
               className="relative w-full max-w-lg bg-white rounded-[2.5rem] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.5)] border border-slate-100 overflow-hidden"
             >
               {/* Header gradient strip */}
-              <div className="h-1.5 w-full bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500" />
+              <div className="h-1.5 w-full bg-gradient-to-r" />
 
               <div className="p-8 sm:p-10">
                 {/* Icon + Title */}

@@ -171,17 +171,18 @@ const ProfilePage: React.FC = () => {
                     <div>
                       <p className="text-[9px] font-black uppercase tracking-widest text-blue-500 mb-1">Token hiện có</p>
                     </div>
-                    <div className="text-[10px] font-black uppercase tracking-widest text-blue-600">
-                      {formatTokenCount(tokenValue)} token
-                    </div>
                   </div>
-                  <div className="h-3 rounded-full bg-blue-100 overflow-hidden">
+                  <div className="relative h-3 rounded-full bg-blue-100 cursor-pointer group/bar">
                     <div
                       className="h-full rounded-full bg-blue-500 transition-all duration-500"
                       style={{ width: `${tokenFill}%` }}
                     />
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-xl shadow-xl opacity-0 group-hover/bar:opacity-100 transition-all duration-300 pointer-events-none whitespace-nowrap z-50">
+                      {formatTokenCount(tokenValue)} token
+                      <span className="absolute top-full left-1/2 -translate-x-1/2 border-[5px] border-transparent border-t-slate-900"></span>
+                    </div>
                   </div>
-                  <p className="mt-2 text-[10px] text-slate-500">1.000 token = 100% thanh. <button onClick={() => navigate('/store')} className="text-blue-600 font-bold underline">Mua thêm token</button></p>
+                  <p className="mt-2 text-[10px] text-slate-500">1.000 token = 100%  <button onClick={() => navigate('/store')} className="text-blue-600 font-bold underline">Mua thêm token</button></p>
                 </div>
 
                 <div className="p-5 bg-slate-50 border border-slate-100 rounded-2xl">
@@ -215,6 +216,7 @@ const ProfilePage: React.FC = () => {
                       <input
                         value={inviteCodeInput}
                         onChange={(e) => setInviteCodeInput(e.target.value.replace(/[^A-Za-z0-9]/g, '').slice(0, 8))}
+                        style={{width:'100px'}}
                         className="flex-1 bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-black tracking-widest"
                         placeholder="AbC123xY"
                       />

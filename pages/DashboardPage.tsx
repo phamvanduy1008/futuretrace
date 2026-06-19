@@ -84,11 +84,7 @@ const DashboardPage: React.FC = () => {
       >
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-20 px-2">
           <motion.div variants={itemVariants}>
-            <div className="flex items-center gap-2 text-[9px] font-black text-blue-600 uppercase tracking-widest mb-4">
-              MẠNG LƯỚI KHÁM PHÁ{" "}
-              <IconMapper name="chevron_right" className=" text-[10px]" />{" "}
-              LỘ TRÌNH v0.8
-            </div>
+      
             <h1 id="tour-welcome-title" className="text-4xl sm:text-6xl font-black tracking-tight font-display text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-500 leading-normal pb-2 uppercase italic pt-2 pr-6">
               Trung tâm Phân tích
             </h1>
