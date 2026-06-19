@@ -371,7 +371,7 @@ const SimulationFlow: React.FC = () => {
               animate={{ scale: 1, opacity: 1 }}
               className="px-6 py-2 bg-blue-50/80 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-widest mb-6 border border-blue-100/50 shadow-sm"
             >
-              Mô phỏng lộ trình tương lai v4.2
+              Mô phỏng lộ trình tương lai
             </motion.div>
             <h1 className="text-4xl sm:text-6xl uppercase italic font-black mb-4 font-display tracking-tighter text-slate-900 leading-none">
               Nhập bối cảnh <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">quyết định.</span>
@@ -395,15 +395,8 @@ const SimulationFlow: React.FC = () => {
                   onChange={(e) => setData({ ...data, decision: e.target.value })}
                 />
                 
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-8 py-4 bg-slate-50/50 border-t border-slate-100/80">
-                  <div className="flex items-center gap-2 text-slate-400 text-[10px] font-black uppercase tracking-wider">
-                    <div className="w-5 h-5 rounded-md bg-blue-50 border border-blue-100/50 flex items-center justify-center text-blue-500 shrink-0">
-                      <IconMapper name="tips_and_updates" className="text-[10px]" />
-                    </div>
-                    <span>Nhập bối cảnh càng chi tiết, AI dự báo càng chuẩn xác</span>
-                  </div>
-                  
-                  <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-end gap-4 px-8 py-4 bg-slate-50/50 border-t border-slate-100/80">
+                  <div className="flex items-center gap-3 w-full sm:w-auto justify-end sm:ml-auto">
                     {data.decision.trim() && (
                       <button
                         onClick={() => setData({ ...data, decision: "" })}
@@ -453,7 +446,7 @@ const SimulationFlow: React.FC = () => {
                         className={`w-8 h-8 rounded-xl flex items-center justify-center border shrink-0 transition-all duration-300 ${
                           isActive
                             ? `${theme.activeBg} text-white border-transparent`
-                            : `${theme.bg} ${theme.text} ${theme.border} ${theme.hoverBg}`
+                            : "bg-slate-50/85 text-slate-500 border-slate-100 group-hover:bg-blue-50/40 group-hover:text-blue-600 group-hover:border-blue-100/50"
                         }`}
                       >
                         <IconMapper name={tmpl.icon} className="text-sm" />
