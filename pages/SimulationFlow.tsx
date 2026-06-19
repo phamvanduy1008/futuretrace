@@ -24,6 +24,14 @@ const DECISION_TEMPLATES = [
     id: "highschool_choice",
     label: "Chọn ngành & Trường ĐH",
     icon: "school",
+    theme: {
+      bg: "bg-blue-50/80",
+      text: "text-blue-600",
+      border: "border-blue-100/50",
+      activeBg: "bg-blue-600",
+      activeShadow: "shadow-blue-600/20",
+      hoverBg: "group-hover:bg-blue-50 group-hover:text-blue-600 group-hover:border-blue-100/50"
+    },
     content: `[BỐI CẢNH CHỌN NGÀNH & TRƯỜNG ĐH]
 - Quyết định: Phân vân giữa [Lựa chọn A: Ví dụ học ngành CNTT tại ĐH Bách Khoa] và [Lựa chọn B: Học ngành Thiết kế Đồ họa tại ĐH Mỹ thuật].
 - Hiện trạng học tập: Học sinh lớp [Lớp 11/12], khối học sở trường là [Khối A00/A01/D01...], điểm trung bình (GPA) khoảng [Điểm số].
@@ -36,6 +44,14 @@ const DECISION_TEMPLATES = [
     id: "university_career",
     label: "Định hướng việc làm ra trường",
     icon: "work",
+    theme: {
+      bg: "bg-emerald-50/80",
+      text: "text-emerald-600",
+      border: "border-emerald-100/50",
+      activeBg: "bg-emerald-600",
+      activeShadow: "shadow-emerald-600/20",
+      hoverBg: "group-hover:bg-emerald-50 group-hover:text-emerald-600 group-hover:border-emerald-100/50"
+    },
     content: `[BỐI CẢNH ĐỊNH HƯỚNG RA TRƯỜNG]
 - Quyết định: Sau khi tốt nghiệp ngành [Tên ngành hiện tại] sẽ chọn đi làm ngay ở vị trí [Lựa chọn A: Ví dụ Nhân viên Marketing tại Agency] hay học tiếp lên [Lựa chọn B: Học Thạc sĩ hoặc đổi sang ngành Quản trị nhân sự].
 - Hiện trạng học tập: Sinh viên năm [Năm 3/Năm cuối] trường [Tên trường], GPA hiện tại là [Điểm số/4.0]. Đã có kinh nghiệm [Thực tập/Làm thêm/Dự án CLB].
@@ -46,6 +62,14 @@ const DECISION_TEMPLATES = [
     id: "study_abroad",
     label: "Du học vs Học trong nước",
     icon: "rocket_launch",
+    theme: {
+      bg: "bg-violet-50/80",
+      text: "text-violet-600",
+      border: "border-violet-100/50",
+      activeBg: "bg-violet-600",
+      activeShadow: "shadow-violet-600/20",
+      hoverBg: "group-hover:bg-violet-50 group-hover:text-violet-650 group-hover:border-violet-100/50"
+    },
     content: `[BỐI CẢNH DU HỌC VS TRONG NƯỚC]
 - Quyết định: Đi du học bậc [Đại học/Thạc sĩ] tại [Tên quốc gia: Ví dụ Đức, Úc, Nhật] hay học chương trình liên kết/chính quy trong nước tại [Tên trường].
 - Hiện trạng năng lực: GPA đạt [Điểm GPA], chứng chỉ ngoại ngữ đạt [Ví dụ: IELTS 6.5, JLPT N3].
@@ -57,6 +81,14 @@ const DECISION_TEMPLATES = [
     id: "work_study_balance",
     label: "Học tập vs Đi làm thêm",
     icon: "account_balance_wallet",
+    theme: {
+      bg: "bg-amber-50/80",
+      text: "text-amber-600",
+      border: "border-amber-100/50",
+      activeBg: "bg-amber-600",
+      activeShadow: "shadow-amber-600/20",
+      hoverBg: "group-hover:bg-amber-50 group-hover:text-amber-650 group-hover:border-amber-100/50"
+    },
     content: `[BỐI CẢNH HỌC TẬP VS ĐI LÀM THÊM]
 - Quyết định: Dành thời gian [Số giờ] giờ/tuần để đi làm thêm [Tên việc làm thêm: Ví dụ gia sư, phục vụ, chạy grab] kiếm tiền tự trang trải hay tập trung 100% thời gian cho việc học để giành học bổng của trường.
 - Hiện trạng tài chính: [Khó khăn/Tự túc một phần], học phí mỗi kỳ là [Số tiền] triệu đồng.
@@ -67,6 +99,14 @@ const DECISION_TEMPLATES = [
     id: "relocation_hometown",
     label: "Thành phố lớn vs Quê nhà",
     icon: "balance",
+    theme: {
+      bg: "bg-indigo-50/80",
+      text: "text-indigo-600",
+      border: "border-indigo-100/50",
+      activeBg: "bg-indigo-600",
+      activeShadow: "shadow-indigo-600/20",
+      hoverBg: "group-hover:bg-indigo-50 group-hover:text-indigo-650 group-hover:border-indigo-100/50"
+    },
     content: `[BỐI CẢNH LẬP NGHIỆP XA NHÀ VS QUÊ NHÀ]
 - Quyết định: Ở lại lập nghiệp tại [Lựa chọn A: Thành phố lớn như Hà Nội, TP.HCM] hay trở về quê hương [Lựa chọn B: Tên tỉnh/thành phố quê nhà] để làm việc gần bố mẹ.
 - Hiện trạng: Sinh viên sắp tốt nghiệp, chưa có nhà riêng ở thành phố lớn, chi phí thuê nhà và ăn uống tốn khoảng [Số tiền] triệu/tháng.
@@ -77,6 +117,14 @@ const DECISION_TEMPLATES = [
     id: "student_startup",
     label: "Dự án Khởi nghiệp sinh viên",
     icon: "psychology",
+    theme: {
+      bg: "bg-rose-50/80",
+      text: "text-rose-600",
+      border: "border-rose-100/50",
+      activeBg: "bg-rose-600",
+      activeShadow: "shadow-rose-600/20",
+      hoverBg: "group-hover:bg-rose-50 group-hover:text-rose-650 group-hover:border-rose-100/50"
+    },
     content: `[BỐI CẢNH KHỞI NGHIỆP/NGHIÊN CỨU SINH VIÊN]
 - Quyết định: Thành lập nhóm khởi nghiệp dự án sinh viên [Mô hình: Ví dụ Phát triển ứng dụng học tập, kinh doanh đồ handmade online] hay tập trung tham gia Nghiên cứu Khoa học tại trường.
 - Hiện trạng nguồn lực: Số vốn ban đầu tự góp là [Số tiền] triệu đồng, có nhóm [Số người] sinh viên cùng tham gia. Có sự bảo trợ/hướng dẫn từ giảng viên [Có/Không].
@@ -321,12 +369,12 @@ const SimulationFlow: React.FC = () => {
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className="px-6 py-2 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-widest mb-6 border border-blue-100"
+              className="px-6 py-2 bg-blue-50/80 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-widest mb-6 border border-blue-100/50 shadow-sm"
             >
               Mô phỏng lộ trình tương lai v4.2
             </motion.div>
             <h1 className="text-4xl sm:text-6xl uppercase italic font-black mb-4 font-display tracking-tighter text-slate-900 leading-none">
-              Nhập bối cảnh <span className="text-blue-600">quyết định.</span>
+              Nhập bối cảnh <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">quyết định.</span>
             </h1>
             <p className="text-slate-500 text-lg max-w-2xl mx-auto font-medium leading-relaxed">
               Trí tuệ nhân tạo sẽ quét các từ khóa để xây dựng các hướng đi
@@ -335,75 +383,102 @@ const SimulationFlow: React.FC = () => {
           </div>
           <div className="space-y-10">
             <div className="relative group">
-              <div className="absolute -inset-2 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-[2.5rem] blur-xl opacity-10 group-focus-within:opacity-20 transition duration-1000"></div>
-              <textarea
-                id="tour-decision-textarea"
-                className="relative w-full h-[320px] p-10 bg-white/70 backdrop-blur-xl border border-slate-200 rounded-[2.5rem] text-lg leading-relaxed focus:ring-4 focus:ring-blue-50 focus:border-blue-600 outline-none resize-none transition-all shadow-2xl shadow-slate-100/50 font-medium text-slate-800"
-                placeholder="Ví dụ: Em là học sinh lớp 12 khối D01, đang phân vân giữa chọn học ngành Ngôn ngữ Anh tại ĐH Ngoại thương hay đi du học Úc ngành Quản trị Khách sạn..."
-                maxLength={1000}
-                value={data.decision}
-                onChange={(e) => setData({ ...data, decision: e.target.value })}
-              />
-              <div className="absolute bottom-10 right-12 text-[10px] font-black text-slate-400 uppercase tracking-widest bg-slate-50 px-3 py-1 rounded-md border border-slate-100">
-                {data.decision.length} / 1000 ký tự
+              <div className="absolute -inset-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-3xl blur-lg opacity-5 group-focus-within:opacity-15 transition duration-500"></div>
+              
+              <div className="relative w-full bg-white/70 backdrop-blur-xl border border-slate-200/60 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.03)] focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/10 transition-all duration-300 overflow-hidden flex flex-col">
+                <textarea
+                  id="tour-decision-textarea"
+                  className="w-full h-[240px] sm:h-[280px] p-8 sm:p-10 bg-transparent text-base sm:text-lg leading-relaxed outline-none resize-none font-medium text-slate-800 placeholder:text-slate-400/80 placeholder:italic border-none"
+                  placeholder="Ví dụ: Em là học sinh lớp 12 khối D01, đang phân vân giữa chọn học ngành Ngôn ngữ Anh tại ĐH Ngoại thương hay đi du học Úc ngành Quản trị Khách sạn..."
+                  maxLength={1000}
+                  value={data.decision}
+                  onChange={(e) => setData({ ...data, decision: e.target.value })}
+                />
+                
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-8 py-4 bg-slate-50/50 border-t border-slate-100/80">
+                  <div className="flex items-center gap-2 text-slate-400 text-[10px] font-black uppercase tracking-wider">
+                    <div className="w-5 h-5 rounded-md bg-blue-50 border border-blue-100/50 flex items-center justify-center text-blue-500 shrink-0">
+                      <IconMapper name="tips_and_updates" className="text-[10px]" />
+                    </div>
+                    <span>Nhập bối cảnh càng chi tiết, AI dự báo càng chuẩn xác</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+                    {data.decision.trim() && (
+                      <button
+                        onClick={() => setData({ ...data, decision: "" })}
+                        className="text-[9px] font-black uppercase tracking-widest text-slate-450 hover:text-rose-500 transition-colors px-2.5 py-1.5 rounded-lg hover:bg-rose-50 border border-transparent hover:border-rose-100"
+                      >
+                        Xóa tất cả
+                      </button>
+                    )}
+                    <span className={`px-2.5 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-lg border shadow-sm transition-all ${
+                      data.decision.length > 900
+                        ? "bg-rose-50 border-rose-100 text-rose-600"
+                        : "bg-slate-50 border-slate-200/50 text-slate-500"
+                    }`}>
+                      {data.decision.length} / 1000 ký tự
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div id="tour-decision-hints" className="space-y-4">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                Chọn biểu mẫu mẫu chi tiết (Bạn chỉ cần chỉnh sửa các thông tin
-                trong dấu ngoặc vuông [...]):
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div id="tour-decision-hints" className="space-y-6">
+              <div className="flex items-center gap-4">
+                <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 whitespace-nowrap">
+                  Hoặc chọn biểu mẫu gợi ý chi tiết
+                </span>
+                <span className="h-px bg-slate-200/60 flex-1"></span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {DECISION_TEMPLATES.map((tmpl) => {
                   const isActive = data.decision === tmpl.content;
+                  const theme = tmpl.theme;
                   return (
                     <motion.button
                       key={tmpl.id}
-                      whileHover={{ y: -2, scale: 1.01 }}
+                      whileHover={{ y: -2 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() =>
                         setData({ ...data, decision: tmpl.content })
                       }
-                      className={`group flex items-center gap-3.5 p-4 rounded-2xl border text-left transition-all ${
+                      className={`group flex items-center gap-3 p-3 rounded-2xl border text-left transition-all duration-300 ${
                         isActive
-                          ? "border-blue-600 bg-blue-50/30 ring-1 ring-blue-600/30 shadow-md shadow-blue-500/5"
-                          : "border-slate-200 bg-white/90 hover:border-blue-400 hover:bg-blue-50/10 shadow-sm"
+                          ? "border-blue-500 bg-blue-50/20 ring-2 ring-blue-500/10 shadow-sm"
+                          : "border-slate-200/60 bg-white/50 backdrop-blur-sm hover:border-slate-300 hover:bg-white/90 shadow-sm"
                       }`}
                     >
                       <div
-                        className={`w-9 h-9 rounded-xl flex items-center justify-center border shrink-0 transition-all ${
+                        className={`w-8 h-8 rounded-xl flex items-center justify-center border shrink-0 transition-all duration-300 ${
                           isActive
-                            ? "bg-blue-600 text-white border-blue-600 shadow-sm shadow-blue-500/10"
-                            : "bg-slate-50 text-blue-600 border-slate-100 group-hover:bg-blue-50"
+                            ? `${theme.activeBg} text-white border-transparent`
+                            : `${theme.bg} ${theme.text} ${theme.border} ${theme.hoverBg}`
                         }`}
                       >
-                        <IconMapper name={tmpl.icon} className="text-lg" />
+                        <IconMapper name={tmpl.icon} className="text-sm" />
                       </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-1.5 mb-0.5">
-                          <p
-                            className={`text-[11px] font-bold uppercase tracking-wide leading-snug transition-colors ${
-                              isActive
-                                ? "text-blue-700"
-                                : "text-slate-800 group-hover:text-blue-600"
-                            }`}
-                          >
-                            {tmpl.label}
-                          </p>
-                          {isActive && (
-                            <span className="w-1.5 h-1.5 bg-blue-600 rounded-full shrink-0 animate-pulse" />
-                          )}
-                        </div>
-                        <p
-                          className={`text-[9px] font-bold uppercase tracking-wider ${
+                      <div className="min-w-0 flex-1 flex items-center justify-between gap-2">
+                        <span
+                          className={`text-[10px] font-black uppercase tracking-wide truncate transition-colors duration-300 ${
                             isActive
-                              ? "text-blue-500"
-                              : "text-slate-400 group-hover:text-blue-500/80"
+                              ? "text-blue-750"
+                              : "text-slate-700 group-hover:text-blue-600"
                           }`}
                         >
-                          {isActive ? "Đang áp dụng" : "Bấm áp dụng"}
-                        </p>
+                          {tmpl.label}
+                        </span>
+                        {isActive ? (
+                          <IconMapper
+                            name="check_circle"
+                            className="text-blue-600 text-sm shrink-0"
+                          />
+                        ) : (
+                          <IconMapper
+                            name="arrow_forward"
+                            className="text-slate-300 group-hover:text-blue-500 text-xs shrink-0 transition-all duration-300 translate-x-[-2px] group-hover:translate-x-0 opacity-0 group-hover:opacity-100"
+                          />
+                        )}
                       </div>
                     </motion.button>
                   );
@@ -412,15 +487,17 @@ const SimulationFlow: React.FC = () => {
             </div>
 
             <div className="flex flex-col sm:flex-row items-center justify-end gap-8 pt-4">
-              <button
+              <motion.button
+                whileHover={data.decision.trim() ? { scale: 1.02 } : {}}
+                whileTap={data.decision.trim() ? { scale: 0.98 } : {}}
                 id="tour-decision-btn"
                 onClick={handleNextStep}
                 disabled={!data.decision.trim()}
-                className="w-full sm:w-auto bg-slate-900 hover:bg-blue-600 disabled:bg-slate-100 disabled:text-slate-400 text-white font-black py-6 px-14 rounded-2xl shadow-2xl shadow-slate-200 transition-all flex items-center justify-center gap-4 text-xs uppercase tracking-widest"
+                className="w-full sm:w-auto bg-slate-900 hover:bg-blue-600 disabled:bg-slate-100 disabled:text-slate-400 text-white font-bold py-5 px-12 rounded-[2rem] shadow-xl hover:shadow-2xl hover:shadow-blue-500/10 disabled:shadow-none transition-all duration-300 flex items-center justify-center gap-4 text-xs uppercase tracking-widest group"
               >
                 Tiếp tục quy trình{" "}
-                <IconMapper name="arrow_forward" className=" font-bold" />
-              </button>
+                <IconMapper name="arrow_forward" className="text-sm transition-transform group-hover:translate-x-1" />
+              </motion.button>
             </div>
           </div>
         </motion.div>
