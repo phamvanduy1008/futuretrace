@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SimulationStep, SimulationData, PredictionResult, ScenarioResult } from '../types';
 import { generateSimulation, analyzeInputReadiness } from '../services/geminiService';
@@ -8,6 +8,8 @@ import SharedHeader from '../components/SharedHeader';
 import SharedFooter from '../components/SharedFooter';
 import { IconMapper } from '../components/IconMapper';
 import { AnimatedBackground } from '../components/AnimatedBackground';
+
+import { getLatestEvaluation } from '../services/evaluationService';
 
 const DECISION_TEMPLATES = [
   {
@@ -77,12 +79,30 @@ const DECISION_TEMPLATES = [
 
 const SimulationFlow: React.FC = () => {
   const navigate = useNavigate();
-  const [step, setStep] = useState<SimulationStep>(SimulationStep.DESCRIPTION);
+  const location = useLocation();
+
+  // Loading state for fetching evaluation
+  const [isFetchingEval, setIsFetchingEval] = useState(true);
+
+  // Helper to map 0-100 to 1-5
+  const mapEvalToSlider = (score: number) => {
+    if (score <= 20) return 1;
+    if (score <= 40) return 2;
+    if (score <= 60) return 3;
+    if (score <= 80) return 4;
+    return 5;
+  };
+
+  // We set initial state to step passed from evaluation flow if any, otherwise description
+  const [step, setStep] = useState<SimulationStep>(
+    location.state?.evaluationResults ? SimulationStep.CONTEXT : SimulationStep.DESCRIPTION
+  );
+
   const [data, setData] = useState<SimulationData>({
-    decision: "",
+    decision: location.state?.decisionContext || "",
     stress: 3,
     personalFinance: 3,
-    risk: 4,
+    risk: 3,
     academicPerformance: 3,
     otherFactors: "",
     tier: 'free',
@@ -91,6 +111,37 @@ const SimulationFlow: React.FC = () => {
     location: "Thành phố lớn",
     coreValues: "Ổn định"
   });
+
+  useEffect(() => {
+    // Check if we already received results from state (after completing test)
+    if (location.state?.evaluationResults) {
+      const evalResults = location.state.evaluationResults;
+      setData(prev => ({
+        ...prev,
+        stress: mapEvalToSlider(evalResults.stress),
+        personalFinance: mapEvalToSlider(evalResults.finance),
+        risk: mapEvalToSlider(evalResults.risk),
+        academicPerformance: mapEvalToSlider(evalResults.capability)
+      }));
+      setIsFetchingEval(false);
+      return;
+    }
+
+    // Otherwise fetch latest from API
+    getLatestEvaluation().then(res => {
+      if (res && res.normalizedScores) {
+        setData(prev => ({
+          ...prev,
+          stress: mapEvalToSlider(res.normalizedScores.stress),
+          personalFinance: mapEvalToSlider(res.normalizedScores.finance),
+          risk: mapEvalToSlider(res.normalizedScores.risk),
+          academicPerformance: mapEvalToSlider(res.normalizedScores.capability)
+        }));
+      }
+    }).catch(err => console.error("Could not fetch latest evaluation", err))
+    .finally(() => setIsFetchingEval(false));
+  }, [location.state]);
+
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [clarificationQuestions, setClarificationQuestions] = useState<any[]>([]);
   const [clarificationAnswers, setClarificationAnswers] = useState<Record<number, string>>({});
@@ -518,6 +569,26 @@ const SimulationFlow: React.FC = () => {
                   onChange={(e) => setData({ ...data, otherFactors: e.target.value })}
                 />
               </div>
+            </div>
+
+            <div className="mt-8 p-6 bg-blue-50/50 border border-blue-100 rounded-3xl flex flex-col sm:flex-row items-center justify-between gap-6">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-blue-600 shadow-sm">
+                  <IconMapper name="assignment" className="text-2xl" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-black text-slate-900 mb-1">Chưa rõ chỉ số của bản thân?</h4>
+                  <p className="text-xs text-slate-600 font-medium">Làm bài test 40 câu hỏi chuyên sâu để AI tự động cấu hình chuẩn xác nhất.</p>
+                </div>
+              </div>
+              <motion.button 
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => navigate('/evaluate', { state: { decisionContext: data.decision, from: 'simulate' } })}
+                className="whitespace-nowrap px-6 py-3 bg-white text-blue-600 border border-blue-200 font-black text-[10px] uppercase tracking-widest hover:bg-blue-600 hover:text-white rounded-xl transition-all shadow-sm"
+              >
+                Đánh giá chi tiết
+              </motion.button>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 mt-10 pt-8 border-t border-slate-100">
