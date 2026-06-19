@@ -35,6 +35,10 @@ export interface SimulationData {
   otherFactors?: string;
   timeHorizon?: number; // Số năm dự báo (1, 3, 5, hoặc 10)
   tier: UserTier;
+  mood?: "Lạc quan" | "Bình thường" | "Lo lắng" | "Kiệt sức";
+  educationLevel?: "Cấp 3" | "Đại học năm 1-2" | "Đại học năm 3-4" | "Mới ra trường";
+  location?: "Thành phố lớn" | "Tỉnh lẻ";
+  coreValues?: "Ổn định" | "Thu nhập cao" | "Đam mê/Cống hiến";
 }
 
 export interface ScenarioResult {
@@ -62,6 +66,10 @@ export interface ScenarioResult {
     sprint90: { phase: string; tasks: string[] }[];
     criticalAdvice: string;
     riskMitigation?: string;
+  };
+  marketFit?: {
+    score: number;
+    analysis: string;
   };
 }
 

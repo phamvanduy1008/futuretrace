@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SimulationStep, SimulationData, PredictionResult, ScenarioResult } from '../types';
-import { generateSimulation } from '../services/geminiService';
+import { generateSimulation, analyzeInputReadiness } from '../services/geminiService';
 import { saveToHistory } from '../data/mockDatabase';
 import SharedHeader from '../components/SharedHeader';
 import SharedFooter from '../components/SharedFooter';
@@ -85,9 +85,15 @@ const SimulationFlow: React.FC = () => {
     risk: 4,
     academicPerformance: 3,
     otherFactors: "",
-    tier: 'free'
+    tier: 'free',
+    mood: "Bình thường",
+    educationLevel: "Cấp 3",
+    location: "Thành phố lớn",
+    coreValues: "Ổn định"
   });
   const [loadingProgress, setLoadingProgress] = useState(0);
+  const [clarificationQuestions, setClarificationQuestions] = useState<any[]>([]);
+  const [clarificationAnswers, setClarificationAnswers] = useState<Record<number, string>>({});
   const [results, setResults] = useState<PredictionResult | null>(null);
   const [error, setError] = useState<{ message: string; type: 'AUTH' | 'NETWORK' | 'LOCAL_CONFIG' | 'GENERAL' } | null>(null);
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
@@ -101,8 +107,39 @@ const SimulationFlow: React.FC = () => {
     } else if (step === SimulationStep.CONTEXT) {
       setError(null);
       setStep(SimulationStep.PROCESSING);
+      checkInputReadiness();
+    }
+  };
+
+  const checkInputReadiness = async () => {
+    setLoadingProgress(15);
+    try {
+      const readiness = await analyzeInputReadiness(data.decision);
+      if (readiness.status === 'needs_clarification' && readiness.questions && readiness.questions.length > 0) {
+        setClarificationQuestions(readiness.questions);
+        setStep(SimulationStep.CONTEXT);
+      } else {
+        startSimulation();
+      }
+    } catch (e: any) {
       startSimulation();
     }
+  };
+
+  const submitClarification = () => {
+    const additionalContext = clarificationQuestions.map((q, idx) => 
+      `- ${q.question}: ${clarificationAnswers[idx] || 'Bỏ qua'}`
+    ).join('\\n');
+    
+    setData(prev => ({
+      ...prev,
+      decision: prev.decision + '\\n\\n[THÔNG TIN BỔ SUNG TỪ NGƯỜI DÙNG]\\n' + additionalContext
+    }));
+    
+    setClarificationQuestions([]);
+    setClarificationAnswers({});
+    setStep(SimulationStep.PROCESSING);
+    startSimulation();
   };
 
   const handleSelectKey = async () => {
@@ -382,8 +419,91 @@ const SimulationFlow: React.FC = () => {
                   </div>
                 </div>
               ))}
+              
+              <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-8 pt-6 border-t border-slate-50 mt-4">
+                {/* Tâm trạng */}
+                <div className="space-y-4">
+                  <label className="flex items-center gap-4 font-black text-[10px] uppercase tracking-widest text-slate-800">
+                    <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-blue-600 border border-slate-100 shadow-sm">
+                      <IconMapper name="mood" className=" text-xl" />
+                    </div>
+                    Tâm trạng hiện tại
+                  </label>
+                  <div className="flex gap-2">
+                    {["Lạc quan", "Bình thường", "Lo lắng", "Kiệt sức"].map(mood => (
+                      <button 
+                        key={mood}
+                        onClick={() => setData({ ...data, mood: mood as any })}
+                        className={`flex-1 py-3 text-[10px] font-bold uppercase tracking-wide rounded-xl border transition-all ${data.mood === mood ? 'bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-200' : 'bg-white text-slate-500 border-slate-200 hover:border-blue-300 hover:bg-blue-50'}`}
+                      >
+                        {mood}
+                      </button>
+                    ))}
+                  </div>
+                </div>
 
-              <div className="md:col-span-2 space-y-4 pt-4 border-t border-slate-50 mt-4">
+                {/* Giai đoạn học vấn */}
+                <div className="space-y-4">
+                  <label className="flex items-center gap-4 font-black text-[10px] uppercase tracking-widest text-slate-800">
+                    <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-blue-600 border border-slate-100 shadow-sm">
+                      <IconMapper name="menu_book" className=" text-xl" />
+                    </div>
+                    Giai đoạn học vấn
+                  </label>
+                  <select 
+                    value={data.educationLevel}
+                    onChange={(e) => setData({ ...data, educationLevel: e.target.value as any })}
+                    className="w-full px-5 py-4 bg-white border border-slate-200 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all text-slate-700"
+                  >
+                    <option value="Cấp 3">Học sinh Cấp 3</option>
+                    <option value="Đại học năm 1-2">Đại học (Năm 1 - 2)</option>
+                    <option value="Đại học năm 3-4">Đại học (Năm 3 - 4)</option>
+                    <option value="Mới ra trường">Mới ra trường (Fresher)</option>
+                  </select>
+                </div>
+                
+                {/* Khu vực sống */}
+                <div className="space-y-4">
+                  <label className="flex items-center gap-4 font-black text-[10px] uppercase tracking-widest text-slate-800">
+                    <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-blue-600 border border-slate-100 shadow-sm">
+                      <IconMapper name="location_on" className=" text-xl" />
+                    </div>
+                    Khu vực sinh sống
+                  </label>
+                  <div className="flex gap-4">
+                    {["Thành phố lớn", "Tỉnh lẻ"].map(loc => (
+                      <button 
+                        key={loc}
+                        onClick={() => setData({ ...data, location: loc as any })}
+                        className={`flex-1 py-4 text-xs font-bold rounded-xl border transition-all ${data.location === loc ? 'bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-200' : 'bg-white text-slate-500 border-slate-200 hover:border-blue-300 hover:bg-blue-50'}`}
+                      >
+                        {loc}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Core Values */}
+                <div className="space-y-4">
+                  <label className="flex items-center gap-4 font-black text-[10px] uppercase tracking-widest text-slate-800">
+                    <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-blue-600 border border-slate-100 shadow-sm">
+                      <IconMapper name="diamond" className=" text-xl" />
+                    </div>
+                    Ưu tiên lớn nhất
+                  </label>
+                  <select 
+                    value={data.coreValues}
+                    onChange={(e) => setData({ ...data, coreValues: e.target.value as any })}
+                    className="w-full px-5 py-4 bg-white border border-slate-200 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all text-slate-700"
+                  >
+                    <option value="Ổn định">Sự ổn định & An toàn</option>
+                    <option value="Thu nhập cao">Thu nhập & Tiền bạc</option>
+                    <option value="Đam mê/Cống hiến">Đam mê & Trải nghiệm</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="md:col-span-2 space-y-4 pt-6 border-t border-slate-50 mt-4">
                 <label htmlFor="otherFactors" className="flex items-center gap-4 font-black text-[10px] uppercase tracking-widest text-slate-800">
                   <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-blue-600 border border-slate-100 shadow-sm">
                     <IconMapper name="more_horiz" className=" text-xl" />
@@ -410,6 +530,70 @@ const SimulationFlow: React.FC = () => {
             </div>
           </div>
         </motion.div>
+
+        {/* Clarification Modal */}
+        <AnimatePresence>
+          {clarificationQuestions.length > 0 && (
+            <div className="fixed inset-0 z-[200] flex items-center justify-center p-6">
+              <motion.div
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                className="absolute inset-0 bg-slate-900/80 backdrop-blur-md"
+              />
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 30 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 30 }}
+                className="relative w-full max-w-2xl bg-white rounded-[3rem] p-10 sm:p-14 shadow-[0_100px_150px_-50px_rgba(0,0,0,0.5)] border border-slate-100 overflow-hidden max-h-[90vh] overflow-y-auto"
+              >
+                <div className="text-center mb-10">
+                  <div className="w-20 h-20 bg-amber-50 text-amber-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-inner border border-amber-100">
+                    <IconMapper name="contact_support" className=" text-4xl" />
+                  </div>
+                  <h3 className="text-3xl font-black text-slate-900 font-display uppercase tracking-tighter mb-4">Làm rõ thông tin</h3>
+                  <p className="text-slate-600 text-sm font-medium leading-relaxed">
+                    Mô tả của bạn khá ngắn hoặc chưa đủ rõ ràng. Để AI dự báo chính xác hơn, vui lòng chọn thêm thông tin dưới đây:
+                  </p>
+                </div>
+
+                <div className="space-y-8 mb-10">
+                  {clarificationQuestions.map((q, qIdx) => (
+                    <div key={qIdx} className="space-y-4">
+                      <h4 className="text-sm font-bold text-slate-800 leading-snug">
+                        {qIdx + 1}. {q.question}
+                      </h4>
+                      <div className="flex flex-col gap-3">
+                        {q.options.map((opt: string, oIdx: number) => (
+                          <button
+                            key={oIdx}
+                            onClick={() => setClarificationAnswers(prev => ({ ...prev, [qIdx]: opt }))}
+                            className={`p-4 text-left text-sm font-medium rounded-xl border transition-all ${
+                              clarificationAnswers[qIdx] === opt 
+                                ? 'bg-amber-50 border-amber-400 text-amber-800 shadow-md ring-2 ring-amber-400/20' 
+                                : 'bg-white border-slate-200 text-slate-600 hover:border-amber-300 hover:bg-amber-50/50'
+                            }`}
+                          >
+                            {opt}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex flex-col gap-4">
+                  <button
+                    onClick={submitClarification}
+                    disabled={Object.keys(clarificationAnswers).length < clarificationQuestions.length}
+                    className="w-full py-6 bg-slate-900 disabled:bg-slate-200 disabled:text-slate-400 text-white font-black text-[12px] uppercase tracking-widest rounded-2xl hover:bg-blue-600 transition-all shadow-2xl flex items-center justify-center gap-4"
+                  >
+                    Tiếp tục phân tích <IconMapper name="arrow_forward" className=" text-xl" />
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
       </AnimatedBackground>
     );
   }

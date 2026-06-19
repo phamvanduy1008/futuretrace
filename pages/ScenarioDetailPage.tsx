@@ -349,6 +349,44 @@ const ScenarioDetailPage: React.FC = () => {
               ))}
             </section>
 
+            {/* Market Fit Section */}
+            {scenario.marketFit && (
+              <section className="bg-gradient-to-br from-indigo-50 to-blue-50 p-8 sm:p-10 lg:p-12 rounded-[2.5rem] sm:rounded-[3rem] border border-blue-100 shadow-sm">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 mb-8">
+                  <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-indigo-600 shadow-sm shrink-0">
+                    <IconMapper name="radar" className="text-3xl" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-black text-slate-900 font-display uppercase tracking-tight">Mức độ phù hợp thị trường</h3>
+                    <p className="text-sm font-medium text-slate-500">Đánh giá dựa trên xu hướng thực tế và thế mạnh cá nhân</p>
+                  </div>
+                </div>
+                
+                <div className="flex flex-col md:flex-row gap-8 items-center">
+                  <div className="w-40 h-40 relative flex items-center justify-center shrink-0">
+                    <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
+                      <circle cx="50" cy="50" r="42" stroke="rgba(79,70,229,0.1)" strokeWidth="8" fill="none" />
+                      <circle 
+                        cx="50" cy="50" r="42" stroke="#4f46e5" strokeWidth="8" fill="none"
+                        strokeDasharray={`${scenario.marketFit.score * 2.638} 263.8`}
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <span className="text-4xl font-black text-indigo-600 font-display">{scenario.marketFit.score}</span>
+                      <span className="text-[9px] font-black text-indigo-400 uppercase tracking-widest mt-1">Điểm Fit</span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex-1 bg-white/60 backdrop-blur-sm p-6 rounded-3xl border border-white">
+                    <p className="text-base font-medium text-slate-700 leading-relaxed italic">
+                      "{scenario.marketFit.analysis}"
+                    </p>
+                  </div>
+                </div>
+              </section>
+            )}
+
             {/* SWOT Section */}
             <section className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8">
               {scenario.deepAnalysis?.swot.map((item: any, i: number) => (

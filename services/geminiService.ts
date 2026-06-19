@@ -60,6 +60,25 @@ export const generateSimulation = async (
   return result;
 };
 
+export const analyzeInputReadiness = async (decision: string): Promise<any> => {
+  const token = getAuthToken();
+  const response = await fetch(`${API_BASE_URL}/api/simulations/pre-check`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({ decision })
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Lỗi kết nối server AI.');
+  }
+
+  return response.json();
+};
+
 export const generatePremiumAnalysis = async (
   title: string,
   description: string,
