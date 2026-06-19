@@ -90,7 +90,7 @@ const materialToPhosphor: Record<string, string> = {
   'history_edu': 'BookOpen',
   'info': 'Info',
   'query_stats': 'ChartBar',
-  'radar': 'Radar',
+  'radar': 'Target',
   'receipt_long': 'Receipt',
   'refresh': 'ArrowsCounterClockwise',
   'schedule': 'Clock',
