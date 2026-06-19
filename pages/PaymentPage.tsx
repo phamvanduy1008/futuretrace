@@ -175,9 +175,6 @@ const PaymentPage: React.FC = () => {
           {/* LEFT - Payment & Billing */}
           <div className="lg:col-span-7 order-2 lg:order-1">
             <motion.div variants={itemVariants}>
-              <div className="flex items-center gap-2 text-[9px] font-black text-blue-600 uppercase tracking-widest mb-4">
-                CỬA HÀNG <IconMapper name="chevron_right" className="text-[10px]" /> THANH TOÁN
-              </div>
               <h1 className="text-3xl sm:text-5xl font-black tracking-tight font-display text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-500 leading-normal pb-2 uppercase italic pt-2">
                 Hoàn tất thanh toán
               </h1>

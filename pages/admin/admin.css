@@ -90,7 +90,7 @@
   padding: 22px 14px;
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 32px;
 }
 
 .ft-nav-group {
@@ -100,13 +100,13 @@
 }
 
 .ft-nav-group__label {
-  padding: 0 12px;
-  font-size: 0.75rem;
-  font-weight: 650;
-  color: #c9e0ff;
+  padding: 0 16px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: rgba(201, 224, 255, 0.45);
   text-transform: uppercase;
-  letter-spacing: 0.07em;
-  margin-bottom: 8px;
+  letter-spacing: 0.12em;
+  margin-bottom: 2px;
 }
 
 .ft-nav-item {
@@ -413,22 +413,22 @@
 
 .ft-card {
   background: white;
-  border-radius: 16px;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+  border-radius: 20px;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
   overflow: hidden;
-  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.25s ease;
 }
 
 .ft-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px);
   border-color: #d5e2f4;
-  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.1);
+  box-shadow: 0 16px 32px rgba(15, 23, 42, 0.08);
 }
 
 .ft-card__header {
-  padding: 24px;
-  border-bottom: 1px solid #f1f5f9;
+  padding: 28px 32px;
+  border-bottom: 1px solid rgba(241, 245, 249, 0.8);
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -444,6 +444,19 @@
   font-size: 0.875rem;
   color: #64748b;
 }
+
+.ft-card__header--neutral { background: linear-gradient(135deg, rgba(248, 250, 252, 1), rgba(241, 245, 249, 0.4)); border-bottom-color: rgba(226, 232, 240, 1); }
+.ft-card__header--blue { background: linear-gradient(135deg, rgba(239, 246, 255, 1), rgba(219, 234, 254, 0.4)); border-bottom-color: rgba(191, 219, 254, 1); }
+.ft-card__header--indigo { background: linear-gradient(135deg, rgba(238, 242, 255, 1), rgba(224, 231, 255, 0.4)); border-bottom-color: rgba(199, 210, 254, 1); }
+.ft-card__header--purple { background: linear-gradient(135deg, rgba(250, 245, 255, 1), rgba(243, 232, 255, 0.4)); border-bottom-color: rgba(233, 213, 255, 1); }
+.ft-card__header--pink { background: linear-gradient(135deg, rgba(253, 242, 248, 1), rgba(252, 231, 243, 0.4)); border-bottom-color: rgba(251, 207, 232, 1); }
+.ft-card__header--rose { background: linear-gradient(135deg, rgba(255, 241, 242, 1), rgba(255, 228, 230, 0.4)); border-bottom-color: rgba(254, 205, 211, 1); }
+.ft-card__header--orange { background: linear-gradient(135deg, rgba(255, 247, 237, 1), rgba(255, 237, 213, 0.4)); border-bottom-color: rgba(253, 216, 181, 1); }
+.ft-card__header--amber { background: linear-gradient(135deg, rgba(255, 251, 235, 1), rgba(254, 243, 199, 0.4)); border-bottom-color: rgba(253, 230, 138, 1); }
+.ft-card__header--emerald { background: linear-gradient(135deg, rgba(236, 253, 245, 1), rgba(209, 250, 229, 0.4)); border-bottom-color: rgba(167, 243, 208, 1); }
+.ft-card__header--teal { background: linear-gradient(135deg, rgba(240, 253, 250, 1), rgba(204, 251, 241, 0.4)); border-bottom-color: rgba(153, 246, 228, 1); }
+.ft-card__header--cyan { background: linear-gradient(135deg, rgba(236, 254, 255, 1), rgba(207, 250, 254, 0.4)); border-bottom-color: rgba(165, 243, 252, 1); }
+
 
 .ft-stats-grid {
   display: grid;
@@ -564,7 +577,7 @@
 }
 
 .ft-table th {
-  padding: 18px 24px;
+  padding: 20px 32px;
   text-align: left;
   font-size: 0.79rem;
   font-weight: 650;
@@ -575,7 +588,7 @@
 }
 
 .ft-table td {
-  padding: 18px 24px;
+  padding: 20px 32px;
   border-bottom: 1px solid #f1f5f9;
   vertical-align: middle;
 }
@@ -679,6 +692,10 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.ft-grid--2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .ft-grid--1-2 {
   grid-template-columns: minmax(280px, 1fr) minmax(0, 2fr);
 }
@@ -712,6 +729,28 @@
   line-height: 1.7;
 }
 
+.ft-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+  color: #64748b;
+  width: 100%;
+}
+
+.ft-empty-state strong {
+  color: #0f172a;
+  font-size: 1rem;
+  margin-bottom: 8px;
+}
+
+.ft-empty-state p {
+  font-size: 0.875rem;
+  margin: 0;
+}
+
 .ft-feedback-card .ft-empty-state {
   padding: 24px 26px;
 }
@@ -723,7 +762,7 @@
 }
 
 .ft-stats-grid--compact {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 }
 
 .ft-stats-grid--compact .ft-stat-card {

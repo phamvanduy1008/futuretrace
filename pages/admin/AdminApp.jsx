@@ -266,7 +266,7 @@ function DashboardPage({ api, navigate, onForbidden }) {
     return (
         <div className="ft-page-stack ft-settings-page">
             <AdminPageHeader
-                eyebrow="Overview"
+                eyebrow="Bảng Điều Khiển"
                 title="Tổng quan vận hành"
                 description="Theo dõi sức khoẻ hệ thống từ dữ liệu backend admin theo thời gian thực."
                 actions={
@@ -280,24 +280,24 @@ function DashboardPage({ api, navigate, onForbidden }) {
                 <AdminStatCard
                     label="Người dùng đang quản lý"
                     value={stats.totalUsers || 0}
-                    hint={`${stats.activeUsers || 0} active`}
+                    hint={`${stats.activeUsers || 0} hoạt động`}
                 />
                 <AdminStatCard
-                    label="Simulation runs"
+                    label="Lượt mô phỏng"
                     value={stats.totalSimulations || 0}
-                    hint={`${stats.failedSimulations || 0} failed`}
+                    hint={`${stats.failedSimulations || 0} thất bại`}
                     tone="amber"
                 />
                 <AdminStatCard
-                    label="Premium analyses"
-                    value={stats.totalPremiumAnalyses || 0}
-                    hint={`${stats.activePremiumAnalyses || 0} active`}
+                    label="Doanh thu"
+                    value={formatCost(stats.totalRevenue || 0)}
+                    hint={`${stats.totalTokensSold || 0} token đã bán`}
                     tone="blue"
                 />
                 <AdminStatCard
                     label="Bài viết cộng đồng"
                     value={stats.totalCommunityPosts || 0}
-                    hint={`${stats.communityNeedsReview || 0} can review`}
+                    hint={`${stats.communityNeedsReview || 0} cần duyệt`}
                     tone="green"
                 />
             </div>
@@ -336,12 +336,15 @@ function DashboardPage({ api, navigate, onForbidden }) {
                         </button>
                         <button
                             className="ft-button ft-button--ghost"
-                            onClick={() => navigate('/community/review')}
+                            onClick={() => navigate('/community/posts')}
                         >
-                            Hàng đợi kiểm duyệt
+                            Quản lý Bài viết
                         </button>
                         <button className="ft-button ft-button--ghost" onClick={() => navigate('/prompts')}>
-                            Prompt releases
+                            Bản phát hành Prompt
+                        </button>
+                        <button className="ft-button ft-button--ghost" onClick={() => navigate('/payments')}>
+                            Quản lý giao dịch
                         </button>
                         <button className="ft-button ft-button--ghost" onClick={() => navigate('/settings')}>
                             Cài đặt hệ thống
@@ -350,8 +353,8 @@ function DashboardPage({ api, navigate, onForbidden }) {
                 </AdminCard>
             </div>
 
-            <div className="ft-grid ft-grid--3">
-                <AdminCard title="Simulation cần chú ý">
+            <div className="ft-grid ft-grid--2">
+                <AdminCard title="Mô phỏng cần chú ý">
                     <div className="ft-mini-list">
                         {(watchlists.simulations || []).map((simulation) => (
                             <button
@@ -365,7 +368,7 @@ function DashboardPage({ api, navigate, onForbidden }) {
                         ))}
                     </div>
                 </AdminCard>
-                <AdminCard title="Premium cần theo dõi">
+                <AdminCard title="Chuyên sâu cần theo dõi">
                     <div className="ft-mini-list">
                         {(watchlists.premiumAnalyses || []).map((analysis) => (
                             <button
@@ -379,16 +382,6 @@ function DashboardPage({ api, navigate, onForbidden }) {
                         ))}
                     </div>
                 </AdminCard>
-                <AdminCard title="Audit gần nhất">
-                    <div className="ft-mini-list">
-                        {(watchlists.auditLogs || []).map((item) => (
-                            <div className="ft-mini-list__item" key={item.id}>
-                                <strong>{item.action}</strong>
-                                <span>{item.actor}</span>
-                            </div>
-                        ))}
-                    </div>
-                </AdminCard>
             </div>
         </div>
     );
@@ -398,7 +391,6 @@ function UsersPage({ api, navigate, onForbidden }) {
     const [search, setSearch] = useState('');
     const [role, setRole] = useState('all');
     const [status, setStatus] = useState('all');
-    const [tier, setTier] = useState('all');
     const [modalState, setModalState] = useState({ open: false, user: null });
 
     const params = useMemo(
@@ -408,9 +400,8 @@ function UsersPage({ api, navigate, onForbidden }) {
             q: search,
             role,
             status,
-            tier,
         }),
-        [search, role, status, tier],
+        [search, role, status],
     );
 
     const { data, loading, error, reload } = useRemoteResource(
@@ -423,7 +414,6 @@ function UsersPage({ api, navigate, onForbidden }) {
     }, [error, onForbidden]);
 
     const users = data?.items || [];
-    const previewUser = users[0] || null;
 
     if (loading) return <LoadingCard title="Đang tải danh sách users..." />;
     if (error) return <ErrorCard error={error} onRetry={reload} />;
@@ -431,7 +421,7 @@ function UsersPage({ api, navigate, onForbidden }) {
     return (
         <div className="ft-page-stack">
             <AdminPageHeader
-                eyebrow="Users"
+                eyebrow="Người dùng"
                 title="Quản lý người dùng"
                 description="Đồng bộ dữ liệu user và session trực tiếp từ backend admin."
             />
@@ -457,89 +447,64 @@ function UsersPage({ api, navigate, onForbidden }) {
                         <option value="locked">locked</option>
                         <option value="banned">banned</option>
                     </select>
-                    <select value={tier} onChange={(event) => setTier(event.target.value)}>
-                        <option value="all">Tất cả tier</option>
-                        <option value="free">free</option>
-                        <option value="premium">premium</option>
-                    </select>
                 </div>
             </AdminCard>
 
-            <div className="ft-grid ft-grid--2-1">
-                <AdminCard title="Danh sách user">
-                    {users.length === 0 ? (
-                        <AdminEmptyState
-                            title="Không có user phù hợp"
-                            description="Thử đổi bộ lọc hoặc từ khóa tìm kiếm."
-                        />
-                    ) : (
-                        <div className="ft-table-wrapper">
-                            <table className="ft-table">
-                                <thead>
-                                    <tr>
-                                        <th>Ten</th>
-                                        <th>Role</th>
-                                        <th>Tier</th>
-                                        <th>Status</th>
-                                        <th>Last login</th>
-                                        <th />
+            <AdminCard title="Danh sách người dùng">
+                {users.length === 0 ? (
+                    <AdminEmptyState
+                        title="Không có người dùng phù hợp"
+                        description="Thử đổi bộ lọc hoặc từ khóa tìm kiếm."
+                    />
+                ) : (
+                    <div className="ft-table-wrapper">
+                        <table className="ft-table">
+                            <thead>
+                                <tr>
+                                    <th>Tên</th>
+                                    <th>Vai trò</th>
+                                    <th>Token</th>
+                                    <th>Trạng thái</th>
+                                    <th>Lần cuối đăng nhập</th>
+                                    <th />
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {users.map((user) => (
+                                    <tr key={user.id}>
+                                        <td>
+                                            <strong>{user.name}</strong>
+                                            <span>{user.email}</span>
+                                        </td>
+                                        <td>{user.role}</td>
+                                        <td>{user.token?.toLocaleString('vi-VN') || 0}</td>
+                                        <td>
+                                            <AdminBadge tone={getToneByStatus(user.status)}>{user.status}</AdminBadge>
+                                        </td>
+                                        <td>{user.lastLoginAt || '--'}</td>
+                                        <td>
+                                            <div className="ft-inline-actions">
+                                                <button
+                                                    className="ft-link-button"
+                                                    onClick={() => navigate(`/users/${user.id}`)}
+                                                >
+                                                    Chi tiết
+                                                </button>
+                                                <button
+                                                    className="ft-link-button"
+                                                    onClick={() => setModalState({ open: true, user })}
+                                                >
+                                                    Khóa / Mở khóa
+                                                </button>
+                                            </div>
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    {users.map((user) => (
-                                        <tr key={user.id}>
-                                            <td>
-                                                <strong>{user.name}</strong>
-                                                <span>{user.email}</span>
-                                            </td>
-                                            <td>{user.role}</td>
-                                            <td>{user.tier}</td>
-                                            <td>
-                                                <AdminBadge tone={getToneByStatus(user.status)}>{user.status}</AdminBadge>
-                                            </td>
-                                            <td>{user.lastLoginAt || '--'}</td>
-                                            <td>
-                                                <div className="ft-inline-actions">
-                                                    <button
-                                                        className="ft-link-button"
-                                                        onClick={() => navigate(`/users/${user.id}`)}
-                                                    >
-                                                        Chi tiết
-                                                    </button>
-                                                    <button
-                                                        className="ft-link-button"
-                                                        onClick={() => setModalState({ open: true, user })}
-                                                    >
-                                                        Khóa / Mở khóa
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    )}
-                </AdminCard>
-
-                {previewUser ? (
-                    <AdminCard title="Xem nhanh user dau tien">
-                        <div className="ft-profile-card">
-                            <div className="ft-profile-card__avatar">{previewUser.avatar}</div>
-                            <div>
-                                <strong>{previewUser.name}</strong>
-                                <p>{previewUser.email}</p>
-                            </div>
-                        </div>
-                        {fieldLabel('Role', previewUser.role)}
-                        {fieldLabel('Tier', previewUser.tier)}
-                        {fieldLabel('Trạng thái', previewUser.status)}
-                        {fieldLabel('Simulations', previewUser.simulationsCount)}
-                        {fieldLabel('Premium', previewUser.premiumCount)}
-                        {fieldLabel('Community', previewUser.communityCount)}
-                    </AdminCard>
-                ) : null}
-            </div>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+            </AdminCard>
 
             <AdminConfirmModal
                 open={modalState.open}
@@ -566,6 +531,8 @@ function UserDetailPage({ api, userId, navigate, onForbidden }) {
         [api, userId],
     );
 
+    const [tokenModal, setTokenModal] = useState({ open: false, amount: '', reason: '' });
+
     useEffect(() => {
         if (error?.status === 403) onForbidden();
     }, [error, onForbidden]);
@@ -583,12 +550,12 @@ function UserDetailPage({ api, userId, navigate, onForbidden }) {
     return (
         <div className="ft-page-stack">
             <AdminPageHeader
-                eyebrow="Users / Detail"
+                eyebrow="Người dùng / Chi tiết"
                 title={user.name}
                 description={user.bio || 'Không có mô tả.'}
                 actions={
                     <button className="ft-button ft-button--ghost" onClick={() => navigate('/users')}>
-                        Quay lại list
+                        Quay lại danh sách
                     </button>
                 }
             />
@@ -603,26 +570,50 @@ function UserDetailPage({ api, userId, navigate, onForbidden }) {
                             <div className="ft-row-inline">
                                 <AdminBadge tone={getToneByStatus(user.status)}>{user.status}</AdminBadge>
                                 <AdminBadge tone="blue">{user.role}</AdminBadge>
-                                <AdminBadge tone="neutral">{user.tier}</AdminBadge>
                             </div>
                         </div>
                     </div>
                     {fieldLabel('Địa điểm', user.location)}
-                    {fieldLabel('Tham gia', user.joinedAt)}
-                    {fieldLabel('Dang nhap cuoi', user.lastLoginAt)}
+                    {fieldLabel('Token', user.token?.toLocaleString('vi-VN') || 0)}
+                    {fieldLabel('Ngày tham gia', user.joinedAt)}
+                    {fieldLabel('Đăng nhập cuối', user.lastLoginAt)}
                     {fieldLabel('Phiên đăng nhập', user.sessionCount)}
+
+                    <div style={{ marginTop: '1.5rem', borderTop: '1px solid #e2e8f0', paddingTop: '1.5rem' }}>
+                        <h4 style={{ fontSize: '0.875rem', fontWeight: 700, color: '#0f172a', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '0.05em', padding: '0 24px' }}>Hệ thống Affiliate</h4>
+                        {fieldLabel('Mã mời', user.codeInvite)}
+                        {fieldLabel('Đã giới thiệu', `${user.affiliateCount || 0} người`)}
+                        {fieldLabel('Người giới thiệu', user.invitedBy ? `${user.invitedBy.name} (${user.invitedBy.email})` : 'Không có')}
+                    </div>
                 </AdminCard>
 
-                <AdminCard title="Tóm tắt hoạt động">
-                    {fieldLabel('Simulation runs', user.simulationsCount)}
-                    {fieldLabel('Premium analyses', user.premiumCount)}
-                    {fieldLabel('Bai cong dong', user.communityCount)}
+                <AdminCard title="Tóm tắt hoạt động" className="ft-user-summary-card" style={{ alignSelf: 'start' }}>
+                    {fieldLabel('Lượt mô phỏng', user.simulationsCount)}
+                    {fieldLabel('Lượt phân tích', user.premiumCount)}
+                    {fieldLabel('Bài cộng đồng', user.communityCount)}
                     {fieldLabel('Trạng thái tài khoản', user.status)}
+                    <div style={{ marginTop: '1rem', padding: '0 24px', paddingBottom: '24px' }}>
+                        <button className="ft-button" onClick={() => setTokenModal({ open: true, amount: '', reason: '' })}>
+                            Cộng/Trừ Token
+                        </button>
+                    </div>
                 </AdminCard>
             </div>
 
-            <div className="ft-grid ft-grid--3">
-                <AdminCard title="Simulations gần nhất">
+            <div className="ft-grid ft-grid--2">
+                <AdminCard title="Hồ sơ đánh giá ban đầu">
+                    {data.evaluation ? (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                            {fieldLabel('Mức độ căng thẳng (Stress)', `Level ${data.evaluation.level?.stress || 1}`)}
+                            {fieldLabel('Khả năng tài chính', `Level ${data.evaluation.level?.finance || 1}`)}
+                            {fieldLabel('Khả năng chuyên môn', `Level ${data.evaluation.level?.capability || 1}`)}
+                            {fieldLabel('Chấp nhận rủi ro', `Level ${data.evaluation.level?.risk || 1}`)}
+                        </div>
+                    ) : (
+                        <AdminEmptyState title="Chưa có dữ liệu" description="Người dùng chưa hoàn thành bài đánh giá." />
+                    )}
+                </AdminCard>
+                <AdminCard title="Mô phỏng gần nhất">
                     <div className="ft-mini-list">
                         {(data.simulations || []).map((simulation) => (
                             <button
@@ -636,10 +627,10 @@ function UserDetailPage({ api, userId, navigate, onForbidden }) {
                         ))}
                     </div>
                 </AdminCard>
-                <AdminCard title="Premium analyses">
+                <AdminCard title="Phân tích Chuyên sâu">
                     <div className="ft-mini-list">
                         {(data.premiumAnalyses || []).length === 0 ? (
-                            <AdminEmptyState title="Chưa có premium" description="User này chưa tạo premium." />
+                            <AdminEmptyState title="Chưa có phân tích" description="Người dùng này chưa tạo phân tích chuyên sâu." />
                         ) : (
                             (data.premiumAnalyses || []).map((analysis) => (
                                 <button
@@ -673,6 +664,63 @@ function UserDetailPage({ api, userId, navigate, onForbidden }) {
                     </div>
                 </AdminCard>
             </div>
+
+            {tokenModal.open && (
+                <div className="ft-modal-backdrop" role="presentation">
+                    <div className="ft-modal">
+                        <div className="ft-modal__header">
+                            <div>
+                                <p className="ft-eyebrow">Xác nhận hành động</p>
+                                <h3>Điều chỉnh Token</h3>
+                            </div>
+                            <button className="ft-icon-button" type="button" onClick={() => setTokenModal({ open: false, amount: '', reason: '' })}>
+                                x
+                            </button>
+                        </div>
+                        <p className="ft-modal__description">Nhập số token cần cộng (hoặc số âm để trừ). Bắt buộc nhập lý do.</p>
+                        <div className="ft-form-grid" style={{ marginTop: '0.5rem' }}>
+                            <label className="ft-field">
+                                <span>Số Token</span>
+                                <input
+                                    type="number"
+                                    value={tokenModal.amount}
+                                    onChange={(e) => setTokenModal({ ...tokenModal, amount: e.target.value })}
+                                    placeholder="Ví dụ: 100 hoặc -50"
+                                />
+                            </label>
+                            <label className="ft-field">
+                                <span>Lý do</span>
+                                <input
+                                    type="text"
+                                    value={tokenModal.reason}
+                                    onChange={(e) => setTokenModal({ ...tokenModal, reason: e.target.value })}
+                                    placeholder="Lý do điều chỉnh..."
+                                />
+                            </label>
+                        </div>
+                        <div className="ft-modal__actions">
+                            <button className="ft-button ft-button--ghost" type="button" onClick={() => setTokenModal({ open: false, amount: '', reason: '' })}>
+                                Hủy
+                            </button>
+                            <button className="ft-button" type="button" onClick={async () => {
+                                if (!tokenModal.amount || !tokenModal.reason) {
+                                    alert("Vui lòng nhập đầy đủ Số token và Lý do.");
+                                    return;
+                                }
+                                try {
+                                    await api.adjustUserTokens(user.id, parseInt(tokenModal.amount), tokenModal.reason);
+                                    setTokenModal({ open: false, amount: '', reason: '' });
+                                    reload();
+                                } catch (e) {
+                                    alert(e.message);
+                                }
+                            }}>
+                                Xác nhận
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
@@ -700,7 +748,7 @@ function SimulationsPage({ api, navigate, onForbidden }) {
         if (error?.status === 403) onForbidden();
     }, [error, onForbidden]);
 
-    if (loading) return <LoadingCard title="Đang tải simulations..." />;
+    if (loading) return <LoadingCard title="Đang tải danh sách mô phỏng..." />;
     if (error) return <ErrorCard error={error} onRetry={reload} />;
 
     const items = data?.items || [];
@@ -709,26 +757,26 @@ function SimulationsPage({ api, navigate, onForbidden }) {
     return (
         <div className="ft-page-stack">
             <AdminPageHeader
-                eyebrow="Research Ops"
+                eyebrow="Hệ Thống Phân Tích"
                 title="Quản trị mô phỏng"
-                description="Quan sát simulation runs, trạng thái AI và lỗi cần xử lý."
+                description="Quan sát quá trình mô phỏng, trạng thái AI và lỗi cần xử lý."
             />
             <div className="ft-stats-grid ft-stats-grid--compact">
-                <AdminStatCard label="Completed" value={stats.completed || 0} />
-                <AdminStatCard label="Running" value={stats.running || 0} tone="blue" />
-                <AdminStatCard label="Queued" value={stats.queued || 0} tone="amber" />
-                <AdminStatCard label="Failed" value={stats.failed || 0} tone="red" />
+                <AdminStatCard label="Hoàn thành" value={stats.completed || 0} />
+                <AdminStatCard label="Đang chạy" value={stats.running || 0} tone="blue" />
+                <AdminStatCard label="Đang chờ" value={stats.queued || 0} tone="amber" />
+                <AdminStatCard label="Thất bại" value={stats.failed || 0} tone="red" />
             </div>
 
             <AdminCard>
                 <div className="ft-filters ft-community-filters">
                     <input
-                        placeholder="Tìm theo title..."
+                        placeholder="Tìm theo tiêu đề..."
                         value={search}
                         onChange={(event) => setSearch(event.target.value)}
                     />
                     <select value={status} onChange={(event) => setStatus(event.target.value)}>
-                        <option value="all">Tất cả status</option>
+                        <option value="all">Tất cả trạng thái</option>
                         <option value="completed">completed</option>
                         <option value="running">running</option>
                         <option value="queued">queued</option>
@@ -737,17 +785,17 @@ function SimulationsPage({ api, navigate, onForbidden }) {
                 </div>
             </AdminCard>
 
-            <AdminCard title="Simulation runs">
+            <AdminCard title="Danh sách mô phỏng">
                 <div className="ft-table-wrapper">
                     <table className="ft-table">
                         <thead>
                             <tr>
-                                <th>Title</th>
-                                <th>User</th>
-                                <th>Status</th>
-                                <th>Model</th>
-                                <th>Latency</th>
-                                <th>Prompt</th>
+                                <th>Tiêu đề</th>
+                                <th>Người dùng</th>
+                                <th>Trạng thái</th>
+                                <th>Model AI</th>
+                                <th>Độ trễ</th>
+                                <th>Mẫu Prompt</th>
                                 <th />
                             </tr>
                         </thead>
@@ -780,6 +828,116 @@ function SimulationsPage({ api, navigate, onForbidden }) {
     );
 }
 
+function PaymentsPage({ api, navigate, onForbidden }) {
+    const [search, setSearch] = useState('');
+    const [status, setStatus] = useState('all');
+    const [paymentMethod, setPaymentMethod] = useState('all');
+
+    const params = useMemo(
+        () => ({
+            page: '1',
+            limit: '50',
+            status,
+            paymentMethod,
+        }),
+        [status, paymentMethod],
+    );
+
+    const { data, loading, error, reload } = useRemoteResource(
+        () => api.getPayments(params),
+        [api, params],
+    );
+
+    useEffect(() => {
+        if (error?.status === 403) onForbidden();
+    }, [error, onForbidden]);
+
+    if (loading) return <LoadingCard title="Đang tải danh sách giao dịch..." />;
+    if (error) return <ErrorCard error={error} onRetry={reload} />;
+
+    const items = data?.items || [];
+    const stats = data?.stats || {};
+
+    return (
+        <div className="ft-page-stack">
+            <AdminPageHeader
+                eyebrow="Tài chính"
+                title="Quản lý giao dịch Token"
+                description="Lịch sử mua token qua cổng thanh toán và giao dịch thủ công."
+            />
+
+            <div className="ft-stats-grid ft-stats-grid--compact">
+                <AdminStatCard label="Tổng Giao Dịch" value={stats.totalTransactions || 0} />
+                <AdminStatCard label="Doanh thu thành công" value={formatCost(stats.totalRevenue || 0)} tone="green" />
+                <AdminStatCard label="Token bán ra" value={(stats.totalTokens || 0).toLocaleString('vi-VN')} tone="blue" />
+            </div>
+
+            <AdminCard>
+                <div className="ft-filters ft-community-filters">
+                    <select value={status} onChange={(event) => setStatus(event.target.value)}>
+                        <option value="all">Tất cả trạng thái</option>
+                        <option value="success">Success</option>
+                        <option value="pending">Pending</option>
+                        <option value="failed">Failed</option>
+                    </select>
+                    <select value={paymentMethod} onChange={(event) => setPaymentMethod(event.target.value)}>
+                        <option value="all">Tất cả cổng</option>
+                        <option value="momo">MoMo</option>
+                        <option value="vnpay">VNPAY</option>
+                        <option value="manual">Manual (Admin)</option>
+                    </select>
+                </div>
+            </AdminCard>
+
+            <AdminCard title="Lịch sử giao dịch">
+                <div className="ft-table-wrapper">
+                    <table className="ft-table">
+                        <thead>
+                            <tr>
+                                <th>Người dùng</th>
+                                <th>Số tiền</th>
+                                <th>Token nhận</th>
+                                <th>Phương thức</th>
+                                <th>Trạng thái</th>
+                                <th>Nội dung</th>
+                                <th>Ngày</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {items.length === 0 ? (
+                                <tr>
+                                    <td colSpan="7" className="ft-empty-state" style={{ textAlign: 'center', padding: '2rem' }}>
+                                        Không có giao dịch nào phù hợp.
+                                    </td>
+                                </tr>
+                            ) : items.map((tx) => (
+                                <tr key={tx.id}>
+                                    <td>
+                                        <strong>{tx.userName}</strong>
+                                        <span>{tx.userEmail}</span>
+                                    </td>
+                                    <td>{formatCost(tx.amount)}</td>
+                                    <td>{tx.tokenAmount?.toLocaleString('vi-VN')}</td>
+                                    <td>
+                                        <AdminBadge tone={tx.method === 'manual' ? 'blue' : 'neutral'}>
+                                            {tx.method.toUpperCase()}
+                                        </AdminBadge>
+                                    </td>
+                                    <td>
+                                        <AdminBadge tone={getToneByStatus(tx.status)}>{tx.status}</AdminBadge>
+                                    </td>
+                                    <td><span style={{ fontSize: '0.85rem' }}>{tx.description}</span></td>
+                                    <td>{new Date(tx.date).toLocaleString('vi-VN')}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </AdminCard>
+        </div>
+    );
+}
+
 function SimulationDetailPage({ api, simulationId, navigate, onForbidden }) {
     const { data, loading, error, reload } = useRemoteResource(
         () => api.getSimulationDetail(simulationId),
@@ -790,50 +948,58 @@ function SimulationDetailPage({ api, simulationId, navigate, onForbidden }) {
         if (error?.status === 403) onForbidden();
     }, [error, onForbidden]);
 
-    if (loading) return <LoadingCard title="Đang tải chi tiết simulation..." />;
+    if (loading) return <LoadingCard title="Đang tải chi tiết mô phỏng..." />;
     if (error) return <ErrorCard error={error} onRetry={reload} />;
     if (!data) {
         return (
-            <AdminEmptyState title="Không tìm thấy simulation" description="ID simulation không tồn tại." />
+            <AdminEmptyState title="Không tìm thấy mô phỏng" description="ID mô phỏng không tồn tại." />
         );
     }
 
     const relatedLog = data.relatedLog;
     const user = data.user;
 
+    const formatError = (msg) => {
+        if (!msg) return msg;
+        if (msg.includes('high demand') || msg.includes('503') || msg.includes('overloaded')) {
+            return 'Kết quả bị lỗi do hệ thống bị quá tải';
+        }
+        return msg;
+    };
+
     return (
         <div className="ft-page-stack">
             <AdminPageHeader
-                eyebrow="Research Ops / Simulation Detail"
+                eyebrow="Hệ Thống Phân Tích / Chi tiết mô phỏng"
                 title={data.title}
                 description={data.summary || 'Không có tóm tắt.'}
                 actions={
                     <button className="ft-button ft-button--ghost" onClick={() => navigate('/simulations')}>
-                        Quay lại list
+                        Quay lại danh sách
                     </button>
                 }
             />
 
             <div className="ft-grid ft-grid--2-1">
-                <AdminCard title="Thông tin run">
-                    {fieldLabel('Status', data.status)}
-                    {fieldLabel('Prompt version', relatedLog?.promptVersion || '--')}
-                    {fieldLabel('Latency', formatLatency(relatedLog?.latencyMs || 0))}
-                    {fieldLabel('Tokens used', (relatedLog?.inputTokens || 0) + (relatedLog?.outputTokens || 0))}
-                    {fieldLabel('Enterprise detected', data.isEnterprise ? 'Có' : 'Không')}
-                    {data.errorSummary ? fieldLabel('Error summary', data.errorSummary) : null}
+                <AdminCard title="Thông tin chạy (Run)">
+                    {fieldLabel('Trạng thái', data.status)}
+                    {fieldLabel('Phiên bản Prompt', relatedLog?.promptVersion || '--')}
+                    {fieldLabel('Độ trễ', formatLatency(relatedLog?.latencyMs || 0))}
+                    {fieldLabel('Token đã dùng', (relatedLog?.inputTokens || 0) + (relatedLog?.outputTokens || 0))}
+                    {fieldLabel('Tệp khách doanh nghiệp', data.isEnterprise ? 'Có' : 'Không')}
+                    {data.errorSummary ? fieldLabel('Tóm tắt lỗi', formatError(data.errorSummary)) : null}
                 </AdminCard>
 
-                <AdminCard title="Nguoi tao">
-                    {fieldLabel('User', data.userName)}
-                    {fieldLabel('Role', user?.role || '--')}
-                    {fieldLabel('Tier', user?.tier || '--')}
+                <AdminCard title="Người tạo">
+                    {fieldLabel('Tên người dùng', data.userName)}
+                    {fieldLabel('Vai trò', user?.role || '--')}
+                    {fieldLabel('Hạng (Tier)', user?.tier || '--')}
                     {fieldLabel('Email', user?.email || '--')}
                 </AdminCard>
             </div>
 
             <div className="ft-grid ft-grid--2-1">
-                <AdminCard title="Scenario highlights">
+                <AdminCard title="Kịch bản nổi bật">
                     <div className="ft-list">
                         {(data.scenarios || []).map((scenario) => (
                             <div className="ft-list-item" key={scenario.id}>
@@ -843,16 +1009,16 @@ function SimulationDetailPage({ api, simulationId, navigate, onForbidden }) {
                     </div>
                 </AdminCard>
 
-                <AdminCard title="AI log liên quan">
+                <AdminCard title="Nhật ký AI liên quan">
                     {relatedLog ? (
                         <>
-                            {fieldLabel('Correlation ID', relatedLog.id)}
-                            {fieldLabel('Request type', 'simulation')}
-                            {fieldLabel('Latency', formatLatency(relatedLog.latencyMs))}
-                            {fieldLabel('Error', relatedLog.errorMessage || '--')}
+                            {fieldLabel('Mã ID (Correlation)', relatedLog.id)}
+                            {fieldLabel('Loại yêu cầu', 'Mô phỏng (simulation)')}
+                            {fieldLabel('Độ trễ', formatLatency(relatedLog.latencyMs))}
+                            {fieldLabel('Lỗi', formatError(relatedLog.errorMessage) || '--')}
                         </>
                     ) : (
-                        <AdminEmptyState title="Chưa có AI log" description="Log chưa được gắn với simulation này." />
+                        <AdminEmptyState title="Chưa có nhật ký AI" description="Nhật ký chưa được gắn với mô phỏng này." />
                     )}
                 </AdminCard>
             </div>
@@ -882,7 +1048,7 @@ function PremiumAnalysesPage({ api, navigate, onForbidden }) {
         if (error?.status === 403) onForbidden();
     }, [error, onForbidden]);
 
-    if (loading) return <LoadingCard title="Đang tải premium analyses..." />;
+    if (loading) return <LoadingCard title="Đang tải danh sách phân tích chuyên sâu..." />;
     if (error) return <ErrorCard error={error} onRetry={reload} />;
 
     const items = data?.items || [];
@@ -890,32 +1056,32 @@ function PremiumAnalysesPage({ api, navigate, onForbidden }) {
     return (
         <div className="ft-page-stack">
             <AdminPageHeader
-                eyebrow="Research Ops"
-                title="Quản trị Premium analyses"
-                description="Kiem tra report, milestones va tien do action plan."
+                eyebrow="Hệ Thống Phân Tích"
+                title="Quản trị Phân tích Chuyên sâu"
+                description="Kiểm tra báo cáo, cột mốc và tiến độ thực hiện kế hoạch."
             />
 
             <AdminCard>
                 <div className="ft-filters">
                     <select value={status} onChange={(event) => setStatus(event.target.value)}>
-                        <option value="all">Tất cả status</option>
+                        <option value="all">Tất cả trạng thái</option>
                         <option value="active">active</option>
                         <option value="completed">completed</option>
                     </select>
                 </div>
             </AdminCard>
 
-            <AdminCard title="Premium analyses">
+            <AdminCard title="Danh sách Phân tích Chuyên sâu">
                 <div className="ft-table-wrapper">
                     <table className="ft-table">
                         <thead>
                             <tr>
-                                <th>Title</th>
-                                <th>User</th>
-                                <th>Status</th>
-                                <th>Timeframe</th>
-                                <th>Pivot</th>
-                                <th>Completion</th>
+                                <th>Tiêu đề</th>
+                                <th>Người dùng</th>
+                                <th>Trạng thái</th>
+                                <th>Khung thời gian</th>
+                                <th>Thay đổi (Pivot)</th>
+                                <th>Tiến độ</th>
                                 <th />
                             </tr>
                         </thead>
@@ -958,40 +1124,40 @@ function PremiumAnalysisDetailPage({ api, analysisId, navigate, onForbidden }) {
         if (error?.status === 403) onForbidden();
     }, [error, onForbidden]);
 
-    if (loading) return <LoadingCard title="Đang tải chi tiết premium..." />;
+    if (loading) return <LoadingCard title="Đang tải chi tiết phân tích chuyên sâu..." />;
     if (error) return <ErrorCard error={error} onRetry={reload} />;
     if (!data) {
         return (
-            <AdminEmptyState title="Không tìm thấy premium analysis" description="ID premium không tồn tại." />
+            <AdminEmptyState title="Không tìm thấy phân tích chuyên sâu" description="ID phân tích không tồn tại." />
         );
     }
 
     return (
         <div className="ft-page-stack">
             <AdminPageHeader
-                eyebrow="Research Ops / Premium Detail"
+                eyebrow="Hệ Thống Phân Tích / Chi tiết Phân tích Chuyên sâu"
                 title={data.title}
                 description={`Lộ trình ${data.timeframeMonths} tháng, cập nhật ${data.updatedAt}.`}
                 actions={
                     <button className="ft-button ft-button--ghost" onClick={() => navigate('/premium-analyses')}>
-                        Quay lại list
+                        Quay lại danh sách
                     </button>
                 }
             />
 
             <div className="ft-grid ft-grid--2-1 ft-premium-detail-grid">
                 <AdminCard title="Tóm tắt báo cáo">
-                    {fieldLabel('User', data.userName)}
-                    {fieldLabel('Status', data.status)}
-                    {fieldLabel('Pivot count', data.pivotCount)}
-                    {fieldLabel('Completion', formatPercent(data.completionRate))}
-                    {fieldLabel('Next milestone', data.nextMilestone)}
+                    {fieldLabel('Người dùng', data.userName)}
+                    {fieldLabel('Trạng thái', data.status)}
+                    {fieldLabel('Số lần thay đổi (Pivot)', data.pivotCount)}
+                    {fieldLabel('Tiến độ', formatPercent(data.completionRate))}
+                    {fieldLabel('Cột mốc tiếp theo', data.nextMilestone)}
                     <p className="ft-rich-paragraph">{data.report?.detailedNarrative || '--'}</p>
                 </AdminCard>
-                <AdminCard title="Feedback history" className="ft-feedback-card">
+                <AdminCard title="Lịch sử Phản hồi" className="ft-feedback-card">
                     <div className="ft-list ft-feedback-list">
                         {(data.feedbackHistory || []).length === 0 ? (
-                            <AdminEmptyState title="Chưa có feedback" description="Chưa có lịch sử feedback cho report này." />
+                            <AdminEmptyState title="Chưa có phản hồi" description="Chưa có lịch sử phản hồi (feedback) cho báo cáo này." />
                         ) : (
                             (data.feedbackHistory || []).map((item) => (
                                 <div className="ft-list-item" key={item}>
@@ -1003,7 +1169,7 @@ function PremiumAnalysisDetailPage({ api, analysisId, navigate, onForbidden }) {
                 </AdminCard>
             </div>
 
-            <AdminCard title="Milestones">
+            <AdminCard title="Các cột mốc (Milestones)">
                 <div className="ft-timeline">
                     {(data.report?.milestones || []).map((milestone) => (
                         <div className="ft-timeline__item" key={`${milestone.month}-${milestone.event}`}>
@@ -1054,9 +1220,9 @@ function CommunityPostsPage({ api, navigate, onForbidden }) {
     return (
         <div className="ft-page-stack">
             <AdminPageHeader
-                eyebrow="Community"
+                eyebrow="Cộng Đồng"
                 title="Quản trị bài viết cộng đồng"
-                description="Theo dõi post và luồng moderation từ backend admin."
+                description="Theo dõi bài viết và quản lý nội dung từ hệ thống."
             />
 
             <AdminCard>
@@ -1067,7 +1233,7 @@ function CommunityPostsPage({ api, navigate, onForbidden }) {
                         onChange={(event) => setSearch(event.target.value)}
                     />
                     <select value={status} onChange={(event) => setStatus(event.target.value)}>
-                        <option value="all">Tất cả status</option>
+                        <option value="all">Tất cả trạng thái</option>
                         <option value="published">published</option>
                         <option value="needs_review">needs_review</option>
                         <option value="hidden">hidden</option>
@@ -1086,7 +1252,7 @@ function CommunityPostsPage({ api, navigate, onForbidden }) {
                     >
                         <p className="ft-rich-paragraph">{post.excerpt}</p>
                         <div className="ft-row-inline ft-row-inline--spread ft-community-post-card__meta">
-                            <small>{post.likes} likes • {post.commentsCount} comments</small>
+                            <small>{post.likes} lượt thích • {post.commentsCount} bình luận</small>
                             <button className="ft-link-button" onClick={() => navigate(`/community/posts/${post.id}`)}>
                                 Xem chi tiết
                             </button>
@@ -1124,13 +1290,13 @@ function CommunityPostDetailPage({ api, postId, navigate, onForbidden }) {
     return (
         <div className="ft-page-stack">
             <AdminPageHeader
-                eyebrow="Community / Post Detail"
+                eyebrow="Cộng Đồng / Chi tiết Bài viết"
                 title={post.title}
                 description={`${post.authorName} • ${post.category} • ${post.createdAt}`}
                 actions={
                     <div className="ft-page-actions">
                         <button className="ft-button ft-button--ghost" onClick={() => navigate('/community/posts')}>
-                            Quay lại list
+                            Quay lại danh sách
                         </button>
                         <button className="ft-button" onClick={() => setModalOpen(true)}>
                             {nextStatus === 'published' ? 'Khôi phục bài' : 'Ẩn bài'}
@@ -1147,13 +1313,13 @@ function CommunityPostDetailPage({ api, postId, navigate, onForbidden }) {
                         {post.anonymous ? <AdminBadge tone="amber">anonymous</AdminBadge> : null}
                     </div>
                     <p className="ft-rich-paragraph">{post.content || post.excerpt}</p>
-                    {fieldLabel('Reliability', `${post.reliability}%`)}
-                    {fieldLabel('Likes', post.likes)}
-                    {fieldLabel('Comments', post.commentsCount)}
-                    {fieldLabel('Source scenario', post.sourceScenarioId)}
+                    {fieldLabel('Độ tin cậy', `${post.reliability}%`)}
+                    {fieldLabel('Lượt thích', post.likes)}
+                    {fieldLabel('Lượt bình luận', post.commentsCount)}
+                    {fieldLabel('Mô phỏng nguồn', post.sourceScenarioId)}
                 </AdminCard>
 
-                <AdminCard title="Moderation panel" className="ft-community-panel-card">
+                <AdminCard title="Bảng kiểm duyệt" className="ft-community-panel-card">
                     {fieldLabel('Hiện trạng', post.status)}
                     {fieldLabel('Tác giả', post.authorName)}
                     {fieldLabel('Ngày tạo', post.createdAt)}
@@ -1190,91 +1356,7 @@ function CommunityPostDetailPage({ api, postId, navigate, onForbidden }) {
     );
 }
 
-function ReviewQueuePage({ api, onForbidden }) {
-    const { data, loading, error, reload } = useRemoteResource(() => api.getModerationReports(), [api]);
-    const [selectedId, setSelectedId] = useState(null);
-    const [modalOpen, setModalOpen] = useState(false);
 
-    useEffect(() => {
-        if (error?.status === 403) onForbidden();
-    }, [error, onForbidden]);
-
-    if (loading) return <LoadingCard title="Đang tải moderation queue..." />;
-    if (error) return <ErrorCard error={error} onRetry={reload} />;
-
-    const items = data || [];
-    const activeSelectedId = selectedId ?? items[0]?.id ?? null;
-    const selectedItem = items.find((item) => item.id === activeSelectedId) || items[0];
-
-    return (
-        <div className="ft-page-stack">
-            <AdminPageHeader
-                eyebrow="Community"
-                title="Hàng đợi kiểm duyệt"
-                description="Tổng hợp các content report cần moderator xử lý."
-            />
-
-            <div className="ft-grid ft-grid--2-1 ft-community-review-grid">
-                <AdminCard title="Queue" className="ft-community-review-queue-card">
-                    <div className="ft-review-list">
-                        {items.map((item) => (
-                            <button
-                                className={`ft-review-item ${activeSelectedId === item.id ? 'is-active' : ''}`}
-                                key={item.id}
-                                onClick={() => setSelectedId(item.id)}
-                            >
-                                <div className="ft-row-inline ft-row-inline--spread">
-                                    <strong>{item.targetTitle}</strong>
-                                    <AdminBadge tone={getToneByStatus(item.priority)}>{item.priority}</AdminBadge>
-                                </div>
-                                <p>{item.reason}</p>
-                                <small>{item.createdAt}</small>
-                            </button>
-                        ))}
-                    </div>
-                </AdminCard>
-
-                {selectedItem ? (
-                    <AdminCard
-                        className="ft-community-review-decision-card"
-                        title="Decision panel"
-                        subtitle="Mỗi quyết định moderation đều ghi audit log."
-                        actions={<AdminBadge tone={getToneByStatus(selectedItem.status)}>{selectedItem.status}</AdminBadge>}
-                    >
-                        {fieldLabel('Loại nội dung', selectedItem.type)}
-                        {fieldLabel('Author', selectedItem.authorName)}
-                        {fieldLabel('Reports', selectedItem.reportsCount)}
-                        {fieldLabel('Priority', selectedItem.priority)}
-                        <p className="ft-rich-paragraph">{selectedItem.reason}</p>
-                        <div className="ft-inline-actions">
-                            <button className="ft-button" onClick={() => setModalOpen(true)}>
-                                Xử lý nội dung
-                            </button>
-                        </div>
-                    </AdminCard>
-                ) : null}
-            </div>
-
-            <AdminConfirmModal
-                open={modalOpen}
-                title="Xử lý moderation report"
-                description="Mặc định sẽ mark report đã resolve và giữ trạng thái published."
-                confirmText="Xác nhận xử lý"
-                onClose={() => setModalOpen(false)}
-                onConfirm={async (reason) => {
-                    if (!selectedItem) return;
-                    await api.resolveModerationReport(selectedItem.id, {
-                        resolution: reason,
-                        resolutionAction: 'published',
-                        reason,
-                    });
-                    setModalOpen(false);
-                    await reload();
-                }}
-            />
-        </div>
-    );
-}
 
 function AiLogsPage({ api, onForbidden }) {
     const { data, loading, error, reload } = useRemoteResource(
@@ -1286,7 +1368,7 @@ function AiLogsPage({ api, onForbidden }) {
         if (error?.status === 403) onForbidden();
     }, [error, onForbidden]);
 
-    if (loading) return <LoadingCard title="Đang tải AI logs..." />;
+    if (loading) return <LoadingCard title="Đang tải nhật ký AI..." />;
     if (error) return <ErrorCard error={error} onRetry={reload} />;
 
     const logs = data?.items || [];
@@ -1295,29 +1377,29 @@ function AiLogsPage({ api, onForbidden }) {
     return (
         <div className="ft-page-stack">
             <AdminPageHeader
-                eyebrow="System"
-                title="AI Logs / Gemini Monitoring"
-                description="Theo dõi latency, token usage, cost estimate và error code."
+                eyebrow="Kỹ Thuật & Cấu Hình"
+                title="Nhật ký AI / Giám sát Gemini"
+                description="Theo dõi độ trễ, mức sử dụng token, chi phí ước tính và mã lỗi."
             />
 
             <div className="ft-stats-grid ft-stats-grid--compact">
-                <AdminStatCard label="Success" value={stats.success || 0} />
-                <AdminStatCard label="Failed" value={stats.failed || 0} tone="red" />
-                <AdminStatCard label="Retrying" value={stats.retrying || 0} tone="amber" />
-                <AdminStatCard label="Avg latency" value={formatLatency(stats.avgLatency || 0)} tone="blue" />
+                <AdminStatCard label="Thành công" value={stats.success || 0} />
+                <AdminStatCard label="Thất bại" value={stats.failed || 0} tone="red" />
+                <AdminStatCard label="Đang thử lại" value={stats.retrying || 0} tone="amber" />
+                <AdminStatCard label="Độ trễ trung bình" value={formatLatency(stats.avgLatency || 0)} tone="blue" />
             </div>
 
-            <AdminCard title="Gemini logs">
+            <AdminCard title="Nhật ký hệ thống Gemini">
                 <div className="ft-table-wrapper">
                     <table className="ft-table">
                         <thead>
                             <tr>
-                                <th>Correlation ID</th>
-                                <th>Type</th>
-                                <th>User</th>
-                                <th>Status</th>
-                                <th>Latency</th>
-                                <th>Cost</th>
+                                <th>Mã ID (Correlation)</th>
+                                <th>Loại</th>
+                                <th>Người dùng</th>
+                                <th>Trạng thái</th>
+                                <th>Độ trễ</th>
+                                <th>Chi phí ước tính</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1357,7 +1439,7 @@ function PromptsPage({ api, onForbidden }) {
         if (error?.status === 403) onForbidden();
     }, [error, onForbidden]);
 
-    if (loading) return <LoadingCard title="Đang tải prompt templates..." />;
+    if (loading) return <LoadingCard title="Đang tải mẫu prompt..." />;
     if (error) return <ErrorCard error={error} onRetry={reload} />;
 
     const prompts = data || [];
@@ -1367,13 +1449,13 @@ function PromptsPage({ api, onForbidden }) {
     return (
         <div className="ft-page-stack">
             <AdminPageHeader
-                eyebrow="System"
-                title="Quản lý prompts"
-                description="Theo dõi version prompt, owner và release workflow."
+                eyebrow="Kỹ Thuật & Cấu Hình"
+                title="Quản lý Prompts"
+                description="Theo dõi phiên bản prompt, người quản lý và quy trình phát hành."
             />
 
             <div className="ft-grid ft-grid--1-2">
-                <AdminCard title="Prompt versions">
+                <AdminCard title="Phiên bản Prompt">
                     <div className="ft-review-list">
                         {prompts.map((template) => (
                             <button
@@ -1420,7 +1502,7 @@ function PromptsPage({ api, onForbidden }) {
                         }
                     >
                         {fieldLabel('Trạng thái', selected.status)}
-                        {fieldLabel('Updated at', selected.updatedAt)}
+                        {fieldLabel('Ngày cập nhật', selected.updatedAt)}
                         <div className="ft-code-block">{selected.content}</div>
                     </AdminCard>
                 ) : null}
@@ -1428,9 +1510,9 @@ function PromptsPage({ api, onForbidden }) {
 
             <AdminConfirmModal
                 open={modalOpen}
-                title={action === 'release' ? 'Phát hành prompt' : 'Rollback prompt'}
-                description="Hành động này sẽ tạo audit log và cập nhật active prompt."
-                confirmText={action === 'release' ? 'Phát hành' : 'Rollback'}
+                title={action === 'release' ? 'Phát hành prompt' : 'Khôi phục (Rollback) prompt'}
+                description="Hành động này sẽ tạo audit log và cập nhật prompt đang sử dụng."
+                confirmText={action === 'release' ? 'Phát hành' : 'Khôi phục'}
                 onClose={() => setModalOpen(false)}
                 onConfirm={async (reason) => {
                     if (!selected) return;
@@ -1456,7 +1538,7 @@ function SettingsPage({ api, onForbidden }) {
         if (error?.status === 403) onForbidden();
     }, [error, onForbidden]);
 
-    if (loading) return <LoadingCard title="Đang tải system settings..." />;
+    if (loading) return <LoadingCard title="Đang tải cài đặt hệ thống..." />;
     if (error) return <ErrorCard error={error} onRetry={reload} />;
 
     const groups = (data || []).map((group) => draftGroups[group.id] || group);
@@ -1464,9 +1546,9 @@ function SettingsPage({ api, onForbidden }) {
     return (
         <div className="ft-page-stack">
             <AdminPageHeader
-                eyebrow="System"
+                eyebrow="Kỹ Thuật & Cấu Hình"
                 title="Cài đặt hệ thống"
-                description="Feature flags và rule vận hành được đồng bộ từ backend admin."
+                description="Tính năng (Feature flags) và quy tắc vận hành được đồng bộ từ backend admin."
                 actions={
                     <button className="ft-button" onClick={() => setModalOpen(true)}>
                         Lưu thay đổi
@@ -1598,78 +1680,6 @@ function SettingsPage({ api, onForbidden }) {
     );
 }
 
-function AuditLogsPage({ api, onForbidden }) {
-    const [severity, setSeverity] = useState('all');
-
-    const { data, loading, error, reload } = useRemoteResource(
-        () => api.getAuditLogs({ page: '1', limit: '100', severity, q: '' }),
-        [api, severity],
-    );
-
-    useEffect(() => {
-        if (error?.status === 403) onForbidden();
-    }, [error, onForbidden]);
-
-    if (loading) return <LoadingCard title="Đang tải audit logs..." />;
-    if (error) return <ErrorCard error={error} onRetry={reload} />;
-
-    const items = data?.items || [];
-
-    return (
-        <div className="ft-page-stack">
-            <AdminPageHeader
-                eyebrow="System"
-                title="Audit logs"
-                description="Append-only activity log cho các hành động nhạy cảm trong admin app."
-            />
-
-            <AdminCard>
-                <div className="ft-filters">
-                    <select value={severity} onChange={(event) => setSeverity(event.target.value)}>
-                        <option value="all">Tất cả severity</option>
-                        <option value="info">info</option>
-                        <option value="warning">warning</option>
-                        <option value="critical">critical</option>
-                    </select>
-                </div>
-            </AdminCard>
-
-            <AdminCard title="Event timeline">
-                <div className="ft-table-wrapper">
-                    <table className="ft-table">
-                        <thead>
-                            <tr>
-                                <th>Actor</th>
-                                <th>Action</th>
-                                <th>Resource</th>
-                                <th>Severity</th>
-                                <th>Summary</th>
-                                <th>Time</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {items.map((item) => (
-                                <tr key={item.id}>
-                                    <td>
-                                        <strong>{item.actor}</strong>
-                                        <span>{item.role}</span>
-                                    </td>
-                                    <td>{item.action}</td>
-                                    <td>{item.resourceName}</td>
-                                    <td>
-                                        <AdminBadge tone={getToneByStatus(item.severity)}>{item.severity}</AdminBadge>
-                                    </td>
-                                    <td>{item.summary}</td>
-                                    <td>{item.createdAt}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </AdminCard>
-        </div>
-    );
-}
 
 function SystemStatePage({ kind, navigate }) {
     const isForbidden = kind === '403';
@@ -1677,16 +1687,16 @@ function SystemStatePage({ kind, navigate }) {
     return (
         <div className="ft-page-stack">
             <AdminCard className="ft-system-card">
-                <p className="ft-eyebrow">{isForbidden ? 'Permission denied' : 'Page not found'}</p>
-                <h2>{isForbidden ? 'Bạn không có quyền truy cập module này.' : 'Route admin không tồn tại.'}</h2>
+                <p className="ft-eyebrow">{isForbidden ? 'Từ chối quyền truy cập (Permission denied)' : 'Không tìm thấy trang (Page not found)'}</p>
+                <h2>{isForbidden ? 'Bạn không có quyền truy cập module này.' : 'Đường dẫn admin không tồn tại.'}</h2>
                 <p>
                     {isForbidden
-                        ? 'Vui lòng đăng nhập bằng tài khoản có role phù hợp.'
-                        : 'Kiểm tra lại route hoặc quay về dashboard để tiếp tục thao tác.'}
+                        ? 'Vui lòng đăng nhập bằng tài khoản có vai trò phù hợp.'
+                        : 'Kiểm tra lại đường dẫn hoặc quay về bảng điều khiển (dashboard) để tiếp tục thao tác.'}
                 </p>
                 <div className="ft-page-actions">
                     <button className="ft-button" onClick={() => navigate('/dashboard')}>
-                        Về dashboard
+                        Về bảng điều khiển
                     </button>
                 </div>
             </AdminCard>
@@ -1699,6 +1709,9 @@ function resolvePage(route, context) {
 
     if (route === '/dashboard' || route === '/') {
         return <DashboardPage api={api} navigate={navigate} onForbidden={onForbidden} />;
+    }
+    if (route === '/payments') {
+        return <PaymentsPage api={api} navigate={navigate} onForbidden={onForbidden} />;
     }
     if (route === '/users') return <UsersPage api={api} navigate={navigate} onForbidden={onForbidden} />;
     if (route.startsWith('/users/')) {
@@ -1750,13 +1763,10 @@ function resolvePage(route, context) {
             />
         );
     }
-    if (route === '/community/review') {
-        return <ReviewQueuePage api={api} onForbidden={onForbidden} />;
-    }
+
     if (route === '/ai/logs') return <AiLogsPage api={api} onForbidden={onForbidden} />;
     if (route === '/prompts') return <PromptsPage api={api} onForbidden={onForbidden} />;
     if (route === '/settings') return <SettingsPage api={api} onForbidden={onForbidden} />;
-    if (route === '/audit-logs') return <AuditLogsPage api={api} onForbidden={onForbidden} />;
     if (route === '/403') return <SystemStatePage kind="403" navigate={navigate} />;
     return <SystemStatePage kind="404" navigate={navigate} />;
 }
@@ -1822,7 +1832,7 @@ export default function AdminApp() {
     );
 
     useEffect(() => {
-        if (!session || !accessToken) return;
+        if (!accessToken) return;
 
         let active = true;
         api
@@ -1844,7 +1854,7 @@ export default function AdminApp() {
         return () => {
             active = false;
         };
-    }, [api, session, accessToken]);
+    }, [api, accessToken]);
 
     const handleLogin = async ({ email, password }) => {
         setLoginLoading(true);
