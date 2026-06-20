@@ -98,7 +98,7 @@ const ProfilePage: React.FC = () => {
       const data = await redeemInviteCode(inviteCodeInput.trim());
       setUser(data.user);
       setInviteCodeInput('');
-      setInviteMsg({ text: 'Nhập mã mời thành công. Bạn và người mời đều nhận được 20 token.', type: 'success' });
+      setInviteMsg({ text: 'Nhập mã mời thành công. Bạn và người mời đều nhận được 40 token.', type: 'success' });
     } catch (err: any) {
       setInviteMsg({ text: err.message || 'Không thể nhập mã mời.', type: 'error' });
     } finally {
@@ -186,7 +186,12 @@ const ProfilePage: React.FC = () => {
                 </div>
 
                 <div className="p-5 bg-slate-50 border border-slate-100 rounded-2xl">
-                  <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-3">Mã mời của bạn</p>
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">Mã mời của bạn</p>
+                    <span className="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest bg-emerald-100 text-emerald-600">
+                      Mời 1 bạn = 40 token
+                    </span>
+                  </div>
                   <div className="flex items-center gap-3">
                     <code className="flex-1 px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-black tracking-widest text-slate-900 text-center">
                       {user.code_invite || '--------'}

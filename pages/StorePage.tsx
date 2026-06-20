@@ -83,6 +83,7 @@ const COLOR_MAP: Record<string, { bg: string; border: string; text: string; badg
   violet: { bg: 'bg-violet-50', border: 'border-violet-200', text: 'text-violet-700', badge: 'bg-violet-100 text-violet-600', btnBg: 'bg-violet-600 hover:bg-violet-700', icon: 'text-violet-500' },
   purple: { bg: 'bg-purple-50', border: 'border-purple-200', text: 'text-purple-700', badge: 'bg-purple-100 text-purple-600', btnBg: 'bg-purple-600 hover:bg-purple-700', icon: 'text-purple-500' },
   amber: { bg: 'bg-amber-50', border: 'border-amber-200', text: 'text-amber-700', badge: 'bg-amber-100 text-amber-700', btnBg: 'bg-amber-500 hover:bg-amber-600', icon: 'text-amber-500' },
+  emerald: { bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-700', badge: 'bg-emerald-100 text-emerald-600', btnBg: 'bg-emerald-600 hover:bg-emerald-700', icon: 'text-emerald-500' },
 };
 
 const FEATURE_COSTS = [
@@ -94,6 +95,7 @@ const FEATURE_COSTS = [
 const StorePage: React.FC = () => {
   const navigate = useNavigate();
   const [userToken, setUserToken] = useState<number | null>(null);
+  const [hasClaimedFreePack, setHasClaimedFreePack] = useState<boolean>(true);
 
   // Token calculator states
   const [simCount, setSimCount] = useState<number>(0);
@@ -101,7 +103,7 @@ const StorePage: React.FC = () => {
   const [pivotCount, setPivotCount] = useState<number>(0);
 
   // Dynamic token calculation
-  const totalNeededTokens = (simCount * 100) + (analysisCount * 80) + (pivotCount * 50);
+  const totalNeededTokens = (simCount * 80) + (analysisCount * 120) + (pivotCount * 50);
 
   // Recommendation logic
   const getRecommendedPack = (tokensNeeded: number) => {
@@ -122,6 +124,7 @@ const StorePage: React.FC = () => {
           if (res.ok) {
             const data = await res.json();
             setUserToken(data.token ?? 0);
+            setHasClaimedFreePack(data.has_claimed_free_pack ?? true);
           }
         } catch (e) {
           console.error('Error fetching user:', e);
@@ -131,7 +134,30 @@ const StorePage: React.FC = () => {
     fetchUser();
   }, []);
 
-  const handleBuyPack = (pack: typeof TOKEN_PACKS[0]) => {
+  const handleBuyPack = async (pack: typeof TOKEN_PACKS[0]) => {
+    if (pack.id === 'starter' && !hasClaimedFreePack) {
+      const token = localStorage.getItem('token');
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/payment/claim-free-pack`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          }
+        });
+        const data = await res.json();
+        if (res.ok) {
+          alert('Nhận gói 0đ thành công!');
+          setUserToken(data.token);
+          setHasClaimedFreePack(true);
+        } else {
+          alert(data.message || 'Có lỗi xảy ra');
+        }
+      } catch (e) {
+        alert('Lỗi hệ thống');
+      }
+      return;
+    }
     navigate('/checkout', {
       state: {
         plan: {
@@ -247,7 +273,7 @@ const StorePage: React.FC = () => {
                       </div>
                       <div>
                         <p className="text-xs font-bold text-slate-200">Mô phỏng quyết định</p>
-                        <p className="text-[9px] text-slate-400">100 token / 3 kịch bản</p>
+                        <p className="text-[9px] text-slate-400">80 token / 3 kịch bản</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -275,7 +301,7 @@ const StorePage: React.FC = () => {
                       </div>
                       <div>
                         <p className="text-xs font-bold text-slate-200">Phân tích chuyên sâu SWOT</p>
-                        <p className="text-[9px] text-slate-400">80 token / báo cáo</p>
+                        <p className="text-[9px] text-slate-400">120 token / báo cáo</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -372,8 +398,13 @@ const StorePage: React.FC = () => {
         {/* Token packs grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto mb-24">
           {TOKEN_PACKS.map((pack, i) => {
-            const c = COLOR_MAP[pack.color];
-            const pricePerToken = Math.round(pack.price / pack.token);
+            const isFreeStarter = pack.id === 'starter' && !hasClaimedFreePack;
+            const displayColor = isFreeStarter ? 'emerald' : pack.color;
+            const displayPrice = isFreeStarter ? 0 : pack.price;
+            const originalPrice = isFreeStarter ? pack.price : null;
+            
+            const c = COLOR_MAP[displayColor];
+            const pricePerToken = displayPrice > 0 ? Math.round(displayPrice / pack.token) : 0;
             
             // Check if this pack is suggested by the calculator
             const isSuggested = pack.id === recommendedPackId;
@@ -457,7 +488,7 @@ const StorePage: React.FC = () => {
                     isHighlighted ? 'bg-white/5 text-slate-400' : 'bg-slate-50 text-slate-500'
                   }`}>
                     <IconMapper name="toll" className="text-xs" />
-                    ≈ {pricePerToken.toLocaleString('vi-VN')}đ / token
+                    {displayPrice === 0 ? 'Miễn phí' : `≈ ${pricePerToken.toLocaleString('vi-VN')}đ / token`}
                   </span>
                 </div>
 
@@ -472,11 +503,18 @@ const StorePage: React.FC = () => {
                     <span className={`text-[10px] font-black uppercase tracking-widest ${
                       isHighlighted ? 'text-slate-400' : 'text-slate-400'
                     }`}>Giá trọn gói</span>
-                    <span className={`text-2xl font-black font-display tracking-tighter ${
-                      isHighlighted ? 'text-white' : 'text-slate-900'
-                    }`}>
-                      {pack.price.toLocaleString('vi-VN')}đ
-                    </span>
+                    <div className="flex items-baseline gap-2">
+                      {originalPrice !== null && (
+                        <span className="text-sm font-bold text-slate-400 line-through">
+                          {originalPrice.toLocaleString('vi-VN')}đ
+                        </span>
+                      )}
+                      <span className={`text-2xl font-black font-display tracking-tighter ${
+                        isHighlighted ? 'text-white' : (isFreeStarter ? 'text-emerald-600' : 'text-slate-900')
+                      }`}>
+                        {displayPrice.toLocaleString('vi-VN')}đ
+                      </span>
+                    </div>
                   </div>
 
                   <button
@@ -484,12 +522,14 @@ const StorePage: React.FC = () => {
                     className={`w-full py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-3 active:scale-[0.98] ${
                       isHighlighted
                         ? 'bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white shadow-xl shadow-violet-900/30'
-                        : isSuggested
-                          ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-xl shadow-blue-500/20'
-                          : `${c.btnBg} text-white shadow-md hover:shadow-lg`
+                        : isFreeStarter
+                          ? 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-md'
+                          : isSuggested
+                            ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-xl shadow-blue-500/20'
+                            : `${c.btnBg} text-white shadow-md hover:shadow-lg`
                     }`}
                   >
-                    Mua ngay
+                    {isFreeStarter ? 'Nhận Miễn Phí' : 'Mua ngay'}
                     <IconMapper name="arrow_forward" className="text-sm transition-transform group-hover:translate-x-1" />
                   </button>
                 </div>
