@@ -201,12 +201,8 @@ const SimulationFlow: React.FC = () => {
   }, [location.state]);
 
   const [loadingProgress, setLoadingProgress] = useState(0);
-  const [clarificationQuestions, setClarificationQuestions] = useState<any[]>(
-    [],
-  );
-  const [clarificationAnswers, setClarificationAnswers] = useState<
-    Record<number, string>
-  >({});
+  const [clarificationQuestions, setClarificationQuestions] = useState<any[]>([]);
+  const [clarificationAnswers, setClarificationAnswers] = useState<Record<number, string[]>>({});
   const [results, setResults] = useState<PredictionResult | null>(null);
   const [error, setError] = useState<{
     message: string;
@@ -247,14 +243,30 @@ const SimulationFlow: React.FC = () => {
     }
   };
 
-  const submitClarification = () => {
-    const additionalContext = clarificationQuestions
-      .map(
-        (q, idx) => `- ${q.question}: ${clarificationAnswers[idx] || "Bỏ qua"}`,
-      )
-      .join("\\n");
+  const handleToggleAnswerOption = (questionIdx: number, option: string) => {
+    setClarificationAnswers(prev => {
+      const currentOptions = prev[questionIdx] || [];
+      if (currentOptions.includes(option)) {
+        return {
+          ...prev,
+          [questionIdx]: currentOptions.filter(item => item !== option)
+        };
+      } else {
+        return {
+          ...prev,
+          [questionIdx]: [...currentOptions, option]
+        };
+      }
+    });
+  };
 
-    setData((prev) => ({
+  const submitClarification = () => {
+    const additionalContext = clarificationQuestions.map((q, idx) => {
+      const answers = clarificationAnswers[idx] || [];
+      return `- ${q.question}: ${answers.join(', ') || 'Bỏ qua'}`;
+    }).join('\\n');
+    
+    setData(prev => ({
       ...prev,
       decision:
         prev.decision +
@@ -696,12 +708,11 @@ const SimulationFlow: React.FC = () => {
                   </div>
                 </div>
               ))}
+              
+              
 
               <div className="md:col-span-2 space-y-4 pt-6 border-t border-slate-50 mt-4">
-                <label
-                  htmlFor="otherFactors"
-                  className="flex items-center gap-4 font-black text-[10px] uppercase tracking-widest text-slate-800"
-                >
+                <label htmlFor="otherFactors" className="flex items-center gap-4 font-black text-[10px] uppercase tracking-widest text-slate-800">
                   <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-blue-600 border border-slate-100 shadow-sm">
                     <IconMapper name="more_horiz" className=" text-xl" />
                   </div>
@@ -780,7 +791,7 @@ const SimulationFlow: React.FC = () => {
                 initial={{ opacity: 0, scale: 0.9, y: 30 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.9, y: 30 }}
-                className="relative w-full max-w-2xl bg-white rounded-[3rem] p-10 sm:p-14 shadow-[0_100px_150px_-50px_rgba(0,0,0,0.5)] border border-slate-100 overflow-hidden max-h-[90vh] overflow-y-auto"
+                className="relative w-full max-w-2xl bg-white rounded-[3rem] p-10 sm:p-14 shadow-[0_100px_150px_-50px_rgba(0,0,0,0.5)] border border-slate-100 overflow-hidden max-h-[90vh] overflow-y-auto no-scrollbar"
               >
                 <div className="text-center mb-10">
                   <div className="w-20 h-20 bg-amber-50 text-amber-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-inner border border-amber-100">
@@ -790,8 +801,7 @@ const SimulationFlow: React.FC = () => {
                     Làm rõ thông tin
                   </h3>
                   <p className="text-slate-600 text-sm font-medium leading-relaxed">
-                    Mô tả của bạn khá ngắn hoặc chưa đủ rõ ràng. Để AI dự báo
-                    chính xác hơn, vui lòng chọn thêm thông tin dưới đây:
+                    Mô tả của bạn khá ngắn hoặc chưa đủ rõ ràng. Để AI dự báo chính xác hơn, vui lòng chọn thêm thông tin dưới đây (có thể chọn nhiều ý):
                   </p>
                 </div>
 
@@ -802,24 +812,22 @@ const SimulationFlow: React.FC = () => {
                         {qIdx + 1}. {q.question}
                       </h4>
                       <div className="flex flex-col gap-3">
-                        {q.options.map((opt: string, oIdx: number) => (
-                          <button
-                            key={oIdx}
-                            onClick={() =>
-                              setClarificationAnswers((prev) => ({
-                                ...prev,
-                                [qIdx]: opt,
-                              }))
-                            }
-                            className={`p-4 text-left text-sm font-medium rounded-xl border transition-all ${
-                              clarificationAnswers[qIdx] === opt
-                                ? "bg-amber-50 border-amber-400 text-amber-800 shadow-md ring-2 ring-amber-400/20"
-                                : "bg-white border-slate-200 text-slate-600 hover:border-amber-300 hover:bg-amber-50/50"
-                            }`}
-                          >
-                            {opt}
-                          </button>
-                        ))}
+                        {q.options.map((opt: string, oIdx: number) => {
+                          const isSelected = (clarificationAnswers[qIdx] || []).includes(opt);
+                          return (
+                            <button
+                              key={oIdx}
+                              onClick={() => handleToggleAnswerOption(qIdx, opt)}
+                              className={`p-4 text-left text-sm font-medium rounded-xl border transition-all ${
+                                isSelected 
+                                  ? 'bg-amber-50 border-amber-400 text-amber-800 shadow-md ring-2 ring-amber-400/20' 
+                                  : 'bg-white border-slate-200 text-slate-650 hover:border-amber-300 hover:bg-amber-50/50'
+                              }`}
+                            >
+                              {opt}
+                            </button>
+                          );
+                        })}
                       </div>
                     </div>
                   ))}
@@ -828,10 +836,7 @@ const SimulationFlow: React.FC = () => {
                 <div className="flex flex-col gap-4">
                   <button
                     onClick={submitClarification}
-                    disabled={
-                      Object.keys(clarificationAnswers).length <
-                      clarificationQuestions.length
-                    }
+                    disabled={clarificationQuestions.some((_, qIdx) => !clarificationAnswers[qIdx] || clarificationAnswers[qIdx].length === 0)}
                     className="w-full py-6 bg-slate-900 disabled:bg-slate-200 disabled:text-slate-400 text-white font-black text-[12px] uppercase tracking-widest rounded-2xl hover:bg-blue-600 transition-all shadow-2xl flex items-center justify-center gap-4"
                   >
                     Tiếp tục phân tích{" "}
@@ -985,11 +990,11 @@ const SimulationFlow: React.FC = () => {
               <motion.button
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                onClick={() => navigate("/premium")}
+                onClick={() => navigate("/simulate")}
                 className="mt-12 px-10 py-5 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-black rounded-2xl hover:scale-105 transition-all shadow-2xl shadow-amber-200 uppercase tracking-widest text-xs flex items-center gap-4"
               >
                 <IconMapper name="workspace_premium" className=" font-bold" />{" "}
-                Nâng cấp lên bản dành cho doanh nghiệp
+                Tinh năng này sẽ sớm ra mắt.
               </motion.button>
             )}
           </div>

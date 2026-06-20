@@ -385,8 +385,6 @@ const ProgressPage: React.FC = () => {
             >
 
               {/* Header Gradient */}
-              <div className="h-2 bg-gradient-to-r from-amber-400 via-orange-500 to-amber-600"></div>
-
               <div className="p-10 sm:p-12">
 
                 {/* Header */}

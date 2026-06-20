@@ -139,3 +139,25 @@ export const pivotPremiumAnalysis = async (
   syncRemainingToken(data.remainingToken);
   return data.report;
 };
+
+export const expandStepDetail = async (
+  scenarioId: string,
+  stepId: string
+): Promise<{ step: any; report: any }> => {
+  const token = getAuthToken();
+  const response = await fetch(`${API_BASE_URL}/api/premium/expand-step`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({ scenarioId, stepId })
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throwApiError(errorData, 'Không thể tối ưu chi tiết nhiệm vụ.');
+  }
+
+  return response.json();
+};
