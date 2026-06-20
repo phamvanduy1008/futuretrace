@@ -12,6 +12,7 @@ import CommunityPage from './pages/CommunityPage';
 import ScenarioDetailPage from './pages/ScenarioDetailPage';
 import StorePage from './pages/StorePage';
 import PremiumAnalysisPage from './pages/PremiumAnalysisPage';
+import StepDetailPage from './pages/StepDetailPage';
 import ComparisonMatrixPage from './pages/ComparisonMatrixPage';
 import PaymentPage from './pages/PaymentPage';
 import PaymentResultPage from './pages/PaymentResultPage';
@@ -31,10 +32,13 @@ const App: React.FC = () => {
     const initAuth = async () => {
       const token = localStorage.getItem('token');
       if (token) {
+        // Optimistically authenticate and let user enter immediately
+        setIsAuthenticated(true);
+        setIsInitializing(false);
+
         try {
-          // Verify token by fetching profile
+          // Verify token in the background to refresh user info
           await getUserProfile();
-          setIsAuthenticated(true);
         } catch (err) {
           console.error("Session invalid or expired", err);
           logout();
@@ -42,8 +46,8 @@ const App: React.FC = () => {
         }
       } else {
         setIsAuthenticated(false);
+        setIsInitializing(false);
       }
-      setIsInitializing(false);
     };
 
     initAuth();
@@ -128,6 +132,10 @@ const App: React.FC = () => {
           <Route
             path="/premium-analysis"
             element={isAuthenticated ? <PremiumAnalysisPage /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/scenario/:scenarioId/step/:stepId"
+            element={isAuthenticated ? <StepDetailPage /> : <Navigate to="/login" />}
           />
           <Route
             path="/checkout"

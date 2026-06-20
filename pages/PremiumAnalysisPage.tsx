@@ -11,6 +11,188 @@ import SharedFooter from '../components/SharedFooter';
 import { IconMapper } from '../components/IconMapper';
 import { AnimatedBackground } from '../components/AnimatedBackground';
 
+const formatNarrative = (text: string) => {
+  if (!text) return [];
+
+  // Split text by sentence ending with a period followed by whitespace
+  const sentences = text.split(/(?<=\.|\?|!)\s+/);
+  const sections: { time?: string; content: string; type: 'intro' | 'outro' | 'step' | 'general' }[] = [];
+  
+  let currentStepContent: string[] = [];
+  let currentStepTime: string | undefined = undefined;
+
+  sentences.forEach((sentence, idx) => {
+    const trimmed = sentence.trim();
+    if (!trimmed) return;
+
+    // The first sentence is treated as introduction ONLY if it does not contain a time marker
+    if (idx === 0) {
+      const hasTimeMarker = trimmed.match(/(bắt đầu từ\s+tháng\s+\d+(?:-\d+)?|giai đoạn từ\s+tháng\s+\d+(?:-\d+)?|cuối cùng,\s+tháng\s+\d+(?:-\d+)?|tháng\s+\d+(?:-\d+)?|trong suốt\s+\d+\s+tháng|song song đó)/i);
+      if (!hasTimeMarker) {
+        sections.push({
+          content: trimmed,
+          type: 'intro'
+        });
+        return;
+      }
+    }
+
+    // Regex to match various time phases
+    const timeMatch = trimmed.match(/(bắt đầu từ\s+tháng\s+\d+(?:-\d+)?|giai đoạn từ\s+tháng\s+\d+(?:-\d+)?|cuối cùng,\s+tháng\s+\d+(?:-\d+)?|tháng\s+\d+(?:-\d+)?|trong suốt\s+\d+\s+tháng|song song đó)/i);
+    
+    if (timeMatch) {
+      // Push any accumulated step content before starting a new step
+      if (currentStepContent.length > 0) {
+        sections.push({
+          time: currentStepTime,
+          content: currentStepContent.join(' '),
+          type: currentStepTime ? 'step' : 'general'
+        });
+        currentStepContent = [];
+      }
+      
+      const marker = timeMatch[1];
+      if (marker.toLowerCase().includes('trong suốt')) {
+        sections.push({
+          content: trimmed,
+          type: 'outro'
+        });
+        currentStepTime = undefined;
+      } else {
+        currentStepTime = marker;
+        currentStepContent.push(trimmed);
+      }
+    } else {
+      if (currentStepTime) {
+        currentStepContent.push(trimmed);
+      } else {
+        // If it's the last sentence and no current step, treat as outro
+        if (idx === sentences.length - 1) {
+          sections.push({
+            content: trimmed,
+            type: 'outro'
+          });
+        } else {
+          sections.push({
+            content: trimmed,
+            type: 'general'
+          });
+        }
+      }
+    }
+  });
+
+  // Push remaining step content
+  if (currentStepContent.length > 0) {
+    sections.push({
+      time: currentStepTime,
+      content: currentStepContent.join(' '),
+      type: currentStepTime ? 'step' : 'general'
+    });
+  }
+
+  return sections;
+};
+
+const renderNarrative = (text: string) => {
+  const sections = formatNarrative(text);
+  if (!sections || sections.length === 0) {
+    return (
+      <p className="text-lg text-slate-700 leading-relaxed font-medium italic opacity-90 text-justify">
+        {text}
+      </p>
+    );
+  }
+
+  const hasSteps = sections.some(s => s.type === 'step');
+
+  if (!hasSteps) {
+    return (
+      <div className="space-y-6 relative my-2 px-1">
+        {sections.map((sec, idx) => {
+          // The first section serves as the callout introduction
+          if (idx === 0) {
+            return (
+              <p key={idx} className="text-lg text-slate-800 leading-relaxed font-semibold opacity-95 text-justify italic">
+                {sec.content}
+              </p>
+            );
+          }
+          return (
+            <div key={idx} className="flex gap-3 items-start">
+              <span className="mt-2.5 w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0"></span>
+              <p className="text-base text-slate-600 leading-relaxed font-medium text-justify">
+                {sec.content}
+              </p>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-8 font-sans">
+      {/* Intro */}
+      {sections.filter(s => s.type === 'intro').map((sec, idx) => (
+        <div key={idx} className="relative pl-6 border-l-4 border-blue-500 py-3 my-6 bg-blue-50/40 rounded-r-2xl pr-4">
+          <p className="text-lg text-slate-800 font-semibold leading-relaxed italic">
+            "{sec.content}"
+          </p>
+        </div>
+      ))}
+
+      {/* Steps (Timeline style) */}
+      <div className="relative border-l-2 border-slate-100 ml-4 pl-8 space-y-8 my-8">
+        {sections.filter(s => s.type === 'step').map((sec, idx) => {
+          let badgeText = sec.time || 'Giai đoạn';
+          // Capitalize and format the badge text
+          if (badgeText.toLowerCase().includes('tháng')) {
+            const match = badgeText.match(/tháng\s+\d+(?:-\d+)?/i);
+            if (match) {
+              badgeText = match[0].replace(/tháng\s+/i, 'Tháng ').replace('-', ' - ');
+            }
+          } else if (badgeText.toLowerCase() === 'song song đó') {
+            badgeText = 'Hoạt động song song';
+          }
+
+          return (
+            <div key={idx} className="relative group/timeline">
+              {/* Dot */}
+              <div className="absolute -left-[41px] top-1.5 w-6 h-6 rounded-full bg-white border-4 border-blue-500 shadow-md group-hover/timeline:scale-110 transition-transform duration-200"></div>
+              
+              {/* Card */}
+              <div className="bg-slate-50/50 hover:bg-slate-50 border border-slate-100/60 hover:border-slate-200/80 p-6 rounded-2xl transition-all duration-300 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.02)]">
+                <span className="inline-block px-3 py-1 bg-blue-50 text-blue-600 text-xs font-black uppercase tracking-wider rounded-lg mb-3">
+                  {badgeText}
+                </span>
+                <p className="text-base text-slate-700 leading-relaxed font-medium">
+                  {sec.content}
+                </p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Outro */}
+      {sections.filter(s => s.type === 'outro').map((sec, idx) => (
+        <div key={idx} className="p-6 bg-slate-900 text-slate-300 rounded-3xl border border-slate-800 shadow-lg mt-8 flex items-start gap-4">
+          <div className="p-3 bg-slate-800 rounded-2xl text-blue-400 shrink-0">
+            <IconMapper name="verified" className="text-xl" />
+          </div>
+          <div>
+            <h4 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-2">Định hướng tổng thể</h4>
+            <p className="text-sm leading-relaxed font-medium italic">
+              {sec.content}
+            </p>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 const PremiumAnalysisPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -71,6 +253,73 @@ const PremiumAnalysisPage: React.FC = () => {
   const handleCompleteMilestone = (index: number) => {
     if (index === currentMilestoneIndex) {
       setIsFeedbackModalOpen(true);
+    }
+  };
+
+  const handleToggleStepStatus = async (milestoneIndex: number, stepId: string, currentCompleted: boolean) => {
+    if (!report || !progressId) return;
+
+    // 1. Update UI optimistically
+    const updatedReport = { ...report };
+    const milestone = updatedReport.milestones[milestoneIndex];
+    if (Array.isArray(milestone.details)) {
+      const step = milestone.details.find(s => s.id === stepId);
+      if (step) {
+        step.completed = !currentCompleted;
+      }
+    }
+    setReport(updatedReport);
+
+    // Also update selectedMilestone state if it is currently open in modal
+    if (selectedMilestone && selectedMilestoneIndex === milestoneIndex) {
+      const updatedSelected = { ...selectedMilestone };
+      if (Array.isArray(updatedSelected.details)) {
+        const step = updatedSelected.details.find((s: any) => s.id === stepId);
+        if (step) {
+          step.completed = !currentCompleted;
+        }
+      }
+      setSelectedMilestone(updatedSelected);
+    }
+
+    // 2. Call PATCH API to update in database
+    try {
+      const res = await apiFetch('/scenario/step-status', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          scenarioId: progressId,
+          stepId,
+          completed: !currentCompleted
+        })
+      });
+      if (!res.ok) {
+        throw new Error('Failed to update step status');
+      }
+    } catch (err) {
+      console.error("Error updating step status on backend:", err);
+      // Revert if failed
+      const revertedReport = { ...report };
+      const m = revertedReport.milestones[milestoneIndex];
+      if (Array.isArray(m.details)) {
+        const step = m.details.find(s => s.id === stepId);
+        if (step) {
+          step.completed = currentCompleted;
+        }
+      }
+      setReport(revertedReport);
+      
+      if (selectedMilestone && selectedMilestoneIndex === milestoneIndex) {
+        const revertedSelected = { ...selectedMilestone };
+        if (Array.isArray(revertedSelected.details)) {
+          const step = revertedSelected.details.find((s: any) => s.id === stepId);
+          if (step) {
+            step.completed = currentCompleted;
+          }
+        }
+        setSelectedMilestone(revertedSelected);
+      }
+      alert("Lỗi khi cập nhật trạng thái nhiệm vụ.");
     }
   };
 
@@ -226,9 +475,9 @@ const PremiumAnalysisPage: React.FC = () => {
             <h3 className="text-[10px] font-black uppercase tracking-widest text-blue-600 mb-6 flex items-center gap-3">
                <IconMapper name="history_edu" className=" text-lg" /> Diễn biến kịch bản chi tiết
             </h3>
-            <p className="text-lg text-slate-700 leading-relaxed font-medium italic opacity-90 text-justify hyphens-auto">
-              {report.detailedNarrative}
-            </p>
+            <div className="mt-4">
+              {renderNarrative(report.detailedNarrative)}
+            </div>
           </div>
         </header>
 
@@ -405,9 +654,75 @@ const PremiumAnalysisPage: React.FC = () => {
                   <h4 className="text-[10px] font-black text-slate-900 uppercase tracking-widest flex items-center gap-3">
                     <IconMapper name="tips_and_updates" className=" text-blue-600 text-lg" /> HƯỚNG DẪN CỤ THỂ:
                   </h4>
-                  <p className="text-slate-600 text-base leading-relaxed font-medium whitespace-pre-wrap italic opacity-90">
-                    {selectedMilestone.details}
-                  </p>
+                  {Array.isArray(selectedMilestone.details) ? (
+                    <div className="space-y-4">
+                      {selectedMilestone.details.map((step: any, stepIdx: number) => (
+                        <div 
+                          key={step.id || stepIdx}
+                          className={`p-5 rounded-2xl border transition-all duration-300 ${
+                            step.completed 
+                              ? 'bg-slate-50 border-slate-200 opacity-75' 
+                              : 'bg-white border-slate-100 hover:border-slate-200 shadow-sm'
+                          }`}
+                        >
+                          <div className="flex items-start gap-4">
+                            <button
+                              onClick={() => handleToggleStepStatus(selectedMilestoneIndex!, step.id, step.completed)}
+                              className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 border transition-all ${
+                                step.completed 
+                                  ? 'bg-emerald-500 border-emerald-500 text-white scale-105' 
+                                  : 'bg-white border-slate-300 text-transparent hover:border-slate-400'
+                              }`}
+                            >
+                              <IconMapper name="check" className="text-xs font-bold" />
+                            </button>
+                            
+                            <div className="flex-1 min-w-0">
+                              <h5 className={`text-sm font-bold text-slate-900 leading-snug transition-all ${
+                                step.completed ? 'line-through text-slate-400 font-medium' : ''
+                              }`}>
+                                {stepIdx + 1}. {step.title}
+                              </h5>
+                              {step.description && (
+                                <p className={`text-xs text-slate-500 mt-2 leading-relaxed ${
+                                  step.completed ? 'text-slate-400/80' : ''
+                                }`}>
+                                  Mô tả ngắn: {step.description}
+                                </p>
+                              )}
+                              <div className="mt-3 flex justify-start">
+                                <button
+                                  onClick={() => {
+                                    setSelectedMilestone(null);
+                                    setSelectedMilestoneIndex(null);
+                                    navigate(`/scenario/${progressId}/step/${step.id}`, {
+                                      state: {
+                                        scenario,
+                                        context,
+                                        timeframe,
+                                        existingProgress: {
+                                          id: progressId,
+                                          report,
+                                          completedMilestones: report.milestones.map((_, i) => i).filter(i => getMilestoneStatus(i) === 'Đã hoàn thành')
+                                        }
+                                      }
+                                    });
+                                  }}
+                                  className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:text-blue-700 hover:underline flex items-center gap-1"
+                                >
+                                  Xem chi tiết <IconMapper name="arrow_forward" className="text-[10px]" />
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-slate-600 text-base leading-relaxed font-medium whitespace-pre-wrap italic opacity-90">
+                      {selectedMilestone.details}
+                    </p>
+                  )}
                 </div>
               </div>
               <div className="p-8 sm:p-10 border-t border-slate-50 flex justify-end gap-6 bg-slate-50/20">

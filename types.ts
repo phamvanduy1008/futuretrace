@@ -73,6 +73,17 @@ export interface ScenarioResult {
   };
 }
 
+export interface MilestoneStep {
+  id: string;
+  title: string;
+  description: string;
+  objectives: string[];
+  actions: string[];
+  tools: string[];
+  expectedResult: string;
+  completed: boolean;
+}
+
 export interface PremiumAnalysisReport {
   detailedNarrative: string;
   milestones: {
@@ -80,7 +91,7 @@ export interface PremiumAnalysisReport {
     event: string;
     impact: string;
     probability: number;
-    details: string; // Thêm trường thông tin chi tiết hướng dẫn
+    details: string | MilestoneStep[]; // Thêm trường thông tin chi tiết hướng dẫn (chuỗi hoặc mảng steps)
   }[];
   influencingFactors: {
     category: string;
