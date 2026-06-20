@@ -200,6 +200,7 @@ const SimulationFlow: React.FC = () => {
       .finally(() => setIsFetchingEval(false));
   }, [location.state]);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [clarificationQuestions, setClarificationQuestions] = useState<any[]>([]);
   const [clarificationAnswers, setClarificationAnswers] = useState<Record<number, string[]>>({});
@@ -215,9 +216,11 @@ const SimulationFlow: React.FC = () => {
     useState<ScenarioResult | null>(null);
 
   const handleNextStep = async () => {
+    if (isSubmitting) return;
     if (step === SimulationStep.DESCRIPTION) {
       setStep(SimulationStep.CONTEXT);
     } else if (step === SimulationStep.CONTEXT) {
+      setIsSubmitting(true);
       setError(null);
       setStep(SimulationStep.PROCESSING);
       checkInputReadiness();
@@ -234,6 +237,7 @@ const SimulationFlow: React.FC = () => {
         readiness.questions.length > 0
       ) {
         setClarificationQuestions(readiness.questions);
+        setIsSubmitting(false);
         setStep(SimulationStep.CONTEXT);
       } else {
         startSimulation();
@@ -328,8 +332,10 @@ const SimulationFlow: React.FC = () => {
       } else {
         setError({ message: e.message, type: "GENERAL" });
       }
+      setIsSubmitting(false);
       setStep(SimulationStep.CONTEXT);
     } finally {
+      setIsSubmitting(false);
       clearInterval(interval);
     }
   };
@@ -768,7 +774,8 @@ const SimulationFlow: React.FC = () => {
               </button>
               <button
                 onClick={handleNextStep}
-                className="flex-[2] bg-slate-900 text-white px-8 py-5 font-black rounded-2xl hover:bg-blue-600 transition-all shadow-2xl shadow-slate-200 flex items-center justify-center gap-4 text-[10px] uppercase tracking-widest"
+                disabled={isSubmitting}
+                className="flex-[2] bg-slate-900 text-white px-8 py-5 font-black rounded-2xl hover:bg-blue-600 transition-all shadow-2xl shadow-slate-200 flex items-center justify-center gap-4 text-[10px] uppercase tracking-widest disabled:opacity-50"
               >
                 Bắt đầu dự đoán{" "}
                 <IconMapper name="play_arrow" className=" text-xl" />
