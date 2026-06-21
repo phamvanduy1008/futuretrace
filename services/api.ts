@@ -3,16 +3,28 @@ const API_URL = (import.meta as any).env.VITE_API_BASE_URL || 'https://futuretra
 const API_BASE_URL = `${API_URL}/api`;
 
 // Token management
-const getToken = (): string | null => localStorage.getItem('futuretrace_token');
-const setToken = (token: string) => localStorage.setItem('futuretrace_token', token);
-const removeToken = () => localStorage.removeItem('futuretrace_token');
+const getToken = (): string | null => localStorage.getItem('futuretrace_token') || localStorage.getItem('token');
+const setToken = (token: string) => {
+  localStorage.setItem('futuretrace_token', token);
+  localStorage.setItem('token', token);
+};
+const removeToken = () => {
+  localStorage.removeItem('futuretrace_token');
+  localStorage.removeItem('token');
+};
 
-const getRefreshToken = (): string | null => localStorage.getItem('futuretrace_refresh_token');
-const setRefreshToken = (token: string) => localStorage.setItem('futuretrace_refresh_token', token);
-const removeRefreshToken = () => localStorage.removeItem('futuretrace_refresh_token');
+const getRefreshToken = (): string | null => localStorage.getItem('futuretrace_refresh_token') || localStorage.getItem('refreshToken');
+const setRefreshToken = (token: string) => {
+  localStorage.setItem('futuretrace_refresh_token', token);
+  localStorage.setItem('refreshToken', token);
+};
+const removeRefreshToken = () => {
+  localStorage.removeItem('futuretrace_refresh_token');
+  localStorage.removeItem('refreshToken');
+};
 
 export const getUser = () => {
-  const stored = localStorage.getItem('futuretrace_user');
+  const stored = localStorage.getItem('futuretrace_user') || localStorage.getItem('user');
   if (stored) {
     try { return JSON.parse(stored); } catch { return null; }
   }
