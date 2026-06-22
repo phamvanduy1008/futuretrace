@@ -228,7 +228,7 @@ const DashboardPage: React.FC = () => {
                 onClick={() => navigate("/progress")}
                 className="group flex items-center gap-3 text-[10px] font-black text-blue-600 uppercase tracking-widest hover:text-blue-700 transition-all"
               >
-                Lịch sử toàn cầu
+                Vào tiến trình
                 <IconMapper
                   name="arrow_forward"
                   className="text-lg group-hover:translate-x-1 transition-transform"
@@ -322,13 +322,13 @@ const DashboardPage: React.FC = () => {
                         className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all relative overflow-hidden group/card cursor-pointer"
                       >
                         <div className={`absolute top-0 right-0 w-24 h-24 -mr-12 -mt-12 rounded-full blur-2xl opacity-10 transition-opacity group-hover/card:opacity-30 ${scenario.type === 'Positive' ? 'bg-emerald-500' :
-                            scenario.type === 'Risk' ? 'bg-rose-500' : 'bg-blue-500'
+                          scenario.type === 'Risk' ? 'bg-rose-500' : 'bg-blue-500'
                           }`}></div>
 
                         <div className="flex justify-between items-start mb-6">
                           <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-inner ${scenario.type === 'Positive' ? 'bg-emerald-50 text-emerald-600' :
-                              scenario.type === 'Risk' ? 'bg-rose-50 text-rose-600' :
-                                'bg-blue-50 text-blue-600'
+                            scenario.type === 'Risk' ? 'bg-rose-50 text-rose-600' :
+                              'bg-blue-50 text-blue-600'
                             }`}>
                             <IconMapper name={scenario.type === 'Positive' ? 'trending_up' : scenario.type === 'Risk' ? 'warning' : 'equalizer'} className="text-xl" />
                           </div>
@@ -361,7 +361,7 @@ const DashboardPage: React.FC = () => {
                           <div className="h-1 w-full bg-slate-50 rounded-full overflow-hidden">
                             <div
                               className={`h-full transition-all duration-1000 ${scenario.type === 'Positive' ? 'bg-emerald-500' :
-                                  scenario.type === 'Risk' ? 'bg-rose-500' : 'bg-blue-500'
+                                scenario.type === 'Risk' ? 'bg-rose-500' : 'bg-blue-500'
                                 }`}
                               style={{ width: `${scenario.metrics.happiness}%` }}
                             ></div>
