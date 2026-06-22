@@ -282,15 +282,13 @@ const PremiumAnalysisPage: React.FC = () => {
       setSelectedMilestone(updatedSelected);
     }
 
-    // 2. Call PATCH API to update in database
+    // 2. Call PUT API to update in database
     try {
-      const res = await apiFetch('/scenario/step-status', {
-        method: 'PATCH',
+      const res = await apiFetch(`/premium/progress/${progressId}`, {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          scenarioId: progressId,
-          stepId,
-          completed: !currentCompleted
+          report: updatedReport
         })
       });
       if (!res.ok) {
@@ -656,22 +654,25 @@ const PremiumAnalysisPage: React.FC = () => {
                   </h4>
                   {Array.isArray(selectedMilestone.details) ? (
                     <div className="space-y-4">
-                      {selectedMilestone.details.map((step: any, stepIdx: number) => (
+                      {selectedMilestone.details.map((step: any, stepIdx: number) => {
+                        const isPreviousTaskIncomplete = stepIdx > 0 && !selectedMilestone.details[stepIdx - 1].completed;
+                        return (
                         <div 
                           key={step.id || stepIdx}
                           className={`p-5 rounded-2xl border transition-all duration-300 ${
                             step.completed 
                               ? 'bg-slate-50 border-slate-200 opacity-75' 
-                              : 'bg-white border-slate-100 hover:border-slate-200 shadow-sm'
+                              : isPreviousTaskIncomplete ? 'bg-slate-50/50 border-slate-100 opacity-60 grayscale-[50%]' : 'bg-white border-slate-100 hover:border-slate-200 shadow-sm'
                           }`}
                         >
                           <div className="flex items-start gap-4">
                             <button
+                              disabled={isPreviousTaskIncomplete}
                               onClick={() => handleToggleStepStatus(selectedMilestoneIndex!, step.id, step.completed)}
                               className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 border transition-all ${
                                 step.completed 
                                   ? 'bg-emerald-500 border-emerald-500 text-white scale-105' 
-                                  : 'bg-white border-slate-300 text-transparent hover:border-slate-400'
+                                  : isPreviousTaskIncomplete ? 'bg-slate-100 border-slate-200 text-transparent cursor-not-allowed' : 'bg-white border-slate-300 text-transparent hover:border-slate-400'
                               }`}
                             >
                               <IconMapper name="check" className="text-xs font-bold" />
@@ -716,7 +717,7 @@ const PremiumAnalysisPage: React.FC = () => {
                             </div>
                           </div>
                         </div>
-                      ))}
+                      )})}
                     </div>
                   ) : (
                     <p className="text-slate-600 text-base leading-relaxed font-medium whitespace-pre-wrap italic opacity-90">
@@ -735,7 +736,8 @@ const PremiumAnalysisPage: React.FC = () => {
                  {selectedMilestoneIndex !== null && getMilestoneStatus(selectedMilestoneIndex) === 'Đang tiến hành' && (
                    <button 
                     onClick={() => handleCompleteMilestone(selectedMilestoneIndex)}
-                    className="px-10 py-4 bg-emerald-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-200 flex items-center gap-2"
+                    disabled={Array.isArray(selectedMilestone.details) ? !selectedMilestone.details.every((s: any) => s.completed) : false}
+                    className="px-10 py-4 bg-emerald-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-emerald-600"
                    >
                      <IconMapper name="check_circle" className=" text-lg" /> Đánh dấu hoàn thành
                    </button>

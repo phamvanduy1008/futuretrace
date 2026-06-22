@@ -13,7 +13,7 @@ const StepDetailPage: React.FC = () => {
   const { scenarioId, stepId } = useParams<{ scenarioId: string; stepId: string }>();
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [report, setReport] = useState<PremiumAnalysisReport | null>(null);
@@ -22,6 +22,7 @@ const StepDetailPage: React.FC = () => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [isExpanding, setIsExpanding] = useState(false);
   const [expandError, setExpandError] = useState<string | null>(null);
+  const [isPrevIncomplete, setIsPrevIncomplete] = useState(false);
 
   // Extract navigation states to return back nicely
   const { scenario, context, timeframe, existingProgress } = (location.state as any) || {};
@@ -67,17 +68,19 @@ const StepDetailPage: React.FC = () => {
 
   const findActiveStep = (currentReport: PremiumAnalysisReport) => {
     if (!currentReport || !stepId) return;
-    
+
     let foundStep: MilestoneStep | null = null;
     let foundMilestoneIdx: number | null = null;
+    let foundStepIdx: number | null = null;
 
     for (let i = 0; i < currentReport.milestones.length; i++) {
       const milestone = currentReport.milestones[i];
       if (Array.isArray(milestone.details)) {
-        const step = milestone.details.find((s: MilestoneStep) => s.id === stepId);
-        if (step) {
-          foundStep = step;
+        const idx = milestone.details.findIndex((s: MilestoneStep) => s.id === stepId);
+        if (idx !== -1) {
+          foundStep = milestone.details[idx];
           foundMilestoneIdx = i;
+          foundStepIdx = idx;
           break;
         }
       }
@@ -86,6 +89,12 @@ const StepDetailPage: React.FC = () => {
     if (foundStep) {
       setActiveStep(foundStep);
       setMilestoneIndex(foundMilestoneIdx);
+      if (foundStepIdx !== null && foundStepIdx > 0 && foundMilestoneIdx !== null) {
+        const prevStep = currentReport.milestones[foundMilestoneIdx].details[foundStepIdx - 1];
+        setIsPrevIncomplete(typeof prevStep === 'object' && prevStep !== null ? !prevStep.completed : false);
+      } else {
+        setIsPrevIncomplete(false);
+      }
     } else {
       setError('Không tìm thấy nhiệm vụ chi tiết.');
     }
@@ -135,7 +144,7 @@ const StepDetailPage: React.FC = () => {
       console.error(err);
       // Revert optimistic update on failure
       setActiveStep({ ...activeStep, completed: originalCompletedState });
-      
+
       const revertedReport = { ...report };
       const mRev = revertedReport.milestones[milestoneIndex];
       if (Array.isArray(mRev.details)) {
@@ -236,7 +245,7 @@ const StepDetailPage: React.FC = () => {
               {activeStep.actions && activeStep.actions.length > 0 && (
                 <div className="bg-white rounded-[2.5rem] p-8 sm:p-12 border border-slate-100 shadow-[0_20px_50px_rgba(0,0,0,0.02)] space-y-6">
                   <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                    <IconMapper name="format_list_numbered" className="text-sm" /> Các bước thực hiện chi tiết
+                    Các bước thực hiện chi tiết
                   </h3>
                   <div className="relative pl-6 border-l-2 border-blue-100/60 ml-4 space-y-8">
                     {activeStep.actions.map((act, i) => (
@@ -260,7 +269,7 @@ const StepDetailPage: React.FC = () => {
               {activeStep.expectedResult && (
                 <div className="bg-gradient-to-br from-emerald-500/10 to-teal-500/5 border border-emerald-500/20 rounded-[2.5rem] p-8 sm:p-12 shadow-[0_20px_50px_rgba(16,185,129,0.02)] space-y-3">
                   <h3 className="text-[10px] font-black text-emerald-800 uppercase tracking-widest flex items-center gap-2">
-                    <IconMapper name="workspace_premium" className="text-sm" /> Kết quả đầu ra mong muốn
+                    Kết quả đầu ra mong muốn
                   </h3>
                   <p className="text-slate-850 text-sm sm:text-base font-semibold leading-relaxed">
                     {activeStep.expectedResult}
@@ -274,9 +283,9 @@ const StepDetailPage: React.FC = () => {
               {/* Status and Completion Toggle */}
               <div className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-[0_20px_50px_rgba(0,0,0,0.02)] flex flex-col items-center text-center gap-6">
                 <div className="w-16 h-16 rounded-full flex items-center justify-center bg-slate-50 border border-slate-100 shadow-inner">
-                  <IconMapper 
-                    name={activeStep.completed ? 'check_circle' : 'pending'} 
-                    className={`text-3xl ${activeStep.completed ? 'text-emerald-500' : 'text-amber-500'}`} 
+                  <IconMapper
+                    name={activeStep.completed ? 'check_circle' : 'pending'}
+                    className={`text-3xl ${activeStep.completed ? 'text-emerald-500' : 'text-amber-500'}`}
                   />
                 </div>
                 <div>
@@ -289,14 +298,12 @@ const StepDetailPage: React.FC = () => {
                 </div>
                 <button
                   onClick={handleToggleCompletion}
-                  disabled={isUpdating}
-                  className={`w-full py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all shadow-xl flex items-center justify-center gap-2 ${
-                    activeStep.completed
-                      ? 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-emerald-100 shadow-lg'
-                      : 'bg-slate-900 text-white hover:bg-blue-600 shadow-slate-200'
-                  }`}
+                  disabled={isUpdating || isPrevIncomplete}
+                  className={`w-full py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all shadow-xl flex items-center justify-center gap-2 ${activeStep.completed
+                    ? 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-emerald-100 shadow-lg'
+                    : 'bg-slate-900 text-white hover:bg-blue-600 shadow-slate-200'
+                    } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
-                  <IconMapper name={activeStep.completed ? 'check_circle' : 'radio_button_unchecked'} className="text-lg" />
                   {activeStep.completed ? 'Đã hoàn thành' : 'Đánh dấu hoàn thành'}
                 </button>
               </div>
@@ -305,7 +312,7 @@ const StepDetailPage: React.FC = () => {
               {activeStep.objectives && activeStep.objectives.length > 0 && (
                 <div className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-[0_20px_50px_rgba(0,0,0,0.02)] space-y-4">
                   <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                    <IconMapper name="track_changes" className="text-sm" /> Mục tiêu cần đạt
+                    Mục tiêu cần đạt
                   </h3>
                   <ul className="space-y-3">
                     {activeStep.objectives.map((obj, i) => (
@@ -313,9 +320,6 @@ const StepDetailPage: React.FC = () => {
                         key={i}
                         className="flex items-start gap-3 p-4 bg-slate-50/50 rounded-2xl text-slate-700 font-semibold text-xs border border-slate-100/50"
                       >
-                        <span className="w-5 h-5 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 mt-0.5">
-                          <IconMapper name="done" className="text-[10px] font-bold" />
-                        </span>
                         <span className="leading-relaxed">{obj}</span>
                       </li>
                     ))}
@@ -327,7 +331,7 @@ const StepDetailPage: React.FC = () => {
               {activeStep.tools && activeStep.tools.length > 0 && (
                 <div className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-[0_20px_50px_rgba(0,0,0,0.02)] space-y-4">
                   <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                    <IconMapper name="build" className="text-sm" /> Công cụ khuyên dùng
+                    Công cụ khuyên dùng
                   </h3>
                   <div className="flex flex-wrap gap-2">
                     {activeStep.tools.map((tool, i) => (
@@ -335,7 +339,6 @@ const StepDetailPage: React.FC = () => {
                         key={i}
                         className="px-3.5 py-2 bg-blue-50/50 border border-blue-100 rounded-xl text-blue-700 font-bold text-xs flex items-center gap-1.5"
                       >
-                        <IconMapper name="construction" className="text-xs" />
                         {tool}
                       </span>
                     ))}
