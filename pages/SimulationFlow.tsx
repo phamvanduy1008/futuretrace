@@ -330,7 +330,7 @@ const SimulationFlow: React.FC = () => {
       if (e.code === "INSUFFICIENT_TOKENS") {
         setError({ message: e.message, type: "AUTH" });
       } else {
-        setError({ message: e.message, type: "GENERAL" });
+        setError({ message: e.message, type: e.type || "GENERAL" });
       }
       setIsSubmitting(false);
       setStep(SimulationStep.CONTEXT);
@@ -561,21 +561,14 @@ const SimulationFlow: React.FC = () => {
                   </p>
                 </div>
                 <div className="flex flex-col gap-3 w-full sm:w-auto">
-                  {error.type === "AUTH" ? (
+                  {error.type === "AUTH" && (
                     <button
                       onClick={() => navigate("/store")}
                       className="bg-blue-600 text-white px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 flex items-center justify-center gap-2"
                     >
                       Mua thêm token
                     </button>
-                  ) : error.type === 'GENERAL' || error.type === 'LOCAL_CONFIG' ? (
-                    <button
-                      onClick={handleSelectKey}
-                      className="bg-rose-600 text-white px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-rose-700 transition-all shadow-lg shadow-rose-100 flex items-center justify-center gap-2"
-                    >
-                      Cấu hình Key
-                    </button>
-                  ) : null}
+                  )}
                   <button
                     onClick={() => {
                       setError(null);
