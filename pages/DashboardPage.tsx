@@ -84,7 +84,7 @@ const DashboardPage: React.FC = () => {
       >
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-20 px-2">
           <motion.div variants={itemVariants}>
-      
+
             <h1 id="tour-welcome-title" className="text-4xl sm:text-6xl font-black tracking-tight font-display text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-500 leading-normal pb-2 uppercase italic pt-2 pr-6">
               Trung tâm Phân tích
             </h1>
@@ -225,7 +225,7 @@ const DashboardPage: React.FC = () => {
                 </div>
               </div>
               <button
-                onClick={() => navigate("/history")}
+                onClick={() => navigate("/progress")}
                 className="group flex items-center gap-3 text-[10px] font-black text-blue-600 uppercase tracking-widest hover:text-blue-700 transition-all"
               >
                 Lịch sử toàn cầu
@@ -296,7 +296,7 @@ const DashboardPage: React.FC = () => {
                       </div>
                     </div>
 
-          
+
                   </div>
                 </div>
 
@@ -321,22 +321,20 @@ const DashboardPage: React.FC = () => {
                         onClick={() => navigate(`/detail/${scenario.id || recentSimulations[0].id}`, { state: { scenario: scenario } })}
                         className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all relative overflow-hidden group/card cursor-pointer"
                       >
-                        <div className={`absolute top-0 right-0 w-24 h-24 -mr-12 -mt-12 rounded-full blur-2xl opacity-10 transition-opacity group-hover/card:opacity-30 ${
-                          scenario.type === 'Positive' ? 'bg-emerald-500' : 
-                          scenario.type === 'Risk' ? 'bg-rose-500' : 'bg-blue-500'
-                        }`}></div>
-                        
+                        <div className={`absolute top-0 right-0 w-24 h-24 -mr-12 -mt-12 rounded-full blur-2xl opacity-10 transition-opacity group-hover/card:opacity-30 ${scenario.type === 'Positive' ? 'bg-emerald-500' :
+                            scenario.type === 'Risk' ? 'bg-rose-500' : 'bg-blue-500'
+                          }`}></div>
+
                         <div className="flex justify-between items-start mb-6">
-                           <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-inner ${
-                             scenario.type === 'Positive' ? 'bg-emerald-50 text-emerald-600' :
-                             scenario.type === 'Risk' ? 'bg-rose-50 text-rose-600' :
-                             'bg-blue-50 text-blue-600'
-                           }`}>
-                             <IconMapper name={scenario.type === 'Positive' ? 'trending_up' : scenario.type === 'Risk' ? 'warning' : 'equalizer'} className="text-xl" />
-                           </div>
-                           <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest bg-slate-50 px-3 py-1 rounded-md">
-                             KỊCH BẢN 0{idx + 1}
-                           </span>
+                          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-inner ${scenario.type === 'Positive' ? 'bg-emerald-50 text-emerald-600' :
+                              scenario.type === 'Risk' ? 'bg-rose-50 text-rose-600' :
+                                'bg-blue-50 text-blue-600'
+                            }`}>
+                            <IconMapper name={scenario.type === 'Positive' ? 'trending_up' : scenario.type === 'Risk' ? 'warning' : 'equalizer'} className="text-xl" />
+                          </div>
+                          <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest bg-slate-50 px-3 py-1 rounded-md">
+                            KỊCH BẢN 0{idx + 1}
+                          </span>
                         </div>
 
                         <h6 className="text-lg font-black text-slate-900 uppercase tracking-tight mb-3 group-hover/card:text-blue-600 transition-colors">
@@ -361,11 +359,10 @@ const DashboardPage: React.FC = () => {
                             <span className="text-slate-900">+{scenario.metrics.happiness}%</span>
                           </div>
                           <div className="h-1 w-full bg-slate-50 rounded-full overflow-hidden">
-                            <div 
-                              className={`h-full transition-all duration-1000 ${
-                                scenario.type === 'Positive' ? 'bg-emerald-500' :
-                                scenario.type === 'Risk' ? 'bg-rose-500' : 'bg-blue-500'
-                              }`} 
+                            <div
+                              className={`h-full transition-all duration-1000 ${scenario.type === 'Positive' ? 'bg-emerald-500' :
+                                  scenario.type === 'Risk' ? 'bg-rose-500' : 'bg-blue-500'
+                                }`}
                               style={{ width: `${scenario.metrics.happiness}%` }}
                             ></div>
                           </div>
