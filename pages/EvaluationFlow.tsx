@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { mapScoreToLevel, CategoryType } from '../data/evaluationQuestions'; // still using types and helper
+import { evaluationQuestions as localEvaluationQuestions, mapScoreToLevel, CategoryType } from '../data/evaluationQuestions'; // still using types and helper
 import { getEvaluationQuestions, submitEvaluationResult } from '../services/evaluationService';
 import SharedHeader from '../components/SharedHeader';
 import SharedFooter from '../components/SharedFooter';
@@ -14,6 +14,14 @@ interface Answer {
   questionId: number;
   selectedValue: number;
 }
+
+type NormalizedEvaluationQuestion = {
+  questionId: number;
+  category: CategoryType;
+  question: string;
+  isReverse?: boolean;
+  options: { text: string; value: number }[];
+};
 
 const CATEGORY_NAMES: Record<CategoryType, string> = {
   stress: 'Áp lực hiện tại',
@@ -61,17 +69,58 @@ const EvaluationFlow: React.FC = () => {
   const [step, setStep] = useState<EvaluationStep>('loading');
   const [currentQIndex, setCurrentQIndex] = useState(0);
   const [answers, setAnswers] = useState<Answer[]>([]);
-  const [evaluationQuestions, setEvaluationQuestions] = useState<any[]>([]);
+  const [evaluationQuestions, setEvaluationQuestions] = useState<NormalizedEvaluationQuestion[]>([]);
   const [dbResults, setDbResults] = useState<any>(null);
+  const [reviewReturnIndex, setReviewReturnIndex] = useState<number | null>(null);
   const transitionTimeoutRef = useRef<any>(null);
+
+  const normalizeQuestions = (questions: any[]): NormalizedEvaluationQuestion[] => {
+    return questions
+      .map((question) => ({
+        ...question,
+        questionId: Number(question.questionId ?? question.id),
+        options: question.options.map((option: any) => ({
+          ...option,
+          value: Number(option.value)
+        }))
+      }))
+      .filter((question) => Number.isFinite(question.questionId));
+  };
+
+  const getLocalQuestions = () => normalizeQuestions(localEvaluationQuestions);
+
+  const calculateLocalScores = (answeredQuestions: Answer[]) => {
+    const rawScore: Record<CategoryType, number> = {
+      stress: 0,
+      finance: 0,
+      capability: 0,
+      risk: 0
+    };
+
+    for (const answer of answeredQuestions) {
+      const question = evaluationQuestions.find((item) => item.questionId === answer.questionId);
+      if (!question) continue;
+
+      rawScore[question.category] += question.isReverse ? 6 - answer.selectedValue : answer.selectedValue;
+    }
+
+    return {
+      stress: Math.round(((rawScore.stress - 10) / 40) * 100),
+      finance: Math.round(((rawScore.finance - 10) / 40) * 100),
+      capability: Math.round(((rawScore.capability - 10) / 40) * 100),
+      risk: Math.round(((rawScore.risk - 10) / 40) * 100)
+    };
+  };
 
   useEffect(() => {
     getEvaluationQuestions().then(data => {
-      setEvaluationQuestions(data);
+      const normalizedQuestions = normalizeQuestions(Array.isArray(data) ? data : []);
+      setEvaluationQuestions(normalizedQuestions.length > 0 ? normalizedQuestions : getLocalQuestions());
       setStep('onboarding');
     }).catch(err => {
       console.error(err);
-      // Fallback or error handling
+      setEvaluationQuestions(getLocalQuestions());
+      setStep('onboarding');
     });
   }, []);
 
@@ -83,25 +132,55 @@ const EvaluationFlow: React.FC = () => {
     setStep('questionnaire');
     setCurrentQIndex(0);
     setAnswers([]);
+    setReviewReturnIndex(null);
   };
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSelectOption = (questionId: number, selectedValue: number) => {
+    const normalizedQuestionId = Number(questionId);
+    const normalizedSelectedValue = Number(selectedValue);
+
     if (transitionTimeoutRef.current) {
       clearTimeout(transitionTimeoutRef.current);
     }
 
     setAnswers((prev) => {
-      const existing = prev.find((a) => a.questionId === questionId);
+      const existing = prev.find((a) => a.questionId === normalizedQuestionId);
       const newAnswers = existing 
-        ? prev.map((a) => (a.questionId === questionId ? { ...a, selectedValue } : a))
-        : [...prev, { questionId, selectedValue }];
+        ? prev.map((a) => (a.questionId === normalizedQuestionId ? { ...a, selectedValue: normalizedSelectedValue } : a))
+        : [...prev, { questionId: normalizedQuestionId, selectedValue: normalizedSelectedValue }];
       
       return newAnswers;
     });
 
+    transitionTimeoutRef.current = setTimeout(() => {
+      if (reviewReturnIndex !== null && currentQIndex !== reviewReturnIndex) {
+        setCurrentQIndex(reviewReturnIndex);
+        setReviewReturnIndex(null);
+        return;
+      }
 
+      if (currentQIndex < evaluationQuestions.length - 1) {
+        setCurrentQIndex((prev) => (prev === currentQIndex ? prev + 1 : prev));
+      }
+    }, 220);
+  };
+
+  const isQuestionAnswered = (questionId?: number) => {
+    return answers.some((answer) => answer.questionId === Number(questionId));
+  };
+
+  const handleJumpToMissingQuestion = (questionIndex: number) => {
+    setReviewReturnIndex(evaluationQuestions.length - 1);
+    setCurrentQIndex(questionIndex);
+  };
+
+  const handleReturnToReview = () => {
+    if (reviewReturnIndex === null) return;
+
+    setCurrentQIndex(reviewReturnIndex);
+    setReviewReturnIndex(null);
   };
 
   const handlePrev = () => {
@@ -118,8 +197,7 @@ const EvaluationFlow: React.FC = () => {
       clearTimeout(transitionTimeoutRef.current);
     }
     if (currentQIndex < evaluationQuestions.length - 1) {
-      const hasAnswered = answers.some((a) => a.questionId === currentQuestion.questionId);
-      if (hasAnswered) {
+      if (isQuestionAnswered(currentQuestion.questionId)) {
         setCurrentQIndex((prev) => prev + 1);
       }
     }
@@ -129,7 +207,7 @@ const EvaluationFlow: React.FC = () => {
     if (transitionTimeoutRef.current) {
       clearTimeout(transitionTimeoutRef.current);
     }
-    if (answers.length < evaluationQuestions.length) {
+    if (missingQuestionIndices.length > 0) {
       alert("Vui lòng trả lời đầy đủ tất cả các câu hỏi trước khi gửi.");
       return;
     }
@@ -140,7 +218,8 @@ const EvaluationFlow: React.FC = () => {
       setStep('result');
     } catch (error) {
       console.error("Error submitting evaluation", error);
-      alert("Lỗi lưu kết quả, vui lòng thử lại sau.");
+      setDbResults(calculateLocalScores(answers));
+      setStep('result');
     } finally {
       setIsSubmitting(false);
     }
@@ -158,11 +237,11 @@ const EvaluationFlow: React.FC = () => {
 
   // Find missing questions
   const missingQuestionIndices = useMemo(() => {
+    const answeredQuestionIds = new Set(answers.map((answer) => answer.questionId));
     const missing = [];
     for (let i = 0; i < evaluationQuestions.length; i++) {
       const q = evaluationQuestions[i];
-      const hasAnswer = answers.some(a => a.questionId === q.questionId);
-      if (!hasAnswer) {
+      if (!answeredQuestionIds.has(q.questionId)) {
         missing.push(i + 1); // 1-indexed
       }
     }
@@ -377,7 +456,7 @@ const EvaluationFlow: React.FC = () => {
                         {missingQuestionIndices.map((qNum) => (
                           <button
                             key={qNum}
-                            onClick={() => setCurrentQIndex(qNum - 1)}
+                            onClick={() => handleJumpToMissingQuestion(qNum - 1)}
                             className="w-8 h-8 flex items-center justify-center rounded-xl bg-white border border-amber-200 text-xs font-black text-amber-700 hover:bg-amber-100 hover:border-amber-300 transition-all shadow-sm hover:scale-105"
                           >
                             {qNum}
@@ -405,23 +484,38 @@ const EvaluationFlow: React.FC = () => {
                     </button>
 
                     {currentQIndex < evaluationQuestions.length - 1 ? (
+                      <div className="flex flex-wrap justify-end gap-3">
+                        {reviewReturnIndex !== null && reviewReturnIndex !== currentQIndex && (
+                          <button
+                            onClick={handleReturnToReview}
+                            disabled={!isQuestionAnswered(currentQuestion.questionId)}
+                            className={`flex items-center gap-2 px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
+                              !isQuestionAnswered(currentQuestion.questionId)
+                                ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                                : 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-500/20'
+                            }`}
+                          >
+                            Về cuối bài <IconMapper name="arrow_forward" className="text-lg" />
+                          </button>
+                        )}
                       <button
                         onClick={handleNext}
-                        disabled={!answers.some(a => a.questionId === currentQuestion.questionId)}
+                        disabled={!isQuestionAnswered(currentQuestion.questionId)}
                         className={`flex items-center gap-2 px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
-                          !answers.some(a => a.questionId === currentQuestion.questionId)
+                          !isQuestionAnswered(currentQuestion.questionId)
                             ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
                             : 'bg-slate-900 text-white hover:bg-blue-600 shadow-lg shadow-slate-900/10'
                         }`}
                       >
                         Tiếp theo <IconMapper name="arrow_forward" className="text-lg" />
                       </button>
+                      </div>
                     ) : (
                       <button
                         onClick={handleSubmit}
-                        disabled={isSubmitting || answers.length < evaluationQuestions.length}
+                        disabled={isSubmitting || missingQuestionIndices.length > 0}
                         className={`flex items-center gap-2 px-8 py-4 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
-                          isSubmitting || answers.length < evaluationQuestions.length
+                          isSubmitting || missingQuestionIndices.length > 0
                             ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
                             : 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-500/20'
                         }`}
