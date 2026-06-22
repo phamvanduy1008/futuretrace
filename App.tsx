@@ -1,6 +1,19 @@
 
 import React, { useState, useEffect } from 'react';
-import { Routes, Route, Navigate, HashRouter } from 'react-router-dom';
+import { Routes, Route, Navigate, HashRouter, useLocation } from 'react-router-dom';
+
+const ScrollToTop: React.FC = () => {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'instant' // hoặc 'smooth' nếu muốn cuộn mượt, 'instant' giúp phản hồi tức thì
+    });
+  }, [pathname]);
+
+  return null;
+};
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -83,6 +96,7 @@ const App: React.FC = () => {
 
   return (
     <HashRouter>
+      <ScrollToTop />
       <TourProvider>
         <Routes>
           <Route path="/" element={<LandingPage />} />

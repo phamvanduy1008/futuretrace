@@ -60,6 +60,8 @@ const ProfilePage: React.FC = () => {
     }
   };
 
+  const isGoogleWithoutPassword = user?.is_google_user && !user?.has_manual_password;
+
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setProfileMsg({ text: '', type: '' });
@@ -76,11 +78,15 @@ const ProfilePage: React.FC = () => {
 
     setIsUpdatingPassword(true);
     try {
-      await changePassword(currentPassword, newPassword);
+      const result = await changePassword(isGoogleWithoutPassword ? '' : currentPassword, newPassword);
       setPasswordMsg({ text: 'Đổi mật khẩu thành công.', type: 'success' });
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
+      // Update user state so has_manual_password reflects new status
+      if (result.user) {
+        setUser(result.user);
+      }
     } catch (err: any) {
       setPasswordMsg({ text: err.message || 'Lỗi khi đổi mật khẩu.', type: 'error' });
     } finally {
@@ -351,6 +357,7 @@ const ProfilePage: React.FC = () => {
                   </div>
                 )}
 
+                {!isGoogleWithoutPassword && (
                 <div className="space-y-2">
                   <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2">Mật khẩu hiện tại</label>
                   <input
@@ -361,6 +368,14 @@ const ProfilePage: React.FC = () => {
                     placeholder="••••••••"
                   />
                 </div>
+                )}
+
+                {isGoogleWithoutPassword && (
+                  <div className="p-4 rounded-xl text-sm font-bold flex items-center gap-2 bg-blue-50 text-blue-600">
+                    <IconMapper name="info" />
+                    Tài khoản đăng nhập bằng Google. Bạn có thể đặt mật khẩu mới mà không cần nhập mật khẩu hiện tại.
+                  </div>
+                )}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">

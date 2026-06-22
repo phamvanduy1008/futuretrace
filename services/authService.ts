@@ -9,7 +9,9 @@ const normalizeUser = (user: any) => {
     id: user.id || user._id?.toString(),
     token: user.token ?? 0,
     code_invite: user.code_invite,
-    invite_redeemed: !!user.invite_redeemed
+    invite_redeemed: !!user.invite_redeemed,
+    is_google_user: !!user.is_google_user,
+    has_manual_password: user.has_manual_password !== false,
   };
 };
 
@@ -49,6 +51,46 @@ export const register = async (userData: any) => {
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.message || 'Đăng ký thất bại');
+  }
+
+  const data = await response.json();
+  const user = normalizeUser(data.user);
+  localStorage.setItem('token', data.accessToken);
+  localStorage.setItem('user', JSON.stringify(user));
+  return { ...data, user };
+};
+
+export const sendRegisterOtp = async (userData: any) => {
+  const { email, password, fullName, role } = userData;
+  const response = await fetch(`${API_BASE_URL}/api/auth/register/send-otp`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      email,
+      password,
+      full_name: fullName,
+      role
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Gửi mã xác thực thất bại');
+  }
+
+  return response.json();
+};
+
+export const verifyRegisterOtp = async (email: string, otp: string) => {
+  const response = await fetch(`${API_BASE_URL}/api/auth/register/verify-otp`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, otp }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Xác thực thất bại');
   }
 
   const data = await response.json();
@@ -115,13 +157,18 @@ export const changePassword = async (currentPassword: string, newPassword: strin
   const token = localStorage.getItem('token');
   if (!token) throw new Error('No token found');
 
+  const body: any = { newPassword };
+  if (currentPassword) {
+    body.currentPassword = currentPassword;
+  }
+
   const response = await fetch(`${API_BASE_URL}/api/auth/password`, {
     method: 'PUT',
     headers: { 
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}` 
     },
-    body: JSON.stringify({ currentPassword, newPassword }),
+    body: JSON.stringify(body),
   });
 
   if (!response.ok) {
@@ -129,7 +176,13 @@ export const changePassword = async (currentPassword: string, newPassword: strin
     throw new Error(error.message || 'Đổi mật khẩu thất bại');
   }
 
-  return response.json();
+  const data = await response.json();
+  // Update local user if server returns updated user
+  if (data.user) {
+    const user = normalizeUser(data.user);
+    localStorage.setItem('user', JSON.stringify(user));
+  }
+  return data;
 };
 
 export const redeemInviteCode = async (codeInvite: string) => {
