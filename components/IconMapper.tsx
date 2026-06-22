@@ -71,7 +71,7 @@ const materialToPhosphor: Record<string, string> = {
   'list_alt': 'ClipboardText',
   'pending': 'ClockClockwise',
   'circle': 'Circle',
-  'inbox_customize': 'Package',
+  'package': 'Package',
   'work': 'Briefcase',
   'content_copy': 'Copy',
   'toll': 'Coin',
@@ -100,9 +100,9 @@ const materialToPhosphor: Record<string, string> = {
   'assignment': 'ClipboardText',
   'contact_support': 'Question',
   'storefront': 'Storefront',
-    'hourglass_empty': 'HourglassLow',
+  'hourglass_empty': 'HourglassLow',
   'block': 'Prohibit',
-  
+
 };
 
 interface IconMapperProps {

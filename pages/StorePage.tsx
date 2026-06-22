@@ -97,6 +97,12 @@ const StorePage: React.FC = () => {
   const [userToken, setUserToken] = useState<number | null>(null);
   const [hasClaimedFreePack, setHasClaimedFreePack] = useState<boolean>(true);
 
+  // Transaction History States
+  const [loadingHistory, setLoadingHistory] = useState(true);
+  const [transactions, setTransactions] = useState<any[]>([]);
+  const [historyPage, setHistoryPage] = useState(1);
+  const [historyTotalPages, setHistoryTotalPages] = useState(1);
+
   // Token calculator states
   const [simCount, setSimCount] = useState<number>(0);
   const [analysisCount, setAnalysisCount] = useState<number>(0);
@@ -133,6 +139,30 @@ const StorePage: React.FC = () => {
     };
     fetchUser();
   }, []);
+
+  useEffect(() => {
+    const fetchHistory = async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          setLoadingHistory(true);
+          const res = await fetch(`${API_BASE_URL}/api/payment/history?page=${historyPage}&limit=4`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          if (res.ok) {
+            const data = await res.json();
+            setTransactions(data.transactions || []);
+            setHistoryTotalPages(data.totalPages || 1);
+          }
+        } catch (e) {
+          console.error('Error fetching history:', e);
+        } finally {
+          setLoadingHistory(false);
+        }
+      }
+    };
+    fetchHistory();
+  }, [historyPage]);
 
   const handleBuyPack = async (pack: typeof TOKEN_PACKS[0]) => {
     if (pack.id === 'starter' && !hasClaimedFreePack) {
@@ -184,7 +214,7 @@ const StorePage: React.FC = () => {
       <main className="flex-1 max-w-[1440px] mx-auto w-full px-4 sm:px-8 py-12 lg:py-20">
         {/* Hero & Calculator Section */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 mb-20 items-stretch">
-          
+
           {/* Left Column: Hero Intro */}
           <div className="lg:col-span-7 flex flex-col justify-center space-y-6">
             <motion.div
@@ -258,11 +288,11 @@ const StorePage: React.FC = () => {
                     Interactive
                   </span>
                 </div>
-                
+
                 <h3 className="text-lg font-black uppercase tracking-tight text-white mb-4">
                   Bạn cần chạy bao nhiêu tác vụ?
                 </h3>
-                
+
                 {/* Counter Controls */}
                 <div className="space-y-4 mb-6">
                   {/* Simulation count */}
@@ -402,13 +432,13 @@ const StorePage: React.FC = () => {
             const displayColor = isFreeStarter ? 'emerald' : pack.color;
             const displayPrice = isFreeStarter ? 0 : pack.price;
             const originalPrice = isFreeStarter ? pack.price : null;
-            
+
             const c = COLOR_MAP[displayColor];
             const pricePerToken = displayPrice > 0 ? Math.round(displayPrice / pack.token) : 0;
-            
+
             // Check if this pack is suggested by the calculator
             const isSuggested = pack.id === recommendedPackId;
-            
+
             // Default highlighted is advanced pack
             const isHighlighted = pack.highlight;
 
@@ -418,13 +448,12 @@ const StorePage: React.FC = () => {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 + i * 0.05 }}
-                className={`relative flex flex-col rounded-[2.5rem] border-2 p-8 transition-all duration-300 group hover:shadow-2xl hover:-translate-y-2 ${
-                  isHighlighted
-                    ? 'bg-gradient-to-b from-slate-900 via-slate-950 to-indigo-950 border-violet-500 ring-4 ring-violet-500/20 shadow-2xl shadow-violet-900/30'
-                    : isSuggested
-                      ? 'bg-white border-blue-500 ring-4 ring-blue-500/20 shadow-xl'
-                      : `bg-white/80 backdrop-blur-md ${c.border} hover:border-blue-400/60`
-                }`}
+                className={`relative flex flex-col rounded-[2.5rem] border-2 p-8 transition-all duration-300 group hover:shadow-2xl hover:-translate-y-2 ${isHighlighted
+                  ? 'bg-gradient-to-b from-slate-900 via-slate-950 to-indigo-950 border-violet-500 ring-4 ring-violet-500/20 shadow-2xl shadow-violet-900/30'
+                  : isSuggested
+                    ? 'bg-white border-blue-500 ring-4 ring-blue-500/20 shadow-xl'
+                    : `bg-white/80 backdrop-blur-md ${c.border} hover:border-blue-400/60`
+                  }`}
               >
                 {/* Popular Badge */}
                 {isHighlighted && (
@@ -442,17 +471,15 @@ const StorePage: React.FC = () => {
 
                 {/* Header */}
                 <div className="flex items-start justify-between mb-6">
-                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 duration-300 ${
-                    isHighlighted ? 'bg-violet-600/20 text-violet-400' : `${c.bg} ${c.icon}`
-                  }`}>
+                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 duration-300 ${isHighlighted ? 'bg-violet-600/20 text-violet-400' : `${c.bg} ${c.icon}`
+                    }`}>
                     <IconMapper name={pack.icon} className="text-2xl" />
                   </div>
                   {pack.bonusPercent > 0 && (
-                    <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${
-                      isHighlighted 
-                        ? 'bg-violet-500/20 text-violet-300' 
-                        : c.badge
-                    }`}>
+                    <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${isHighlighted
+                      ? 'bg-violet-500/20 text-violet-300'
+                      : c.badge
+                      }`}>
                       +{pack.bonusPercent}% ưu đãi
                     </span>
                   )}
@@ -460,58 +487,50 @@ const StorePage: React.FC = () => {
 
                 {/* Pack info */}
                 <div className="mb-6 flex-1">
-                  <h3 className={`text-[11px] font-black uppercase tracking-widest mb-3 ${
-                    isHighlighted ? 'text-violet-400' : 'text-slate-400'
-                  }`}>
+                  <h3 className={`text-[11px] font-black uppercase tracking-widest mb-3 ${isHighlighted ? 'text-violet-400' : 'text-slate-400'
+                    }`}>
                     Gói {pack.name}
                   </h3>
                   <div className="flex items-baseline gap-2 mb-2">
-                    <span className={`text-4xl font-black font-display tracking-tighter ${
-                      isHighlighted ? 'text-white' : 'text-slate-900'
-                    }`}>
+                    <span className={`text-4xl font-black font-display tracking-tighter ${isHighlighted ? 'text-white' : 'text-slate-900'
+                      }`}>
                       {pack.token.toLocaleString('vi-VN')}
                     </span>
-                    <span className={`text-xs font-black uppercase tracking-widest ${
-                      isHighlighted ? 'text-slate-400' : 'text-slate-500'
-                    }`}>
+                    <span className={`text-xs font-black uppercase tracking-widest ${isHighlighted ? 'text-slate-400' : 'text-slate-500'
+                      }`}>
                       tokens
                     </span>
                   </div>
-                  <p className={`text-sm font-medium ${
-                    isHighlighted ? 'text-slate-400' : 'text-slate-600'
-                  } mb-4 leading-relaxed`}>
+                  <p className={`text-sm font-medium ${isHighlighted ? 'text-slate-400' : 'text-slate-600'
+                    } mb-4 leading-relaxed`}>
                     {pack.description}
                   </p>
-                  
+
                   {/* Cost per token badge */}
-                  <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider ${
-                    isHighlighted ? 'bg-white/5 text-slate-400' : 'bg-slate-50 text-slate-500'
-                  }`}>
+                  <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider ${isHighlighted ? 'bg-white/5 text-slate-400' : 'bg-slate-50 text-slate-500'
+                    }`}>
                     <IconMapper name="toll" className="text-xs" />
                     {displayPrice === 0 ? 'Miễn phí' : `≈ ${pricePerToken.toLocaleString('vi-VN')}đ / token`}
                   </span>
                 </div>
 
                 {/* Divider */}
-                <div className={`border-t mb-6 ${
-                  isHighlighted ? 'border-white/10' : 'border-slate-100'
-                }`} />
+                <div className={`border-t mb-6 ${isHighlighted ? 'border-white/10' : 'border-slate-100'
+                  }`} />
 
                 {/* Price & button */}
                 <div>
                   <div className="flex items-baseline justify-between mb-5">
-                    <span className={`text-[10px] font-black uppercase tracking-widest ${
-                      isHighlighted ? 'text-slate-400' : 'text-slate-400'
-                    }`}>Giá trọn gói</span>
+                    <span className={`text-[10px] font-black uppercase tracking-widest ${isHighlighted ? 'text-slate-400' : 'text-slate-400'
+                      }`}>Giá trọn gói</span>
                     <div className="flex items-baseline gap-2">
                       {originalPrice !== null && (
                         <span className="text-sm font-bold text-slate-400 line-through">
                           {originalPrice.toLocaleString('vi-VN')}đ
                         </span>
                       )}
-                      <span className={`text-2xl font-black font-display tracking-tighter ${
-                        isHighlighted ? 'text-white' : (isFreeStarter ? 'text-emerald-600' : 'text-slate-900')
-                      }`}>
+                      <span className={`text-2xl font-black font-display tracking-tighter ${isHighlighted ? 'text-white' : (isFreeStarter ? 'text-emerald-600' : 'text-slate-900')
+                        }`}>
                         {displayPrice.toLocaleString('vi-VN')}đ
                       </span>
                     </div>
@@ -519,15 +538,14 @@ const StorePage: React.FC = () => {
 
                   <button
                     onClick={() => handleBuyPack(pack)}
-                    className={`w-full py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-3 active:scale-[0.98] ${
-                      isHighlighted
-                        ? 'bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white shadow-xl shadow-violet-900/30'
-                        : isFreeStarter
-                          ? 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-md'
-                          : isSuggested
-                            ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-xl shadow-blue-500/20'
-                            : `${c.btnBg} text-white shadow-md hover:shadow-lg`
-                    }`}
+                    className={`w-full py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-3 active:scale-[0.98] ${isHighlighted
+                      ? 'bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white shadow-xl shadow-violet-900/30'
+                      : isFreeStarter
+                        ? 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-md'
+                        : isSuggested
+                          ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-xl shadow-blue-500/20'
+                          : `${c.btnBg} text-white shadow-md hover:shadow-lg`
+                      }`}
                   >
                     {isFreeStarter ? 'Nhận Miễn Phí' : 'Mua ngay'}
                     <IconMapper name="arrow_forward" className="text-sm transition-transform group-hover:translate-x-1" />
@@ -537,6 +555,92 @@ const StorePage: React.FC = () => {
             );
           })}
         </div>
+
+        {/* Transaction History Section */}
+        {userToken !== null && (
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="pt-8 pb-16 max-w-4xl mx-auto"
+          >
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h3 className="text-2xl font-black text-slate-900 font-display uppercase tracking-tight mb-2">
+                  Lịch sử giao dịch
+                </h3>
+                <p className="text-sm text-slate-500 font-medium">
+                  Quản lý các lần nạp token và nhận ưu đãi của bạn.
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-slate-50 border border-slate-100 text-blue-600 rounded-2xl flex items-center justify-center shadow-sm">
+                <IconMapper name="receipt_long" className="text-2xl" />
+              </div>
+            </div>
+
+            <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
+              {loadingHistory ? (
+                <div className="p-12 flex flex-col items-center justify-center gap-3">
+                  <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                  <p className="text-xs font-black uppercase tracking-widest text-slate-400">Đang tải lịch sử...</p>
+                </div>
+              ) : transactions.length === 0 ? (
+                <div className="p-12 text-center">
+                  <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-slate-300">
+                    <IconMapper name="package" className="text-3xl" />
+                  </div>
+                  <p className="text-sm font-medium text-slate-500 italic">Bạn chưa có giao dịch nào.</p>
+                </div>
+              ) : (
+                <div className="divide-y divide-slate-100">
+                  {transactions.map((tx, idx) => (
+                    <div key={tx._id || idx} className="p-6 sm:px-8 flex items-center justify-between hover:bg-slate-50 transition-colors">
+                      <div className="flex items-center gap-4 sm:gap-5">
+                        <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center shrink-0 border ${tx.status === 'success' ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-rose-50 border-rose-100 text-rose-600'
+                          }`}>
+                          <IconMapper name={tx.status === 'success' ? 'package' : 'close'} className="text-lg sm:text-xl" />
+                        </div>
+                        <div>
+                          <p className="text-sm sm:text-base font-bold text-slate-900 mb-1 leading-tight">{tx.description || 'Nạp token'}</p>
+                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                            {new Date(tx.created_at).toLocaleDateString('vi-VN')} • {new Date(tx.created_at).toLocaleTimeString('vi-VN')}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-black text-emerald-600 text-base sm:text-lg">+{tx.tokenAmount} <span className="text-[9px] uppercase tracking-widest">tokens</span></p>
+                        <p className="text-xs font-bold text-slate-400">
+                          {tx.amount > 0 ? `${tx.amount.toLocaleString('vi-VN')}đ` : '0đ'}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {historyTotalPages > 1 && (
+                <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-center gap-4">
+                  <button
+                    disabled={historyPage === 1}
+                    onClick={() => setHistoryPage(prev => Math.max(1, prev - 1))}
+                    className="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-500 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white hover:text-slate-900 transition-colors shadow-sm"
+                  >
+                    <IconMapper name="chevron_left" className="text-lg" />
+                  </button>
+                  <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">
+                    Trang {historyPage} / {historyTotalPages}
+                  </span>
+                  <button
+                    disabled={historyPage === historyTotalPages}
+                    onClick={() => setHistoryPage(prev => Math.min(historyTotalPages, prev + 1))}
+                    className="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-500 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white hover:text-slate-900 transition-colors shadow-sm"
+                  >
+                    <IconMapper name="chevron_right" className="text-lg" />
+                  </button>
+                </div>
+              )}
+            </div>
+          </motion.section>
+        )}
 
         {/* Bottom Trust Section */}
         <motion.section
