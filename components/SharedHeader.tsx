@@ -57,6 +57,7 @@ const SharedHeader: React.FC = () => {
     { label: 'Cộng đồng', path: '/community', icon: 'groups' },
     { label: 'Tiến trình', path: '/progress', icon: 'trending_up' },
     { label: 'Lịch sử', path: '/history', icon: 'history' },
+    { label: 'Rủi ro', path: '/risk-analysis', icon: 'warning' },
   ];
 
   const profileMenuItems = [

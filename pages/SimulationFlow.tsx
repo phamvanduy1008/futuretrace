@@ -12,6 +12,7 @@ import {
   analyzeInputReadiness,
 } from "../services/geminiService";
 import { saveToHistory } from "../data/mockDatabase";
+import { apiFetch } from "../services/apiClient";
 import SharedHeader from "../components/SharedHeader";
 import SharedFooter from "../components/SharedFooter";
 import { IconMapper } from "../components/IconMapper";
@@ -346,10 +347,40 @@ const SimulationFlow: React.FC = () => {
     });
   };
 
-  const handleSaveToHistory = () => {
+  const [isSavingHistory, setIsSavingHistory] = useState(false);
+
+  const handleSaveToHistory = async () => {
     if (!results) return;
-    setIsSaved(true);
-    setIsSaveModalOpen(false);
+    setIsSavingHistory(true);
+    try {
+      if (results.simulationId) {
+        await apiFetch(`/simulations/${results.simulationId}/save`, { method: "POST" });
+      }
+      if (results.historyItem) {
+        try {
+          const currentHistory = JSON.parse(localStorage.getItem('futuretrace_history') || '[]');
+          const itemToSave = { ...results.historyItem, isSaved: true };
+          if (folderName.trim()) {
+            itemToSave.title = folderName.trim();
+          }
+          const exists = currentHistory.some((h: any) => h.id === itemToSave.id);
+          if (!exists) {
+            localStorage.setItem('futuretrace_history', JSON.stringify([itemToSave, ...currentHistory]));
+          } else {
+            const updated = currentHistory.map((h: any) => h.id === itemToSave.id ? { ...h, isSaved: true, title: itemToSave.title } : h);
+            localStorage.setItem('futuretrace_history', JSON.stringify(updated));
+          }
+        } catch (e) { }
+      }
+      setIsSaved(true);
+      setIsSaveModalOpen(false);
+    } catch (err) {
+      console.error("Lỗi khi lưu vào lịch sử:", err);
+      setIsSaved(true);
+      setIsSaveModalOpen(false);
+    } finally {
+      setIsSavingHistory(false);
+    }
   };
 
   const pageVariants = {
@@ -1230,14 +1261,14 @@ const SimulationFlow: React.FC = () => {
             </button>
             {!results.isEnterprise && (
               <>
-                {/* <button 
+                <button 
                    onClick={() => !isSaved && setIsSaveModalOpen(true)}
-                   disabled={isSaved}
+                   disabled={isSaved || isSavingHistory}
                    className={`px-16 py-6 ${isSaved ? 'bg-emerald-500' : 'bg-blue-600 hover:bg-blue-700'} text-white font-black text-[11px] uppercase tracking-widest rounded-2xl transition-all shadow-2xl shadow-blue-200 flex items-center gap-5`}
                  >
                    <IconMapper name={isSaved ? 'check_circle' : 'save'} className=" text-xl" /> 
-                   {isSaved ? 'Đã lưu vào lịch sử' : 'Lưu vào lịch sử'}
-                 </button> */}
+                   {isSaved ? 'Đã lưu vào lịch sử' : isSavingHistory ? 'Đang lưu...' : 'Lưu vào lịch sử'}
+                 </button>
                 <button className="px-16 py-6 bg-slate-900 text-white font-black text-[11px] uppercase tracking-widest hover:bg-slate-800 rounded-2xl transition-all shadow-2xl shadow-slate-200 flex items-center gap-5">
                   <IconMapper name="download" className=" text-xl" /> Xuất chiến
                   lược (.PDF)
@@ -1293,10 +1324,11 @@ const SimulationFlow: React.FC = () => {
 
                 <div className="flex flex-col gap-4">
                   <button
+                    disabled={isSavingHistory}
                     onClick={handleSaveToHistory}
-                    className="w-full py-6 bg-blue-600 text-white font-black text-[12px] uppercase tracking-widest rounded-2xl hover:bg-blue-700 shadow-2xl shadow-blue-100 transition-all flex items-center justify-center gap-4"
+                    className="w-full py-6 bg-blue-600 disabled:opacity-50 text-white font-black text-[12px] uppercase tracking-widest rounded-2xl hover:bg-blue-700 shadow-2xl shadow-blue-100 transition-all flex items-center justify-center gap-4"
                   >
-                    LƯU NGAY <IconMapper name="save" className=" text-xl" />
+                    {isSavingHistory ? "ĐANG LƯU..." : "LƯU NGAY"} <IconMapper name="save" className=" text-xl" />
                   </button>
                   <button
                     onClick={() => setIsSaveModalOpen(false)}

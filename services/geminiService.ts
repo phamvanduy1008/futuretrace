@@ -32,6 +32,69 @@ const throwApiError = (errorData: any, fallback: string) => {
   throw error;
 };
 
+export const generateSimulationStream = async (
+  data: SimulationData,
+  onChunk: (chunk: any) => void
+): Promise<PredictionResult> => {
+  const token = getAuthToken();
+  const response = await fetch(`${API_BASE_URL}/api/simulations/stream`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({
+      ...data,
+      tier: 'FREE'
+    })
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throwApiError(errorData, 'Lỗi kết nối server AI.');
+  }
+
+  const reader = response.body?.getReader();
+  if (!reader) throw new Error("Không thể đọc luồng dữ liệu");
+  
+  const decoder = new TextDecoder('utf-8');
+  let result: PredictionResult | null = null;
+  let buffer = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split('\n\n');
+    buffer = lines.pop() || '';
+    
+    for (const line of lines) {
+      if (line.startsWith('data: ')) {
+        try {
+          const dataStr = line.substring(6).trim();
+          if (!dataStr) continue;
+          
+          const parsed = JSON.parse(dataStr);
+          if (parsed.event === 'result') {
+            result = parsed.data;
+          } else if (parsed.event === 'error') {
+            throw new Error(parsed.message);
+          } else {
+            onChunk(parsed);
+          }
+        } catch (e) {
+          // Bỏ qua JSON lỗi trong chunk
+        }
+      }
+    }
+  }
+
+  if (!result) throw new Error("Không nhận được dữ liệu kết quả từ luồng.");
+  return result;
+};
+
+// Vẫn giữ API cũ cho tương thích (nếu cần)
 export const generateSimulation = async (
   data: SimulationData,
 ): Promise<PredictionResult> => {

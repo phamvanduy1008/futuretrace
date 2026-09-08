@@ -207,3 +207,53 @@ export const redeemInviteCode = async (codeInvite: string) => {
   localStorage.setItem('user', JSON.stringify(user));
   return { ...data, user };
 };
+
+export const sendForgotPasswordOtp = async (email: string) => {
+  const response = await fetch(`${API_BASE_URL}/api/auth/forgot-password/send-otp`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+  });
+
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || 'Không thể gửi mã OTP đặt lại mật khẩu');
+  }
+
+  return data;
+};
+
+export const verifyForgotPasswordOtp = async (email: string, otp: string) => {
+  const response = await fetch(`${API_BASE_URL}/api/auth/forgot-password/verify-otp`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, otp }),
+  });
+
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || 'Mã xác thực không chính xác hoặc đã hết hạn');
+  }
+
+  return data;
+};
+
+export const resetForgotPassword = async (params: {
+  email: string;
+  otp: string;
+  newPassword: string;
+  confirmPassword: string;
+}) => {
+  const response = await fetch(`${API_BASE_URL}/api/auth/forgot-password/reset`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(params),
+  });
+
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || 'Đặt lại mật khẩu thất bại');
+  }
+
+  return data;
+};

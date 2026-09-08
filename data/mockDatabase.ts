@@ -528,14 +528,50 @@ export const deleteProgressItem = (id: string) => {
 export const MOCK_RISKS = [
   { 
     id: 1,
-    title: "Kiệt sức Nguồn nhân lực", 
-    desc: "Dự báo cạn kiệt tài nguyên trong 18 tháng do tốc độ tăng trưởng siêu tốc kéo dài.", 
-    prob: 85, 
-    status: "NGHIÊM TRỌNG", 
+    title: "Kiệt sức & Quá tải Tâm lý", 
+    desc: "Dự báo cạn kiệt năng lượng tinh thần trong 12-18 tháng do vừa gánh học phí cao vừa chịu áp lực học tập/làm thêm dày đặc.", 
+    prob: 78, 
+    status: "BÁO ĐỘNG", 
     statusColor: "text-rose-600 bg-rose-50 border-rose-100",
-    time: "2 giờ trước",
-    loss: "$1.2M",
-    score: 8.4,
+    time: "Cập nhật hôm nay",
+    loss: "Giảm 45% năng suất",
+    score: 8.2,
     icon: "psychology_alt"
+  },
+  { 
+    id: 2,
+    title: "Đứt gãy Dòng tiền Học phí", 
+    desc: "Nguy cơ thiếu hụt ngân sách trang trải học phí và chi phí sinh hoạt phát sinh ngoài dự kiến ở các năm học sau.", 
+    prob: 64, 
+    status: "TRUNG BÌNH", 
+    statusColor: "text-amber-600 bg-amber-50 border-amber-100",
+    time: "Dự báo năm 2",
+    loss: "~40-60 triệu/năm",
+    score: 6.9,
+    icon: "account_balance_wallet"
+  },
+  { 
+    id: 3,
+    title: "Lệch pha Kỹ năng Thực tế", 
+    desc: "Chương trình học hàn lâm chậm cập nhật so với tốc độ AI và yêu cầu tuyển dụng thực tế của doanh nghiệp.", 
+    prob: 52, 
+    status: "CẢNH BÁO", 
+    statusColor: "text-blue-600 bg-blue-50 border-blue-100",
+    time: "Sau 24 tháng",
+    loss: "Chậm thăng tiến 1-2 năm",
+    score: 6.1,
+    icon: "school"
+  },
+  { 
+    id: 4,
+    title: "Cạnh tranh Việc làm Đầu đời", 
+    desc: "Thị trường lao động bão hòa ở phân khúc Junior, đòi hỏi phải có Portfolio thực chiến và chứng chỉ quốc tế từ sớm.", 
+    prob: 70, 
+    status: "QUAN TRỌNG", 
+    statusColor: "text-indigo-600 bg-indigo-50 border-indigo-100",
+    time: "Khi tốt nghiệp",
+    loss: "Giảm 30% lương khởi điểm",
+    score: 7.5,
+    icon: "trending_up"
   }
 ];

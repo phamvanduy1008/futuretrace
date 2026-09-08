@@ -69,57 +69,89 @@ const ScenarioDetailPage: React.FC = () => {
     }
   }, [id, state?.fromCommunity]);
 
+  const [scenario, setScenario] = useState<any>(state.scenario);
+  const [isLoading, setIsLoading] = useState<boolean>(!state.scenario);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
   useEffect(() => {
     window.scrollTo(0, 0);
-    if (!state.scenario) {
-      navigate("/history");
-    } else {
-      if (state.scenario && state.scenario.id) {
+    if (state.scenario) {
+      setScenario(state.scenario);
+      setIsLoading(false);
+      if (state.scenario.id) {
         setSaveForm((prev) => ({ ...prev, title: state.scenario.title || "" }));
-        // If not from community, check if it has progress
         if (!state.fromCommunity) {
           fetchProgress(state.scenario.id);
         }
       }
-
       if (state.fromCommunity) {
         loadComments();
       }
+      return;
     }
-  }, [state, navigate, id, loadComments]);
 
-  const [scenario, setScenario] = useState<any>(state.scenario);
-  const [isLoadingFull, setIsLoadingFull] = useState(false);
-
-  useEffect(() => {
-    if (state.scenario) {
-      setScenario(state.scenario);
+    if (!id) {
+      navigate("/history");
+      return;
     }
-  }, [state.scenario]);
 
-  useEffect(() => {
-    const fetchFullData = async () => {
-      if (id && scenario && !scenario.deepAnalysis && !state.fromCommunity) {
-        setIsLoadingFull(true);
-        try {
-          const fullData = await apiGetSimulation(id);
-          if (fullData.scenarios) {
-            const sub = fullData.scenarios.find((s: any) => String(s.id) === String(id) || String(s._id) === String(id)) || fullData.scenarios[0];
-            if (sub) setScenario((prev: any) => ({ ...prev, ...sub }));
-          } else {
-            setScenario((prev: any) => ({ ...prev, ...fullData }));
-          }
-        } catch (err) {
-          console.error("Error fetching full scenario data", err);
-        } finally {
-          setIsLoadingFull(false);
+    setIsLoading(true);
+    setLoadError(null);
+
+    apiGetSimulation(id)
+      .then((fullData) => {
+        let matched = null;
+        if (fullData.matchedScenario) {
+          matched = fullData.matchedScenario;
+        } else if (fullData.scenarios && fullData.scenarios.length > 0) {
+          matched = fullData.scenarios.find(
+            (s: any) =>
+              String(s.id) === String(id) ||
+              String(s._id) === String(id) ||
+              String(s.type?.toLowerCase()) === String(id.toLowerCase())
+          ) || fullData.scenarios[0];
+        } else {
+          matched = fullData;
         }
-      }
-    };
-    fetchFullData();
-  }, [id, scenario?.deepAnalysis, state.fromCommunity]);
 
-  if (!scenario) return null;
+        if (matched) {
+          setScenario(matched);
+          setSaveForm((prev) => ({ ...prev, title: matched.title || "" }));
+          if (matched.id) {
+            fetchProgress(matched.id);
+          }
+        } else {
+          setLoadError("Không tìm thấy thông tin kịch bản.");
+        }
+      })
+      .catch((err) => {
+        console.error("Error loading scenario by id:", err);
+        try {
+          const localHistory = JSON.parse(localStorage.getItem('futuretrace_history') || '[]');
+          let found = null;
+          for (const item of localHistory) {
+            if (item.id === id) { found = item; break; }
+            if (item.scenarios) {
+              const sub = item.scenarios.find(
+                (s: any) =>
+                  s.id === id ||
+                  s._id === id ||
+                  s.type?.toLowerCase() === id.toLowerCase()
+              );
+              if (sub) { found = sub; break; }
+            }
+          }
+          if (found) {
+            setScenario(found);
+            return;
+          }
+        } catch (e) { }
+        setLoadError("Không thể tải thông tin kịch bản.");
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [id, state.scenario, state.fromCommunity, navigate, loadComments]);
 
   const displayRoi = scenario.roi ?? scenario.metrics?.roi ?? 0;
   const displayCareer = scenario.careerGrowth ?? scenario.metrics?.career ?? 0;
@@ -229,9 +261,44 @@ const ScenarioDetailPage: React.FC = () => {
     }
   };
 
+  if (isLoading) {
+    return (
+      <AnimatedBackground className="min-h-screen bg-[#f8fafc] flex flex-col font-sans relative">
+        <SharedHeader />
+        <div className="flex-1 flex flex-col items-center justify-center p-8">
+          <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4" />
+          <p className="text-slate-500 font-medium text-sm">Đang tải chi tiết kịch bản...</p>
+        </div>
+        <SharedFooter />
+      </AnimatedBackground>
+    );
+  }
+
+  if (loadError || !scenario) {
+    return (
+      <AnimatedBackground className="min-h-screen bg-[#f8fafc] flex flex-col font-sans relative">
+        <SharedHeader />
+        <div className="flex-1 flex flex-col items-center justify-center p-8 text-center max-w-md mx-auto">
+          <div className="w-16 h-16 bg-rose-50 text-rose-500 rounded-3xl flex items-center justify-center mb-6 shadow-sm border border-rose-100 mx-auto">
+            <IconMapper name="search_off" className="text-3xl" />
+          </div>
+          <h2 className="text-2xl font-black text-slate-900 mb-2 font-display uppercase italic">Không tìm thấy kịch bản</h2>
+          <p className="text-slate-500 text-sm mb-8">{loadError || "Kịch bản này có thể chưa được lưu hoặc không tồn tại."}</p>
+          <button
+            onClick={() => navigate('/history')}
+            className="px-8 py-4 bg-slate-900 text-white text-[11px] font-black uppercase tracking-widest rounded-2xl hover:bg-blue-600 transition-colors shadow-lg"
+          >
+            Về Kho Lịch Sử
+          </button>
+        </div>
+        <SharedFooter />
+      </AnimatedBackground>
+    );
+  }
+
   const currentUser = getCurrentUser();
   // Robust ID check: handle both nested objects and direct strings
-  const scenarioUserId = scenario.user_id?._id || scenario.user_id;
+  const scenarioUserId = scenario?.user_id?._id || scenario?.user_id;
   const isOwner =
     currentUser &&
     ((state.fromCommunity &&
@@ -609,6 +676,17 @@ const ScenarioDetailPage: React.FC = () => {
                   </motion.button>
                 )
               )}
+
+              {/* Nút Giám sát rủi ro */}
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => navigate('/risk-analysis')}
+                className="w-full py-5 bg-white border-2 border-slate-100 hover:border-blue-500 hover:bg-blue-50/50 text-slate-800 hover:text-blue-600 font-black text-[10px] uppercase tracking-widest rounded-[1.5rem] sm:rounded-[2rem] transition-all flex items-center justify-center gap-3 shadow-sm"
+              >
+                <IconMapper name="warning" className="text-lg text-amber-500" />
+                GIÁM SÁT RỦI RO LỘ TRÌNH
+              </motion.button>
 
               {/* 2. Nút Xuất bản (Chỉ hiện nếu đang ở xem từ lịch sử) */}
               {!state.fromCommunity && (

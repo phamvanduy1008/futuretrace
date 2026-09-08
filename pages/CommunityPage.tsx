@@ -8,7 +8,7 @@ import { CommunityPost } from '../types';
 import { IconMapper } from '../components/IconMapper';
 import { AnimatedBackground } from '../components/AnimatedBackground';
 
-const POSTS_PER_PAGE = 3;
+const POSTS_PER_PAGE = 9;
 
 const CommunityPage: React.FC = () => {
   const navigate = useNavigate();

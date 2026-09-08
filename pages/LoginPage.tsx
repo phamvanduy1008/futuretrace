@@ -5,6 +5,7 @@ import SharedHeader from "../components/SharedHeader";
 import SharedFooter from "../components/SharedFooter";
 import { login, getUserProfile } from "../services/authService";
 import { IconMapper } from '../components/IconMapper';
+import { ForgotPasswordModal } from '../components/ForgotPasswordModal';
 
 interface LoginPageProps {
   onLogin: () => void;
@@ -14,7 +15,10 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [resetSuccessMessage, setResetSuccessMessage] = useState("");
+  const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
   const [loading, setLoading] = useState(false);
 
   React.useEffect(() => {
@@ -77,6 +81,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setResetSuccessMessage("");
 
     try {
       await login(email, password);
@@ -109,6 +114,15 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
 
           <div className="w-full bg-white border border-slate-200 rounded-[2.5rem] p-8 sm:p-12 shadow-[0_40px_80px_-15px_rgba(0,0,0,0.18)]">
             <form className="flex flex-col gap-7" onSubmit={handleSubmit}>
+              {/* Success Notification */}
+              {resetSuccessMessage && (
+                <div className="p-4 bg-emerald-50 border border-emerald-100 text-emerald-700 rounded-2xl text-xs font-bold flex items-center gap-3 animate-in fade-in">
+                  <IconMapper name="check_circle" className="text-lg text-emerald-600 flex-shrink-0" />
+                  <span>{resetSuccessMessage}</span>
+                </div>
+              )}
+
+              {/* Error Notification */}
               {error && (
                 <div className="p-4 bg-rose-50 border border-rose-100 text-rose-600 rounded-2xl text-xs font-bold flex items-center gap-3">
                   <IconMapper name="error" className=" text-lg" />
@@ -123,33 +137,51 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
                 <input
                   required
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (resetSuccessMessage) setResetSuccessMessage("");
+                  }}
                   className="w-full rounded-2xl border border-slate-100 bg-slate-50 h-14 px-5 text-base focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-50 outline-none transition-all font-medium"
                   placeholder="name@company.vn"
                   type="email"
                 />
               </div>
               <div className="flex flex-col gap-2.5">
-                <div className="flex justify-between items-center ml-1">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                    Mật khẩu
-                  </label>
-                  <a
-                    className="text-blue-600 text-[10px] font-black uppercase tracking-widest hover:underline"
-                    href="#"
-                  >
-                    Quên mật khẩu?
-                  </a>
-                </div>
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">
+                  Mật khẩu
+                </label>
                 <div className="relative">
                   <input
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full rounded-2xl border border-slate-100 bg-slate-50 h-14 px-5 text-base focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-50 outline-none transition-all font-medium"
+                    className="w-full rounded-2xl border border-slate-100 bg-slate-50 h-14 px-5 pr-12 text-base focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-50 outline-none transition-all font-medium"
                     placeholder="Nhập mật khẩu"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors p-1"
+                  >
+                    <IconMapper
+                      name={showPassword ? "visibility_off" : "visibility"}
+                      className="text-lg"
+                    />
+                  </button>
+                </div>
+                <div className="flex justify-end mt-0.5 mr-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setError("");
+                      setResetSuccessMessage("");
+                      setShowForgotPasswordModal(true);
+                    }}
+                    className="text-blue-600 text-[11px] font-black uppercase tracking-wider hover:underline transition-colors focus:outline-none"
+                  >
+                    Quên mật khẩu?
+                  </button>
                 </div>
               </div>
 
@@ -208,6 +240,19 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
       </main>
 
       <SharedFooter />
+
+      {/* Forgot Password Modal */}
+      <ForgotPasswordModal
+        isOpen={showForgotPasswordModal}
+        initialEmail={email}
+        onClose={() => setShowForgotPasswordModal(false)}
+        onSuccess={(updatedEmail) => {
+          setEmail(updatedEmail);
+          setPassword("");
+          setResetSuccessMessage("Đổi mật khẩu thành công! Hãy đăng nhập với mật khẩu mới của bạn.");
+          setError("");
+        }}
+      />
     </AnimatedBackground>
   );
 };
