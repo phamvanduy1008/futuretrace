@@ -12,13 +12,14 @@ import { IconMapper } from "../components/IconMapper";
 import { InteractiveDecisionTree } from "../components/InteractiveDecisionTree";
 import { calculateRealisticRoi } from "../services/roiCalculator";
 import { RoiFinancialBreakdownModal } from "../components/RoiFinancialBreakdownModal";
+import { ParentPerspectiveView } from "../components/ParentPerspectiveView";
 
 const ScenarioDetailPage: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [activeTab, setActiveTab] = useState<"overview" | "decisionTree">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "decisionTree" | "parent">("overview");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [saveForm, setSaveForm] = useState({
     title: "",
@@ -428,11 +429,11 @@ const ScenarioDetailPage: React.FC = () => {
         </header>
 
         {/* View Switcher Tabs */}
-        <div className="flex items-center gap-3 mb-10 p-1.5 bg-slate-200/50 rounded-2xl w-fit border border-slate-200/80 shadow-inner">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-10 p-1.5 bg-slate-200/50 rounded-2xl w-fit border border-slate-200/80 shadow-inner">
           <button
             type="button"
             onClick={() => setActiveTab("overview")}
-            className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 ${
+            className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 ${
               activeTab === "overview"
                 ? "bg-white text-slate-900 shadow-md border border-slate-100"
                 : "text-slate-600 hover:text-slate-900"
@@ -443,8 +444,23 @@ const ScenarioDetailPage: React.FC = () => {
           </button>
           <button
             type="button"
+            onClick={() => setActiveTab("parent")}
+            className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 relative ${
+              activeTab === "parent"
+                ? "bg-gradient-to-r from-blue-600 via-indigo-600 to-sky-600 text-white shadow-md shadow-blue-500/20"
+                : "text-slate-600 hover:text-slate-900"
+            }`}
+          >
+            <IconMapper name="favorite" className={`text-sm ${activeTab === "parent" ? "text-rose-300" : "text-rose-500"}`} />
+            Góc Nhìn Phụ Huynh
+            <span className="ml-1 px-1.5 py-0.5 rounded-full text-[9px] bg-amber-400 text-amber-950 font-black shadow-sm">
+              MỚI
+            </span>
+          </button>
+          <button
+            type="button"
             onClick={() => setActiveTab("decisionTree")}
-            className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 ${
+            className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 ${
               activeTab === "decisionTree"
                 ? "bg-blue-600 text-white shadow-md shadow-blue-500/20"
                 : "text-slate-600 hover:text-slate-900"
@@ -464,6 +480,17 @@ const ScenarioDetailPage: React.FC = () => {
             <InteractiveDecisionTree
               decisionTitle={scenario.title}
               scenarios={[scenario]}
+            />
+          </motion.div>
+        ) : activeTab === "parent" ? (
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-16"
+          >
+            <ParentPerspectiveView
+              scenario={scenario}
+              context={state.context}
             />
           </motion.div>
         ) : (
@@ -783,6 +810,19 @@ const ScenarioDetailPage: React.FC = () => {
                   </motion.button>
                 )
               )}
+
+              {/* Nút Chuyển Góc Nhìn Phụ Huynh */}
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveTab("parent");
+                  window.scrollTo({ top: 400, behavior: "smooth" });
+                }}
+                className="w-full py-5 bg-gradient-to-r from-blue-50 via-indigo-50 to-sky-50 border-2 border-blue-200 text-blue-900 font-black text-[10px] uppercase tracking-widest rounded-[1.5rem] sm:rounded-[2rem] hover:bg-blue-100 hover:border-blue-300 transition-all shadow-sm flex items-center justify-center gap-3 group"
+              >
+                GÓC NHÌN PHỤ HUYNH & CHIA SẺ
+                <IconMapper name="favorite" className="text-rose-500 text-lg group-hover:scale-125 transition-transform" />
+              </button>
 
               {/* 2. Nút Xuất bản (Chỉ hiện nếu đang ở xem từ lịch sử) */}
               {!state.fromCommunity && (

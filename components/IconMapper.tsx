@@ -108,6 +108,16 @@ const materialToPhosphor: Record<string, string> = {
   'math_operations': 'MathOperations',
   'coins': 'Coins',
   'chart': 'ChartLineUp',
+  'auto_stories': 'BookOpen',
+  'tune': 'Sliders',
+  'expand_less': 'CaretUp',
+  'caret_up': 'CaretUp',
+  'caret_down': 'CaretDown',
+  'shield_warning': 'ShieldWarning',
+  'compass': 'Compass',
+  'books': 'Books',
+  'sliders': 'Sliders',
+  'path': 'Path',
 };
 
 interface IconMapperProps {
@@ -118,8 +128,10 @@ interface IconMapperProps {
 }
 
 export const IconMapper: React.FC<IconMapperProps> = ({ name, className, weight = 'bold', style }) => {
-  const PhosphorName = materialToPhosphor[name] || 'Lightning';
-  const IconComponent = (PhosphorIcons as any)[PhosphorName];
+  const PhosphorName =
+    materialToPhosphor[name] ||
+    ((PhosphorIcons as any)[name] ? name : 'Sparkle');
+  const IconComponent = (PhosphorIcons as any)[PhosphorName] || PhosphorIcons.Sparkle;
   if (!IconComponent) return null;
   return <IconComponent size={20} className={className} weight={weight} style={style} />;
 };

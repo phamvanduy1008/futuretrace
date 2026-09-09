@@ -34,6 +34,7 @@ import ProfilePage from './pages/ProfilePage';
 import { getUserProfile, logout } from './services/authService';
 import AdminApp from './pages/admin/AdminApp';
 import { TourProvider } from './components/GuideTour';
+import ParentPerspectivePage from './pages/ParentPerspectivePage';
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
@@ -102,6 +103,7 @@ const App: React.FC = () => {
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/parent-view" element={<ParentPerspectivePage />} />
 
           <Route
             path="/dashboard"

@@ -417,7 +417,7 @@ export const InteractiveDecisionTree: React.FC<InteractiveDecisionTreeProps> = (
                   }`}
                 >
                   <IconMapper
-                    name={isNodeSelected ? "expand_less" : "tune"}
+                    name={isNodeSelected ? "caret_up" : "compass"}
                     className="text-sm"
                   />
                   {isNodeSelected ? "Thu gọn phân tích" : "Xem rủi ro & Bẻ lái"}
