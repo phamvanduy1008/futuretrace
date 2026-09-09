@@ -41,6 +41,16 @@ export interface SimulationData {
   coreValues?: "Ổn định" | "Thu nhập cao" | "Đam mê/Cống hiến";
 }
 
+export interface RoiDetails {
+  annualizedRoi: number; // Tỷ suất sinh lời bình quân hàng năm (%/năm), vd: 24.5
+  cumulativeRoi: number; // Tổng tỷ suất tích lũy cả kỳ (%), vd: 200
+  estimatedCost: string; // Chi phí đầu tư dự kiến (vd: "45 - 65 triệu VNĐ")
+  estimatedAnnualGain: string; // Mức thu nhập tăng thêm dự kiến (vd: "15 - 22 triệu VNĐ/tháng")
+  paybackPeriodYears: number; // Thời gian hoàn vốn dự kiến (năm), vd: 1.8
+  breakdownExplanation: string; // Giải trình cơ sở tính toán
+  riskFactor?: string; // Yếu tố rủi ro
+}
+
 export interface ScenarioResult {
   id?: string;
   title: string;
@@ -48,6 +58,13 @@ export interface ScenarioResult {
   careerGrowth: number;
   happiness: number;
   roi: number;
+  cumulativeRoi?: number;
+  roiDetails?: RoiDetails;
+  metrics?: {
+    career?: number;
+    happiness?: number;
+    roi?: number;
+  };
   type: "Positive" | "Neutral" | "Risk";
   deepAnalysis?: {
     swot: {

@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { MATRIX_DATA } from '../data/mockDatabase';
 import { IconMapper } from '../components/IconMapper';
 import { AnimatedBackground } from '../components/AnimatedBackground';
+import { RadarComparisonChart } from '../components/RadarComparisonChart';
 
 const ComparisonMatrixPage: React.FC = () => {
   return (
@@ -13,7 +14,7 @@ const ComparisonMatrixPage: React.FC = () => {
       <SharedHeader />
       
       <main className="flex-1 max-w-[1440px] mx-auto w-full px-4 sm:px-8 py-8 sm:py-16 mb-20">
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-12 sm:mb-20">
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-12 sm:mb-16">
           <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest mb-8 border border-blue-100">
             BẢNG SO SÁNH CÁC HƯỚNG ĐI v2.0
           </div>
@@ -21,6 +22,16 @@ const ComparisonMatrixPage: React.FC = () => {
           <p className="text-slate-600 text-sm sm:text-xl max-w-3xl leading-relaxed font-medium">
             Phân tích điểm tương đồng, khác biệt và hiệu quả tương đối giữa các kịch bản tương lai dự báo để tìm ra lộ trình tối ưu nhất.
           </p>
+        </motion.div>
+
+        {/* Radar Comparison Chart */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }} 
+          animate={{ opacity: 1, y: 0 }} 
+          transition={{ delay: 0.15 }}
+          className="mb-16"
+        >
+          <RadarComparisonChart />
         </motion.div>
 
         <div className="overflow-x-auto pb-6 -mx-4 px-4 sm:mx-0 sm:px-0">

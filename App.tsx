@@ -32,7 +32,6 @@ import PaymentResultPage from './pages/PaymentResultPage';
 import EvaluationFlow from './pages/EvaluationFlow';
 import ProfilePage from './pages/ProfilePage';
 import { getUserProfile, logout } from './services/authService';
-import RiskAnalysisPage from './pages/RiskAnalysisPage';
 import AdminApp from './pages/admin/AdminApp';
 import { TourProvider } from './components/GuideTour';
 
@@ -131,14 +130,6 @@ const App: React.FC = () => {
           <Route
             path="/matrix"
             element={isAuthenticated ? <ComparisonMatrixPage /> : <Navigate to="/login" />}
-          />
-          <Route
-            path="/risk-analysis"
-            element={isAuthenticated ? <RiskAnalysisPage /> : <Navigate to="/login" />}
-          />
-          <Route
-            path="/risk"
-            element={<Navigate to="/risk-analysis" replace />}
           />
           <Route
             path="/store"

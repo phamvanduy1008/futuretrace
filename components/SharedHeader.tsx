@@ -57,7 +57,6 @@ const SharedHeader: React.FC = () => {
     { label: 'Cộng đồng', path: '/community', icon: 'groups' },
     { label: 'Tiến trình', path: '/progress', icon: 'trending_up' },
     { label: 'Lịch sử', path: '/history', icon: 'history' },
-    { label: 'Rủi ro', path: '/risk-analysis', icon: 'warning' },
   ];
 
   const profileMenuItems = [
@@ -67,10 +66,10 @@ const SharedHeader: React.FC = () => {
 
   return (
     <>
-      <header className="sticky top-0 z-[100] w-full bg-slate-950/90 backdrop-blur-2xl border-b border-slate-800/50 px-6 sm:px-10 py-4 transition-all duration-300">
-        <div className="max-w-[1440px] mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-10">
-            <div className="flex items-center gap-3 cursor-pointer group" onClick={() => navigate('/')}>
+      <header className="sticky top-0 z-[100] w-full bg-slate-950/95 backdrop-blur-2xl border-b border-slate-800/60 px-4 sm:px-6 lg:px-8 py-3 transition-all duration-300">
+        <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-4">
+          <div className="flex items-center gap-6 xl:gap-12 shrink-0">
+            <div className="flex items-center gap-3 cursor-pointer group shrink-0" onClick={() => navigate('/')}>
               <div className="w-10 h-10 rounded-xl overflow-hidden shadow-lg shadow-blue-900/20 border border-slate-800 transition-all group-hover:scale-105 group-hover:border-blue-500/50">
                 <img src="/logo.png" alt="Logo" className="w-full h-full object-cover" />
               </div>
@@ -89,70 +88,80 @@ const SharedHeader: React.FC = () => {
             </div>
 
             {isLoggedIn && (
-              <nav className="hidden lg:flex items-center gap-8">
-                {navItems.map((item) => (
-                  <button
-                    key={item.path}
-                    id={`tour-nav-${item.path.replace('/', '')}`}
-                    onClick={() => navigate(item.path)}
-                    className={`text-[11px] font-black uppercase tracking-widest transition-all ${location.pathname === item.path
-                        ? 'text-white border-b-2 border-white pb-1'
-                        : 'text-slate-400 hover:text-white'
+              <nav className="hidden lg:flex items-center gap-5 xl:gap-8 shrink-0">
+                {navItems.map((item) => {
+                  const isActive = location.pathname === item.path;
+                  return (
+                    <button
+                      key={item.path}
+                      id={`tour-nav-${item.path.replace('/', '')}`}
+                      onClick={() => navigate(item.path)}
+                      className={`relative py-1.5 text-[11px] xl:text-[12px] font-black uppercase tracking-widest whitespace-nowrap transition-all duration-200 ${
+                        isActive
+                          ? 'text-white'
+                          : 'text-slate-400 hover:text-white'
                       }`}
-                  >
-                    {item.label}
-                  </button>
-                ))}
+                    >
+                      <span>{item.label}</span>
+                      {isActive && (
+                        <span className="absolute -bottom-1 left-0 right-0 h-[2px] bg-gradient-to-r from-blue-600 via-blue-400 to-blue-600 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.8)]" />
+                      )}
+                    </button>
+                  );
+                })}
                 <button
                   id="tour-nav-store"
                   onClick={() => navigate('/store')}
-                  className={`flex items-center gap-2 text-[11px] font-black uppercase tracking-widest transition-all px-4 py-1.5 rounded-full border ${location.pathname === '/store'
-                      ? 'bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-600/20'
-                      : 'border-slate-700 text-blue-400 hover:border-blue-500 hover:bg-blue-950/50'
-                    }`}
+                  className={`flex items-center gap-2 text-[11px] xl:text-[12px] font-black uppercase tracking-widest whitespace-nowrap transition-all duration-200 px-4 py-1.5 rounded-full border ${
+                    location.pathname === '/store'
+                      ? 'bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-600/30'
+                      : 'border-slate-800 bg-slate-900/60 text-blue-400 hover:border-blue-500/50 hover:bg-blue-950/60 hover:text-blue-300'
+                  }`}
                 >
-                  <IconMapper name="store" className=" text-sm" />
-                  Cửa hàng
+                  <IconMapper name="store" className="text-sm shrink-0" />
+                  <span>Cửa hàng</span>
                 </button>
               </nav>
             )}
           </div>
 
-          <div className="flex items-center gap-3 sm:gap-6">
+          <div className="flex items-center gap-2.5 sm:gap-4 shrink-0">
             {isLoggedIn ? (
               <>
-                <div className="relative hidden lg:block">
-                  <IconMapper name="search" className=" absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg" />
-                  <input aria-label="Tìm kiếm kịch bản cộng đồng" value={searchValue}
+                <div className="relative hidden lg:block shrink-0">
+                  <IconMapper name="search" className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-base" />
+                  <input
+                    aria-label="Tìm kiếm kịch bản cộng đồng"
+                    value={searchValue}
                     onChange={handleSearchChange}
-                    className="bg-slate-900/80 border border-slate-800 rounded-xl py-2 pl-10 pr-4 text-[11px] w-48 xl:w-64 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-slate-900 text-white transition-all font-medium placeholder-slate-500"
+                    className="bg-slate-900/80 border border-slate-800 rounded-xl py-2 pl-9 pr-4 text-[11px] w-36 xl:w-52 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-slate-900 focus:w-48 xl:focus:w-64 text-white transition-all font-medium placeholder-slate-500 whitespace-nowrap"
                     placeholder="Tìm kịch bản..."
                   />
                   {searchValue && (
                     <button
                       onClick={() => { setSearchValue(""); navigate('/community'); }}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white"
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white"
                     >
-                      <IconMapper name="close" className=" text-sm" />
+                      <IconMapper name="close" className="text-xs" />
                     </button>
                   )}
                 </div>
 
                 <button
                   onClick={startTour}
-                  className="text-slate-400 hover:text-white transition-all flex items-center gap-1.5 hover:bg-slate-900 border border-transparent hover:border-slate-800 px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest"
+                  className="text-slate-400 hover:text-white transition-all flex items-center gap-1.5 hover:bg-slate-900 border border-transparent hover:border-slate-800 px-2.5 py-1.5 rounded-xl text-[10px] xl:text-[11px] font-black uppercase tracking-wider whitespace-nowrap shrink-0"
                   title="Xem hướng dẫn sử dụng"
                 >
-                  <IconMapper name="help" className="text-lg" />
-                  <span className="hidden xl:inline">Hướng dẫn</span>
+                  <IconMapper name="help" className="text-base shrink-0" />
+                  <span className="hidden xl:inline whitespace-nowrap">Hướng dẫn</span>
                 </button>
 
-                <button className="text-slate-400 hover:text-white transition-colors hidden sm:block">
-                  <IconMapper name="notifications" className="text-2xl" />
+                <button className="text-slate-400 hover:text-white transition-colors hidden sm:block p-1.5 shrink-0">
+                  <IconMapper name="notifications" className="text-xl" />
                 </button>
 
                 <div
-                  className="relative hidden lg:block"
+                  className="relative hidden lg:block shrink-0"
                   onMouseEnter={() => setIsProfileOpen(true)}
                   onMouseLeave={() => setIsProfileOpen(false)}
                 >

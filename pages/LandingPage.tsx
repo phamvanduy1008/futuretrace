@@ -1,25 +1,43 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import SharedHeader from '../components/SharedHeader';
 import SharedFooter from '../components/SharedFooter';
 import { IconMapper } from '../components/IconMapper';
 import { AnimatedBackground } from '../components/AnimatedBackground';
+import { HeroNetworkCanvas } from '../components/HeroNetworkCanvas';
 
 const LandingPage: React.FC = () => {
   const navigate = useNavigate();
+
+  // 3D Card tilt tracking
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+
+  const handleCardMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 14;
+    const y = ((e.clientY - rect.top) / rect.height - 0.5) * -14;
+    setTilt({ x, y });
+  };
+
+  const handleCardMouseLeave = () => {
+    setTilt({ x: 0, y: 0 });
+  };
 
   return (
     <AnimatedBackground className="flex flex-col">
       <SharedHeader />
 
       <main className="flex-1">
-        <section className="px-6 pt-24 pb-32 mx-auto max-w-7xl flex flex-col items-center text-center">
+        <section className="px-6 pt-24 pb-32 mx-auto max-w-7xl flex flex-col items-center text-center relative overflow-hidden">
+          {/* Particle Constellation Background Canvas */}
+          <HeroNetworkCanvas className="z-0" />
+
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="inline-flex items-center gap-3 px-4 py-1.5 mb-14 text-[10px] font-black tracking-widest uppercase border border-slate-200 text-slate-600 rounded-full bg-slate-50/50"
+            className="inline-flex items-center gap-3 px-4 py-1.5 mb-14 text-[10px] font-black tracking-widest uppercase border border-slate-200 text-slate-600 rounded-full bg-slate-50/50 relative z-10"
           >
             <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
             Intelligence Simulation System v4.0
@@ -29,7 +47,7 @@ const LandingPage: React.FC = () => {
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2 }}
-            className="max-w-5xl uppercase italic font-black mb-12 tracking-tight text-slate-900 font-display"
+            className="max-w-5xl uppercase italic font-black mb-12 tracking-tight text-slate-900 font-display relative z-10"
           >
             <span className="block text-5xl md:text-7xl mb-4 md:mb-6 leading-tight">Dự báo tương lai</span>
             <span className="text-blue-600 block text-4xl md:text-7xl leading-normal pb-4">bằng dữ liệu mô phỏng.</span>
@@ -39,7 +57,7 @@ const LandingPage: React.FC = () => {
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.3 }}
-            className="max-w-2xl text-xl text-slate-600 mb-16 leading-relaxed font-medium"
+            className="max-w-2xl text-xl text-slate-600 mb-16 leading-relaxed font-medium relative z-10"
           >
             Xây dựng bản đồ hệ quả dài hạn cho các quyết định sự nghiệp và tài chính quan trọng của bạn thông qua AI.
           </motion.p>
@@ -48,7 +66,7 @@ const LandingPage: React.FC = () => {
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.4 }}
-            className="flex flex-col sm:flex-row items-center gap-6"
+            className="flex flex-col sm:flex-row items-center gap-6 relative z-10"
           >
             <motion.button
               whileHover={{ scale: 1.02, boxShadow: "0 20px 40px -10px rgba(37,99,235,0.3)" }}
@@ -69,15 +87,50 @@ const LandingPage: React.FC = () => {
             </motion.button>
           </motion.div>
 
+          {/* Live Metrics Counter Strip */}
+          <motion.div
+            initial={{ opacity: 0, y: 25 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 w-full max-w-4xl mx-auto mt-16 p-6 rounded-3xl bg-white/70 backdrop-blur-xl border border-white/80 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.06)] relative z-10"
+          >
+            {[
+              { val: "12,850+", label: "Lộ Trình Đã Mô Phỏng", icon: "route" },
+              { val: "94.8%", label: "Tránh Điểm Gãy Sự Nghiệp", icon: "verified" },
+              { val: "10,000", label: "Nhánh Monte Carlo / Lần", icon: "account_tree" },
+              { val: "< 3.2s", label: "Tốc Độ Tính Toán AI", icon: "bolt" },
+            ].map((stat, sIdx) => (
+              <div key={sIdx} className="flex flex-col items-center text-center p-2">
+                <div className="flex items-center gap-1.5 text-blue-600 mb-1">
+                  <IconMapper name={stat.icon} className="text-base" />
+                  <span className="text-xl sm:text-2xl font-black font-display tracking-tight text-slate-900">
+                    {stat.val}
+                  </span>
+                </div>
+                <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+                  {stat.label}
+                </span>
+              </div>
+            ))}
+          </motion.div>
+
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8 }}
-            className="hidden lg:block relative z-30 max-w-5xl mx-auto mt-24 px-6 perspective-1000"
+            className="hidden lg:block relative z-30 max-w-5xl mx-auto mt-20 px-6"
           >
-            <div className="bg-white/50 backdrop-blur-2xl rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] border border-white p-2 flex flex-col items-center">
-              <div className="w-full flex items-center justify-between px-6 py-4 bg-white/40 rounded-t-2xl border-b border-white">
+            <div
+              onMouseMove={handleCardMouseMove}
+              onMouseLeave={handleCardMouseLeave}
+              style={{
+                transform: `perspective(1200px) rotateX(${tilt.y}deg) rotateY(${tilt.x}deg)`,
+                transition: 'transform 0.12s ease-out',
+              }}
+              className="bg-white/60 backdrop-blur-2xl rounded-3xl shadow-[0_30px_80px_-20px_rgba(0,0,0,0.12)] border border-white p-2 flex flex-col items-center cursor-pointer"
+            >
+              <div className="w-full flex items-center justify-between px-6 py-4 bg-white/50 rounded-t-2xl border-b border-white">
                 <div className="flex gap-2">
                   <div className="w-2.5 h-2.5 rounded-full bg-slate-300"></div>
                   <div className="w-2.5 h-2.5 rounded-full bg-slate-300"></div>

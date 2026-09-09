@@ -17,6 +17,10 @@ import SharedHeader from "../components/SharedHeader";
 import SharedFooter from "../components/SharedFooter";
 import { IconMapper } from "../components/IconMapper";
 import { AnimatedBackground } from "../components/AnimatedBackground";
+import { DecisionTemplatesModal } from "../components/DecisionTemplatesModal";
+import { RadarComparisonChart } from "../components/RadarComparisonChart";
+import { InteractiveDecisionTree } from "../components/InteractiveDecisionTree";
+import { calculateRealisticRoi } from "../services/roiCalculator";
 
 import { getLatestEvaluation } from "../services/evaluationService";
 
@@ -211,6 +215,7 @@ const SimulationFlow: React.FC = () => {
     type: "AUTH" | "NETWORK" | "LOCAL_CONFIG" | "GENERAL" | "OVERLOADED" | "RATE_LIMIT";
   } | null>(null);
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+  const [isTemplatesModalOpen, setIsTemplatesModalOpen] = useState(false);
   const [folderName, setFolderName] = useState("");
   const [isSaved, setIsSaved] = useState(false);
   const [selectedScenario, setSelectedScenario] =
@@ -467,11 +472,21 @@ const SimulationFlow: React.FC = () => {
             </div>
 
             <div id="tour-decision-hints" className="space-y-6">
-              <div className="flex items-center gap-4">
-                <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 whitespace-nowrap">
-                  Hoặc chọn biểu mẫu gợi ý chi tiết
-                </span>
-                <span className="h-px bg-slate-200/60 flex-1"></span>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 whitespace-nowrap">
+                    Hoặc chọn biểu mẫu gợi ý nhanh
+                  </span>
+                  <span className="h-px bg-slate-200/60 w-12 hidden sm:block"></span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsTemplatesModalOpen(true)}
+                  className="px-4 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-600 text-[11px] font-black uppercase tracking-wider transition-all flex items-center gap-2 border border-blue-200/60 shadow-sm w-fit"
+                >
+                  <IconMapper name="auto_stories" className="text-sm text-blue-600" />
+                  Mở Thư Viện Kịch Bản Chuyên Sâu (5 Mẫu Chi Tiết)
+                </button>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {DECISION_TEMPLATES.map((tmpl) => {
@@ -542,6 +557,23 @@ const SimulationFlow: React.FC = () => {
               </motion.button>
             </div>
           </div>
+
+          {/* Detailed Decision Templates Modal */}
+          <DecisionTemplatesModal
+            isOpen={isTemplatesModalOpen}
+            onClose={() => setIsTemplatesModalOpen(false)}
+            onSelectTemplate={(tmpl) => {
+              setData((prev) => ({
+                ...prev,
+                decision: tmpl.promptTemplate,
+                stress: tmpl.presetParameters.stress,
+                personalFinance: tmpl.presetParameters.personalFinance,
+                risk: tmpl.presetParameters.risk,
+                academicPerformance: tmpl.presetParameters.academicPerformance,
+              }));
+              setIsTemplatesModalOpen(false);
+            }}
+          />
         </motion.div>
       </AnimatedBackground>
     );
@@ -1034,6 +1066,19 @@ const SimulationFlow: React.FC = () => {
         <main className="max-w-7xl mx-auto px-6 py-24 w-full">
           {!results.isEnterprise && (
             <>
+              {/* Radar Comparison Chart - 5 Trục */}
+              <motion.div
+                initial={{ opacity: 0, y: 25 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="mb-16"
+              >
+                <RadarComparisonChart
+                  scenarios={results.scenarios}
+                  title="So Sánh Đa Chiều 3 Kịch Bản Tương Lai"
+                />
+              </motion.div>
+
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
                 <AnimatePresence>
                   {results.scenarios.map((scenario, idx) => (
@@ -1106,28 +1151,35 @@ const SimulationFlow: React.FC = () => {
                       </div>
 
                       <div className="p-10 space-y-12 flex-grow">
-                        {[
-                          {
-                            label: "Tăng trưởng sự nghiệp",
-                            val: scenario.careerGrowth,
-                            color: "bg-blue-600",
-                            tooltip:
-                              "Đánh giá mức độ thăng tiến chuyên môn và cơ hội nghề nghiệp trong kịch bản.",
-                          },
-                          {
-                            label: "Chỉ số Hạnh phúc",
-                            val: scenario.happiness,
-                            color: "bg-emerald-500",
-                            tooltip:
-                              "Đo lường mức độ thỏa mãn tinh thần, giảm áp lực và cân bằng cuộc sống.",
-                          },
-                          {
-                            label: `Hiệu quả tài chính dự kiến (ROI) (${data.timeHorizon || 5} năm)`,
-                            val: scenario.roi,
-                            color: "bg-indigo-600",
-                            tooltip: `Tỷ suất hoàn vốn đầu tư từ tiền bạc và thời gian của bạn sau đúng ${data.timeHorizon || 5} năm.`,
-                          },
-                        ].map((metric, mi) => (
+                        {(() => {
+                          const realisticRoi = calculateRealisticRoi(scenario, data.timeHorizon || 5);
+                          return [
+                            {
+                              label: "Tăng trưởng sự nghiệp",
+                              val: scenario.careerGrowth,
+                              suffix: "%",
+                              color: "bg-blue-600",
+                              tooltip:
+                                "Đánh giá mức độ thăng tiến chuyên môn và cơ hội nghề nghiệp trong kịch bản.",
+                            },
+                            {
+                              label: "Chỉ số Hạnh phúc",
+                              val: scenario.happiness,
+                              suffix: "%",
+                              color: "bg-emerald-500",
+                              tooltip:
+                                "Đo lường mức độ thỏa mãn tinh thần, giảm áp lực và cân bằng cuộc sống.",
+                            },
+                            {
+                              label: `Tỷ suất hoàn vốn (ROI bình quân năm)`,
+                              val: realisticRoi.annualizedRoi,
+                              suffix: "% / năm",
+                              subBadge: `Lũy kế ${realisticRoi.timeHorizon} năm: +${realisticRoi.cumulativeRoi}%`,
+                              color: "bg-indigo-600",
+                              tooltip: `Tỷ suất sinh lời bình quân +${realisticRoi.annualizedRoi}%/năm (Tổng tích lũy ${realisticRoi.timeHorizon} năm: +${realisticRoi.cumulativeRoi}%). Điểm hòa vốn dự kiến: ~${realisticRoi.paybackPeriodYears} năm.`,
+                            },
+                          ];
+                        })().map((metric, mi) => (
                           <div key={mi} className="space-y-4">
                             <div className="flex justify-between items-end">
                               <div className="flex items-center gap-1.5">
@@ -1145,14 +1197,21 @@ const SimulationFlow: React.FC = () => {
                                   </span>
                                 </span>
                               </div>
-                              <p className="text-xl font-black text-slate-900">
-                                +{metric.val}%
-                              </p>
+                              <div className="text-right">
+                                <p className="text-xl font-black text-slate-900">
+                                  +{metric.val}{metric.suffix}
+                                </p>
+                                {metric.subBadge && (
+                                  <span className="text-[10px] font-bold text-blue-600 block -mt-0.5">
+                                    {metric.subBadge}
+                                  </span>
+                                )}
+                              </div>
                             </div>
                             <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
                               <motion.div
                                 initial={{ width: 0 }}
-                                animate={{ width: `${metric.val}%` }}
+                                animate={{ width: `${Math.min(100, Math.max(0, metric.val))}%` }}
                                 transition={{
                                   duration: 1.5,
                                   delay: 0.8 + idx * 0.2 + mi * 0.1,
@@ -1249,6 +1308,19 @@ const SimulationFlow: React.FC = () => {
                   ))}
                 </div>
               </motion.div>
+
+              {/* Interactive Decision Tree */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="mb-24"
+              >
+                <InteractiveDecisionTree
+                  decisionTitle={data.decision}
+                  scenarios={results.scenarios}
+                />
+              </motion.div>
             </>
           )}
 
@@ -1269,7 +1341,10 @@ const SimulationFlow: React.FC = () => {
                    <IconMapper name={isSaved ? 'check_circle' : 'save'} className=" text-xl" /> 
                    {isSaved ? 'Đã lưu vào lịch sử' : isSavingHistory ? 'Đang lưu...' : 'Lưu vào lịch sử'}
                  </button>
-                <button className="px-16 py-6 bg-slate-900 text-white font-black text-[11px] uppercase tracking-widest hover:bg-slate-800 rounded-2xl transition-all shadow-2xl shadow-slate-200 flex items-center gap-5">
+                <button
+                  onClick={() => window.print()}
+                  className="px-16 py-6 bg-slate-900 text-white font-black text-[11px] uppercase tracking-widest hover:bg-slate-800 rounded-2xl transition-all shadow-2xl shadow-slate-200 flex items-center gap-5"
+                >
                   <IconMapper name="download" className=" text-xl" /> Xuất chiến
                   lược (.PDF)
                 </button>

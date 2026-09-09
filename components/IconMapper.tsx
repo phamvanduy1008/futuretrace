@@ -102,7 +102,12 @@ const materialToPhosphor: Record<string, string> = {
   'storefront': 'Storefront',
   'hourglass_empty': 'HourglassLow',
   'block': 'Prohibit',
-
+  'account_balance': 'Bank',
+  'calculator': 'Calculator',
+  'functions': 'MathOperations',
+  'math_operations': 'MathOperations',
+  'coins': 'Coins',
+  'chart': 'ChartLineUp',
 };
 
 interface IconMapperProps {

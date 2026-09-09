@@ -287,19 +287,20 @@ const ProgressPage: React.FC = () => {
           </div>
         </div>
 
-        <aside className="lg:col-span-4 mt-8 lg:mt-0">
-          <AnimatePresence mode='wait'>
-            <motion.div
-              key={selectedIdx}
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 1.05 }}
-              className="bg-white border border-slate-200 rounded-[3rem] overflow-hidden shadow-[0_50px_100px_-20px_rgba(0,0,0,0.12)] lg:sticky lg:top-32"
-            >
-              <div className="p-10 sm:p-12 border-b border-slate-100 bg-slate-50/50">
-                <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest block mb-4">CHI TIẾT TIẾN TRÌNH</span>
-                <h2 className="text-2xl sm:text-4xl font-black text-slate-900 font-display leading-[1.6] sm:leading-[1.4] mb-12 uppercase italic">{selectedProgress.title}</h2>
-              </div>
+        {selectedProgress ? (
+          <aside className="lg:col-span-4 mt-8 lg:mt-0">
+            <AnimatePresence mode='wait'>
+              <motion.div
+                key={selectedIdx}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 1.05 }}
+                className="bg-white border border-slate-200 rounded-[3rem] overflow-hidden shadow-[0_50px_100px_-20px_rgba(0,0,0,0.12)] lg:sticky lg:top-32"
+              >
+                <div className="p-10 sm:p-12 border-b border-slate-100 bg-slate-50/50">
+                  <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest block mb-4">CHI TIẾT TIẾN TRÌNH</span>
+                  <h2 className="text-2xl sm:text-4xl font-black text-slate-900 font-display leading-[1.6] sm:leading-[1.4] mb-12 uppercase italic">{selectedProgress.title}</h2>
+                </div>
 
               <div className="p-10 sm:p-12 space-y-12">
                 <div className="space-y-6">
@@ -358,6 +359,25 @@ const ProgressPage: React.FC = () => {
             </motion.div>
           </AnimatePresence>
         </aside>
+      ) : (
+        <aside className="lg:col-span-4 mt-8 lg:mt-0">
+          <div className="bg-white border border-slate-200/80 rounded-[2.5rem] p-8 shadow-sm text-center lg:sticky lg:top-32">
+            <div className="w-16 h-16 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-4 border border-blue-100">
+              <IconMapper name="flag" className="text-3xl" />
+            </div>
+            <h3 className="text-lg font-black text-slate-900 mb-2 font-display uppercase italic">Kế Hoạch Từ Decision Tree</h3>
+            <p className="text-xs text-slate-500 mb-6 leading-relaxed">
+              Các cột mốc bạn lưu từ Cây Quyết Định đang được đồng bộ tại đây. Đánh dấu hoàn thành khi bạn đạt được mục tiêu thực tế!
+            </p>
+            <button
+              onClick={() => navigate('/simulate')}
+              className="w-full py-4 rounded-2xl bg-slate-900 hover:bg-blue-600 text-white text-xs font-black uppercase tracking-wider transition-colors shadow-lg"
+            >
+              Khởi Tạo Thêm Mô Phỏng Mới
+            </button>
+          </div>
+        </aside>
+      )}
       </main>
 
       {/* Pivot Modal */}
