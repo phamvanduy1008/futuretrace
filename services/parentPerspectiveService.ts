@@ -404,17 +404,17 @@ export function generateParentReport(
       "Chi phí sinh hoạt & hoạt động kết nối giao lưu: ~3.0 - 4.2 triệu VNĐ/tháng.",
       "Công cụ sáng tạo & chứng chỉ thực chiến (Canva Pro, Adobe, Google/Meta Ads): ~12 - 18 triệu VNĐ."
     ];
-    adviceForParents = "Ngành Marketing đòi hỏi con năng động và cọ xát thực tế nhiều. Gia đình hãy tạo điều kiện cho con tham gia các dự án ngoại khóa, câu lạc bộ hoặc làm cộng tác viên từ sớm để tích lũy portfolio.";
+    adviceForParents = "Ngành Marketing đòi hỏi con năng động và cọ xát thực tế nhiều. Gia đình hãy tạo điều kiện cho con tham gia các dự án ngoại khóa, câu lạc bộ hoặc làm cộng tác viên từ sớm để tích lũy hồ sơ kinh nghiệm thực tế (portfolio).";
     expectedMilestone = "Năm thứ 2.5 - 3 (sinh viên Marketing thường có thu nhập thực tập từ sớm)";
-    startingSalaryRange = "9 - 14 triệu VNĐ / tháng (kèm thưởng KPI chiến dịch)";
+    startingSalaryRange = "9 - 14 triệu VNĐ / tháng (chưa tính thưởng hiệu quả công việc & dự án)";
     fiveYearSalaryRange = "20 - 35+ triệu VNĐ / tháng";
     selfSufficiencyVerdict = "Con có thể sớm tự trang trải chi phí sinh hoạt từ năm 3 nhờ các dự án sáng tạo nội dung / chạy quảng cáo, và đạt mức thu nhập tốt sau 3 năm cọ xát.";
-    mainRisks = threatItem || "Xu hướng thị trường thay đổi nhanh, áp lực KPI doanh số / tương tác và cạnh tranh tuyển dụng từ nhân sự trái ngành.";
-    contingencyPlanB = customMitigation || "Không chỉ làm nội dung đơn thuần, con học thêm kỹ năng phân tích dữ liệu thị trường (Data-driven Marketing), tư duy chiến lược thương hiệu và ngoại ngữ để làm việc tại các Agency quốc tế hoặc tập đoàn lớn.";
-    marketDemandVerdict = "Bất kỳ doanh nghiệp nào muốn bán hàng và mở rộng thị trường đều cần đội ngũ Marketing nhạy bén.";
-    question1 = `Ba mẹ thấy ngành Marketing rất năng động, con thích làm mảng sáng tạo nội dung (Content), chạy quảng cáo số hay tổ chức sự kiện?`;
-    question2 = `Ngành này áp lực về ý tưởng và chạy chiến dịch rất lớn, con đã rèn luyện sức bền và cách giải tỏa căng thẳng thế nào?`;
-    question3 = `Con đã xây dựng được portfolio (hồ sơ các sản phẩm/bài viết con từng làm) để đi xin thực tập chưa? Kể ba mẹ nghe về sản phẩm con ưng ý nhất nhé.`;
+    mainRisks = threatItem || "Xu hướng thị trường thay đổi nhanh, con cần có tinh thần chủ động học hỏi các công cụ mới và rèn luyện sức bền trước áp lực công việc.";
+    contingencyPlanB = customMitigation || "Không chỉ làm nội dung đơn thuần, con học thêm kỹ năng phân tích dữ liệu, ngoại ngữ và quản lý dự án để có thể làm việc tại các doanh nghiệp lớn hoặc tự vận hành dự án độc lập.";
+    marketDemandVerdict = "Bất kỳ doanh nghiệp nào muốn giới thiệu sản phẩm và tiếp cận khách hàng đều cần nhân sự Marketing nhạy bén.";
+    question1 = `Ba mẹ thấy ngành Marketing rất năng động, con thích làm mảng sáng tạo nội dung, chạy quảng cáo số hay tổ chức sự kiện?`;
+    question2 = `Ngành này đòi hỏi ý tưởng mới liên tục, con đã rèn luyện cách giải tỏa căng thẳng và giữ gìn sức khỏe thế nào?`;
+    question3 = `Con đã chuẩn bị hồ sơ các sản phẩm hoặc bài viết con từng làm để đi xin thực tập chưa? Kể ba mẹ nghe về sản phẩm con ưng ý nhất nhé.`;
     mentorTips = "Thay vì lo lắng 'ngành này viển vông', cha mẹ hãy công nhận sự nhạy bén của con, khuyến khích con trau dồi thêm tiếng Anh và kỹ năng đo lường hiệu quả bằng con số thực tế.";
   }
 

@@ -72,8 +72,8 @@ const TOUR_STEPS: TourStep[] = [
   {
     target: '#tour-decision-hints',
     route: '/simulate',
-    title: 'Các gợi ý mẫu quyết định',
-    content: 'Nếu chưa biết cách viết, bạn có thể click vào các gợi ý có sẵn này để điền nhanh form và tham khảo cấu trúc viết quyết định.',
+    title: 'Thư viện kịch bản quyết định',
+    content: 'Nếu chưa biết cách viết, bạn có thể bấm vào Thư viện kịch bản để khám phá và áp dụng các mẫu quyết định chi tiết.',
     placement: 'top'
   },
   {

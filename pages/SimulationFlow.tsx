@@ -24,120 +24,6 @@ import { calculateRealisticRoi } from "../services/roiCalculator";
 
 import { getLatestEvaluation } from "../services/evaluationService";
 
-const DECISION_TEMPLATES = [
-  {
-    id: "highschool_choice",
-    label: "Chọn ngành & Trường ĐH",
-    icon: "school",
-    theme: {
-      bg: "bg-blue-50/80",
-      text: "text-blue-600",
-      border: "border-blue-100/50",
-      activeBg: "bg-blue-600",
-      activeShadow: "shadow-blue-600/20",
-      hoverBg: "group-hover:bg-blue-50 group-hover:text-blue-600 group-hover:border-blue-100/50"
-    },
-    content: `[BỐI CẢNH CHỌN NGÀNH & TRƯỜNG ĐH]
-- Quyết định: Phân vân giữa [Lựa chọn A: Ví dụ học ngành CNTT tại ĐH Bách Khoa] và [Lựa chọn B: Học ngành Thiết kế Đồ họa tại ĐH Mỹ thuật].
-- Hiện trạng học tập: Học sinh lớp [Lớp 11/12], khối học sở trường là [Khối A00/A01/D01...], điểm trung bình (GPA) khoảng [Điểm số].
-- Năng lực nổi trội: [Ví dụ: Tư duy logic toán tốt, thích vẽ, biết giao tiếp ngoại ngữ].
-- Ngân sách học phí: Bố mẹ có thể hỗ trợ khoảng [Số tiền] triệu/năm.
-- Định hướng nghề nghiệp mong muốn: Trở thành [Vị trí mong muốn] sau khi tốt nghiệp.
-- Lo ngại lớn nhất: [Sợ không đủ điểm chuẩn / Học phí quá cao / Ngành học không phù hợp thực tế].`,
-  },
-  {
-    id: "university_career",
-    label: "Định hướng việc làm ra trường",
-    icon: "work",
-    theme: {
-      bg: "bg-emerald-50/80",
-      text: "text-emerald-600",
-      border: "border-emerald-100/50",
-      activeBg: "bg-emerald-600",
-      activeShadow: "shadow-emerald-600/20",
-      hoverBg: "group-hover:bg-emerald-50 group-hover:text-emerald-600 group-hover:border-emerald-100/50"
-    },
-    content: `[BỐI CẢNH ĐỊNH HƯỚNG RA TRƯỜNG]
-- Quyết định: Sau khi tốt nghiệp ngành [Tên ngành hiện tại] sẽ chọn đi làm ngay ở vị trí [Lựa chọn A: Ví dụ Nhân viên Marketing tại Agency] hay học tiếp lên [Lựa chọn B: Học Thạc sĩ hoặc đổi sang ngành Quản trị nhân sự].
-- Hiện trạng học tập: Sinh viên năm [Năm 3/Năm cuối] trường [Tên trường], GPA hiện tại là [Điểm số/4.0]. Đã có kinh nghiệm [Thực tập/Làm thêm/Dự án CLB].
-- Mục tiêu 3 năm đầu ra trường: Đạt mức lương [Thu nhập kỳ vọng] triệu/tháng và thăng tiến lên [Vị trí].
-- Lo ngại lớn nhất: [Thiếu kinh nghiệm thực tế / Thị trường việc làm cạnh tranh / Sợ chọn sai hướng đi đầu đời].`,
-  },
-  {
-    id: "study_abroad",
-    label: "Du học vs Học trong nước",
-    icon: "rocket_launch",
-    theme: {
-      bg: "bg-violet-50/80",
-      text: "text-violet-600",
-      border: "border-violet-100/50",
-      activeBg: "bg-violet-600",
-      activeShadow: "shadow-violet-600/20",
-      hoverBg: "group-hover:bg-violet-50 group-hover:text-violet-650 group-hover:border-violet-100/50"
-    },
-    content: `[BỐI CẢNH DU HỌC VS TRONG NƯỚC]
-- Quyết định: Đi du học bậc [Đại học/Thạc sĩ] tại [Tên quốc gia: Ví dụ Đức, Úc, Nhật] hay học chương trình liên kết/chính quy trong nước tại [Tên trường].
-- Hiện trạng năng lực: GPA đạt [Điểm GPA], chứng chỉ ngoại ngữ đạt [Ví dụ: IELTS 6.5, JLPT N3].
-- Điều kiện tài chính: Cần tìm học bổng [Toàn phần/Bán phần] vì ngân sách gia đình chỉ tự túc được khoảng [Số tiền] triệu/năm.
-- Định hướng sau tốt nghiệp: [Muốn ở lại làm việc định cư nước ngoài / Trở về Việt Nam cống hiến].
-- Lo ngại lớn nhất: [Rủi ro trượt học bổng / Chi phí sinh hoạt đắt đỏ / Sốc văn hóa và cô đơn].`,
-  },
-  {
-    id: "work_study_balance",
-    label: "Học tập vs Đi làm thêm",
-    icon: "account_balance_wallet",
-    theme: {
-      bg: "bg-amber-50/80",
-      text: "text-amber-600",
-      border: "border-amber-100/50",
-      activeBg: "bg-amber-600",
-      activeShadow: "shadow-amber-600/20",
-      hoverBg: "group-hover:bg-amber-50 group-hover:text-amber-650 group-hover:border-amber-100/50"
-    },
-    content: `[BỐI CẢNH HỌC TẬP VS ĐI LÀM THÊM]
-- Quyết định: Dành thời gian [Số giờ] giờ/tuần để đi làm thêm [Tên việc làm thêm: Ví dụ gia sư, phục vụ, chạy grab] kiếm tiền tự trang trải hay tập trung 100% thời gian cho việc học để giành học bổng của trường.
-- Hiện trạng tài chính: [Khó khăn/Tự túc một phần], học phí mỗi kỳ là [Số tiền] triệu đồng.
-- Mục tiêu học tập: Duy trì GPA trên [GPA mong muốn] để không bị ảnh hưởng bằng tốt nghiệp.
-- Lo ngại lớn nhất: [Đi làm thêm gây kiệt sức, sụt giảm điểm số / Thiếu chi phí sinh hoạt hàng ngày nếu không đi làm].`,
-  },
-  {
-    id: "relocation_hometown",
-    label: "Thành phố lớn vs Quê nhà",
-    icon: "balance",
-    theme: {
-      bg: "bg-indigo-50/80",
-      text: "text-indigo-600",
-      border: "border-indigo-100/50",
-      activeBg: "bg-indigo-600",
-      activeShadow: "shadow-indigo-600/20",
-      hoverBg: "group-hover:bg-indigo-50 group-hover:text-indigo-650 group-hover:border-indigo-100/50"
-    },
-    content: `[BỐI CẢNH LẬP NGHIỆP XA NHÀ VS QUÊ NHÀ]
-- Quyết định: Ở lại lập nghiệp tại [Lựa chọn A: Thành phố lớn như Hà Nội, TP.HCM] hay trở về quê hương [Lựa chọn B: Tên tỉnh/thành phố quê nhà] để làm việc gần bố mẹ.
-- Hiện trạng: Sinh viên sắp tốt nghiệp, chưa có nhà riêng ở thành phố lớn, chi phí thuê nhà và ăn uống tốn khoảng [Số tiền] triệu/tháng.
-- Sự ủng hộ từ gia đình: [Bố mẹ muốn ở gần / Bố mẹ ủng hộ tự lập ở thành phố].
-- Lo ngại lớn nhất: [Chi phí đắt đỏ và áp lực cạnh tranh ở thành phố / Cơ hội việc làm hạn chế ở quê nhà].`,
-  },
-  {
-    id: "student_startup",
-    label: "Dự án Khởi nghiệp sinh viên",
-    icon: "psychology",
-    theme: {
-      bg: "bg-rose-50/80",
-      text: "text-rose-600",
-      border: "border-rose-100/50",
-      activeBg: "bg-rose-600",
-      activeShadow: "shadow-rose-600/20",
-      hoverBg: "group-hover:bg-rose-50 group-hover:text-rose-650 group-hover:border-rose-100/50"
-    },
-    content: `[BỐI CẢNH KHỞI NGHIỆP/NGHIÊN CỨU SINH VIÊN]
-- Quyết định: Thành lập nhóm khởi nghiệp dự án sinh viên [Mô hình: Ví dụ Phát triển ứng dụng học tập, kinh doanh đồ handmade online] hay tập trung tham gia Nghiên cứu Khoa học tại trường.
-- Hiện trạng nguồn lực: Số vốn ban đầu tự góp là [Số tiền] triệu đồng, có nhóm [Số người] sinh viên cùng tham gia. Có sự bảo trợ/hướng dẫn từ giảng viên [Có/Không].
-- Mục tiêu ngắn hạn: [Tham gia cuộc thi khởi nghiệp sinh viên / Công bố bài báo khoa học / Có doanh thu nhỏ].
-- Lo ngại lớn nhất: [Thiếu kiến thức thực tế / Nhóm tan vỡ vì xung đột thời gian học / Mất số vốn tích lũy].`,
-  },
-];
-
 const SimulationFlow: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -471,76 +357,34 @@ const SimulationFlow: React.FC = () => {
               </div>
             </div>
 
-            <div id="tour-decision-hints" className="space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 whitespace-nowrap">
-                    Hoặc chọn biểu mẫu gợi ý nhanh
-                  </span>
-                  <span className="h-px bg-slate-200/60 w-12 hidden sm:block"></span>
+            {/* Decision Templates Callout */}
+            <div
+              id="tour-decision-hints"
+              className="flex flex-col sm:flex-row items-center justify-between gap-4 p-5 rounded-3xl bg-gradient-to-r from-blue-50/70 via-indigo-50/40 to-slate-50/60 border border-blue-100/70 shadow-sm"
+            >
+              <div className="flex items-center gap-3.5">
+                <div className="w-11 h-11 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-md shadow-blue-500/20 shrink-0">
+                  <IconMapper name="auto_stories" className="text-xl" />
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setIsTemplatesModalOpen(true)}
-                  className="px-4 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-600 text-[11px] font-black uppercase tracking-wider transition-all flex items-center gap-2 border border-blue-200/60 shadow-sm w-fit"
-                >
-                  <IconMapper name="auto_stories" className="text-sm text-blue-600" />
-                  Mở Thư Viện Kịch Bản Chuyên Sâu (5 Mẫu Chi Tiết)
-                </button>
+                <div>
+                  <h4 className="text-xs font-black uppercase tracking-wider text-slate-800">
+                    Thư Viện Kịch Bản Quyết Định
+                  </h4>
+                  <p className="text-xs text-slate-500 font-medium mt-0.5">
+                    Khám phá các kịch bản chi tiết (Chọn ngành & trường ĐH, Du học, Khởi nghiệp, Định hướng việc làm...)
+                  </p>
+                </div>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {DECISION_TEMPLATES.map((tmpl) => {
-                  const isActive = data.decision === tmpl.content;
-                  const theme = tmpl.theme;
-                  return (
-                    <motion.button
-                      key={tmpl.id}
-                      whileHover={{ y: -2 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() =>
-                        setData({ ...data, decision: tmpl.content })
-                      }
-                      className={`group flex items-center gap-3 p-3 rounded-2xl border text-left transition-all duration-300 ${
-                        isActive
-                          ? "border-blue-500 bg-blue-50/20 ring-2 ring-blue-500/10 shadow-sm"
-                          : "border-slate-200/60 bg-white/50 backdrop-blur-sm hover:border-slate-300 hover:bg-white/90 shadow-sm"
-                      }`}
-                    >
-                      <div
-                        className={`w-8 h-8 rounded-xl flex items-center justify-center border shrink-0 transition-all duration-300 ${
-                          isActive
-                            ? `${theme.activeBg} text-white border-transparent`
-                            : "bg-slate-50/85 text-slate-500 border-slate-100 group-hover:bg-blue-50/40 group-hover:text-blue-600 group-hover:border-blue-100/50"
-                        }`}
-                      >
-                        <IconMapper name={tmpl.icon} className="text-sm" />
-                      </div>
-                      <div className="min-w-0 flex-1 flex items-center justify-between gap-2">
-                        <span
-                          className={`text-[10px] font-black uppercase tracking-wide truncate transition-colors duration-300 ${
-                            isActive
-                              ? "text-blue-750"
-                              : "text-slate-700 group-hover:text-blue-600"
-                          }`}
-                        >
-                          {tmpl.label}
-                        </span>
-                        {isActive ? (
-                          <IconMapper
-                            name="check_circle"
-                            className="text-blue-600 text-sm shrink-0"
-                          />
-                        ) : (
-                          <IconMapper
-                            name="arrow_forward"
-                            className="text-slate-300 group-hover:text-blue-500 text-xs shrink-0 transition-all duration-300 translate-x-[-2px] group-hover:translate-x-0 opacity-0 group-hover:opacity-100"
-                          />
-                        )}
-                      </div>
-                    </motion.button>
-                  );
-                })}
-              </div>
+              <motion.button
+                type="button"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setIsTemplatesModalOpen(true)}
+                className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-white hover:bg-blue-600 text-blue-600 hover:text-white border border-blue-200 hover:border-transparent text-xs font-black uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-2.5 shadow-sm hover:shadow-lg hover:shadow-blue-500/20 shrink-0"
+              >
+                <IconMapper name="auto_stories" className="text-sm" />
+                <span>Mở Thư Viện Kịch Bản</span>
+              </motion.button>
             </div>
 
             <div className="flex flex-col sm:flex-row items-center justify-end gap-8 pt-4">
@@ -565,11 +409,11 @@ const SimulationFlow: React.FC = () => {
             onSelectTemplate={(tmpl) => {
               setData((prev) => ({
                 ...prev,
-                decision: tmpl.promptTemplate,
-                stress: tmpl.presetParameters.stress,
-                personalFinance: tmpl.presetParameters.personalFinance,
-                risk: tmpl.presetParameters.risk,
-                academicPerformance: tmpl.presetParameters.academicPerformance,
+                decision: tmpl.content || (tmpl as any).promptTemplate || "",
+                stress: tmpl.defaultParams?.stress ?? (tmpl as any).presetParameters?.stress ?? prev.stress,
+                personalFinance: tmpl.defaultParams?.personalFinance ?? (tmpl as any).presetParameters?.personalFinance ?? prev.personalFinance,
+                risk: tmpl.defaultParams?.risk ?? (tmpl as any).presetParameters?.risk ?? prev.risk,
+                academicPerformance: tmpl.defaultParams?.academicPerformance ?? (tmpl as any).presetParameters?.academicPerformance ?? prev.academicPerformance,
               }));
               setIsTemplatesModalOpen(false);
             }}
