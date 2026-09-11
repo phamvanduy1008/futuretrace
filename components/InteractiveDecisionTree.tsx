@@ -382,7 +382,7 @@ export const InteractiveDecisionTree: React.FC<InteractiveDecisionTreeProps> = (
             <div
               key={m.id}
               onClick={() => handleToggleNode(m)}
-              className={`p-6 sm:p-7 rounded-3xl border text-left cursor-pointer transition-all duration-200 hover:-translate-y-1 relative flex flex-col justify-between group ${
+              className={`p-6 sm:p-7 rounded-3xl border text-left cursor-pointer transition-[border-color,background-color,box-shadow] duration-200 hover:-translate-y-1 relative flex flex-col justify-between group ${
                 isNodeSelected
                   ? "bg-slate-50/90 border-blue-600 ring-2 ring-blue-600/20 shadow-xl"
                   : "bg-white border-slate-200/80 hover:border-slate-300 hover:shadow-lg hover:bg-slate-50/40 shadow-sm"
@@ -421,45 +421,59 @@ export const InteractiveDecisionTree: React.FC<InteractiveDecisionTreeProps> = (
               {/* Bottom Card Action */}
               <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
                 <span
-                  className={`text-xs sm:text-sm font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors ${
-                    isNodeSelected ? "text-blue-600" : "text-slate-500 group-hover:text-slate-900"
+                  className={`text-xs sm:text-sm font-bold uppercase tracking-wider flex items-center gap-2 transition-colors duration-200 ${
+                    isNodeSelected ? "text-blue-600" : "text-slate-500 group-hover:text-blue-600"
                   }`}
                 >
                   <IconMapper
                     name={isNodeSelected ? "caret_up" : "compass"}
-                    className="text-base"
+                    className={`text-base transition-transform duration-300 ${isNodeSelected ? "scale-110" : ""}`}
                   />
                   {isNodeSelected ? "Thu gọn phân tích" : "Xem lưu ý & Kế hoạch bẻ lái"}
                 </span>
 
-                <IconMapper
-                  name="arrow_forward"
-                  className={`text-sm transition-transform duration-200 ${
-                    isNodeSelected ? "rotate-90 text-blue-600" : "text-slate-400 group-hover:translate-x-1"
+                <div
+                  className={`w-7 h-7 rounded-full flex items-center justify-center transition-all duration-300 ${
+                    isNodeSelected
+                      ? "bg-blue-600 text-white rotate-90 shadow-md shadow-blue-500/30"
+                      : "bg-slate-100 text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-600 group-hover:translate-x-0.5"
                   }`}
-                />
+                >
+                  <IconMapper
+                    name="arrow_forward"
+                    className="text-xs"
+                  />
+                </div>
               </div>
             </div>
           );
         })}
       </div>
 
-      {/* Node Detail Inspection Drawer - Hardware-Accelerated Smooth CSS Grid Transition */}
+      {/* Node Detail Inspection Drawer - Ultra-Fast GPU-Accelerated Transition */}
       <div
         ref={drawerRef}
-        className={`grid transition-[grid-template-rows,opacity,margin] duration-250 ease-out will-change-[grid-template-rows,opacity] ${
-          selectedNode
-            ? "grid-rows-[1fr] opacity-100 mt-8"
-            : "grid-rows-[0fr] opacity-0 mt-0 pointer-events-none"
-        }`}
+        className={selectedNode ? "mt-7" : "mt-0"}
+        style={{
+          display: "grid",
+          gridTemplateRows: selectedNode ? "1fr" : "0fr",
+          opacity: selectedNode ? 1 : 0,
+          transition: "grid-template-rows 200ms cubic-bezier(0.16, 1, 0.3, 1), opacity 160ms ease, margin-top 200ms cubic-bezier(0.16, 1, 0.3, 1)",
+          willChange: "grid-template-rows, opacity",
+          pointerEvents: selectedNode ? "auto" : "none",
+          transform: "translateZ(0)",
+        }}
       >
-        <div className="overflow-hidden min-h-0">
+        <div style={{ overflow: "hidden", minHeight: 0 }}>
           {displayedNode && (
-            <div className="p-7 sm:p-9 rounded-3xl bg-slate-900 text-white shadow-2xl relative transition-transform duration-250 ease-out">
+            <div
+              key={displayedNode.id}
+              className="p-7 sm:p-9 rounded-3xl bg-slate-900 text-white shadow-2xl relative transition-opacity duration-150"
+            >
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-800">
                 <div className="flex items-center gap-3.5">
                   <div
-                    className="w-11 h-11 rounded-2xl flex items-center justify-center font-black text-sm text-white shrink-0"
+                    className="w-11 h-11 rounded-2xl flex items-center justify-center font-black text-sm text-white shrink-0 shadow-md"
                     style={{ backgroundColor: activeBranch.primaryColor }}
                   >
                     {displayedNode.stepNumber}
@@ -477,7 +491,7 @@ export const InteractiveDecisionTree: React.FC<InteractiveDecisionTreeProps> = (
                 <button
                   type="button"
                   onClick={() => setSelectedNode(null)}
-                  className="self-end sm:self-center text-xs sm:text-sm text-slate-300 hover:text-white px-3.5 py-1.5 rounded-xl hover:bg-slate-800 transition-colors"
+                  className="self-end sm:self-center text-xs sm:text-sm text-slate-300 hover:text-white px-3.5 py-1.5 rounded-xl hover:bg-slate-800 transition-colors cursor-pointer"
                 >
                   Đóng ✕
                 </button>
