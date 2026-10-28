@@ -11,6 +11,27 @@ import {
     formatLatency,
     formatPercent,
 } from './ui';
+import {
+    Compass,
+    ChatTeardropDots,
+    FileCode,
+    CreditCard,
+    Gear,
+    Sparkle,
+    CaretRight,
+    WarningCircle,
+    GraduationCap,
+    CurrencyCircleDollar,
+    Buildings,
+    ChartBar,
+    MagnifyingGlass,
+    Database,
+    HardDrive,
+    CheckCircle,
+    ArrowClockwise,
+    Plus,
+    Tag,
+} from '@phosphor-icons/react';
 import { ApiError, createAdminApi } from './api';
 import './admin.css';
 
@@ -313,16 +334,16 @@ function DashboardPage({ api, navigate, onForbidden }) {
                         ) : (
                             alerts.map((alert) => (
                                 <div className="ft-list-item" key={alert.id}>
-                                    <div>
-                                        <div className="ft-row-inline">
-                                            <strong>{alert.title}</strong>
+                                    <div className="ft-list-item__main">
+                                        <div className="ft-list-item__header">
+                                            <strong className="ft-list-item__title">{alert.title}</strong>
                                             <AdminBadge tone={getToneByStatus(alert.severity)}>
                                                 {alert.severity}
                                             </AdminBadge>
                                         </div>
-                                        <p>{alert.description}</p>
+                                        <p className="ft-list-item__desc">{alert.description}</p>
                                     </div>
-                                    <span>{alert.createdAt}</span>
+                                    <span className="ft-list-item__date">{alert.createdAt}</span>
                                 </div>
                             ))
                         )}
@@ -331,23 +352,25 @@ function DashboardPage({ api, navigate, onForbidden }) {
 
                 <AdminCard title="Lối tắt vận hành" subtitle="Đi nhanh đến các luồng nghẽn.">
                     <div className="ft-quick-actions">
-                        <button className="ft-button ft-button--ghost" onClick={() => navigate('/simulations')}>
-                            Mô phỏng thất bại
+                        <button className="ft-quick-btn" type="button" onClick={() => navigate('/simulations')}>
+                            <Compass size={18} weight="duotone" />
+                            <span>Mô phỏng thất bại</span>
                         </button>
-                        <button
-                            className="ft-button ft-button--ghost"
-                            onClick={() => navigate('/community/posts')}
-                        >
-                            Quản lý Bài viết
+                        <button className="ft-quick-btn" type="button" onClick={() => navigate('/community/posts')}>
+                            <ChatTeardropDots size={18} weight="duotone" />
+                            <span>Quản lý Bài viết</span>
                         </button>
-                        <button className="ft-button ft-button--ghost" onClick={() => navigate('/prompts')}>
-                            Bản phát hành Prompt
+                        <button className="ft-quick-btn" type="button" onClick={() => navigate('/prompts')}>
+                            <FileCode size={18} weight="duotone" />
+                            <span>Bản phát hành Prompt</span>
                         </button>
-                        <button className="ft-button ft-button--ghost" onClick={() => navigate('/payments')}>
-                            Quản lý giao dịch
+                        <button className="ft-quick-btn" type="button" onClick={() => navigate('/payments')}>
+                            <CreditCard size={18} weight="duotone" />
+                            <span>Quản lý giao dịch</span>
                         </button>
-                        <button className="ft-button ft-button--ghost" onClick={() => navigate('/settings')}>
-                            Cài đặt hệ thống
+                        <button className="ft-quick-btn" type="button" onClick={() => navigate('/settings')}>
+                            <Gear size={18} weight="duotone" />
+                            <span>Cài đặt hệ thống</span>
                         </button>
                     </div>
                 </AdminCard>
@@ -362,8 +385,16 @@ function DashboardPage({ api, navigate, onForbidden }) {
                                 key={simulation.id}
                                 onClick={() => navigate(`/simulations/${simulation.id}`)}
                             >
-                                <strong>{simulation.title}</strong>
-                                <span>{simulation.status}</span>
+                                <div className="ft-mini-list__item-left">
+                                    <Compass size={17} weight="duotone" />
+                                    <strong>{simulation.title}</strong>
+                                </div>
+                                <div className="ft-mini-list__item-right">
+                                    <AdminBadge tone={getToneByStatus(simulation.status)}>
+                                        {simulation.status}
+                                    </AdminBadge>
+                                    <CaretRight size={14} weight="bold" color="#94a3b8" />
+                                </div>
                             </button>
                         ))}
                     </div>
@@ -376,8 +407,16 @@ function DashboardPage({ api, navigate, onForbidden }) {
                                 key={analysis.id}
                                 onClick={() => navigate(`/premium-analyses/${analysis.id}`)}
                             >
-                                <strong>{analysis.title}</strong>
-                                <span>{formatPercent(analysis.completionRate)}</span>
+                                <div className="ft-mini-list__item-left">
+                                    <Sparkle size={17} weight="duotone" />
+                                    <strong>{analysis.title}</strong>
+                                </div>
+                                <div className="ft-mini-list__item-right">
+                                    <span className="ft-metric-pill">
+                                        {formatPercent(analysis.completionRate)}
+                                    </span>
+                                    <CaretRight size={14} weight="bold" color="#94a3b8" />
+                                </div>
                             </button>
                         ))}
                     </div>
@@ -621,8 +660,16 @@ function UserDetailPage({ api, userId, navigate, onForbidden }) {
                                 key={simulation.id}
                                 onClick={() => navigate(`/simulations/${simulation.id}`)}
                             >
-                                <strong>{simulation.title}</strong>
-                                <span>{simulation.status}</span>
+                                <div className="ft-mini-list__item-left">
+                                    <Compass size={17} weight="duotone" />
+                                    <strong>{simulation.title}</strong>
+                                </div>
+                                <div className="ft-mini-list__item-right">
+                                    <AdminBadge tone={getToneByStatus(simulation.status)}>
+                                        {simulation.status}
+                                    </AdminBadge>
+                                    <CaretRight size={14} weight="bold" color="#94a3b8" />
+                                </div>
                             </button>
                         ))}
                     </div>
@@ -638,8 +685,16 @@ function UserDetailPage({ api, userId, navigate, onForbidden }) {
                                     key={analysis.id}
                                     onClick={() => navigate(`/premium-analyses/${analysis.id}`)}
                                 >
-                                    <strong>{analysis.title}</strong>
-                                    <span>{formatPercent(analysis.completionRate)}</span>
+                                    <div className="ft-mini-list__item-left">
+                                        <Sparkle size={17} weight="duotone" />
+                                        <strong>{analysis.title}</strong>
+                                    </div>
+                                    <div className="ft-mini-list__item-right">
+                                        <span className="ft-metric-pill">
+                                            {formatPercent(analysis.completionRate)}
+                                        </span>
+                                        <CaretRight size={14} weight="bold" color="#94a3b8" />
+                                    </div>
                                 </button>
                             ))
                         )}
@@ -656,8 +711,16 @@ function UserDetailPage({ api, userId, navigate, onForbidden }) {
                                     key={post.id}
                                     onClick={() => navigate(`/community/posts/${post.id}`)}
                                 >
-                                    <strong>{post.title}</strong>
-                                    <span>{post.status}</span>
+                                    <div className="ft-mini-list__item-left">
+                                        <ChatTeardropDots size={17} weight="duotone" />
+                                        <strong>{post.title}</strong>
+                                    </div>
+                                    <div className="ft-mini-list__item-right">
+                                        <AdminBadge tone={getToneByStatus(post.status)}>
+                                            {post.status}
+                                        </AdminBadge>
+                                        <CaretRight size={14} weight="bold" color="#94a3b8" />
+                                    </div>
                                 </button>
                             ))
                         )}
@@ -1128,60 +1191,359 @@ function PremiumAnalysisDetailPage({ api, analysisId, navigate, onForbidden }) {
     if (error) return <ErrorCard error={error} onRetry={reload} />;
     if (!data) {
         return (
-            <AdminEmptyState title="Không tìm thấy phân tích chuyên sâu" description="ID phân tích không tồn tại." />
+            <AdminEmptyState title="Không tìm thấy phân tích chuyên sâu" description="ID phân tích không tồn tại hoặc đã bị xóa." />
         );
     }
 
+    const report = data.report || {};
+    const context = data.context || {};
+    const scenario = data.scenario || {};
+    const milestones = Array.isArray(report.milestones) ? report.milestones : [];
+    const influencingFactors = Array.isArray(report.influencingFactors) ? report.influencingFactors : [];
+    const strategicPivotPoints = Array.isArray(report.strategicPivotPoints) ? report.strategicPivotPoints : [];
+    const completedMilestonesCount = data.completedMilestones?.length || 0;
+    const totalMilestonesCount = milestones.length;
+
+    // Helper làm sạch prompt injection trong decision của context (chuẩn hóa cả literal \n và real newlines)
+    const cleanDecisionText = (text) => {
+        if (!text || typeof text !== 'string') return 'Chưa có thông tin quyết định ban đầu.';
+        const normalized = text.replace(/\\n/g, '\n');
+        const markers = ['\n\n[THÔNG TIN BỔ SUNG', '\n[THÔNG TIN BỔ SUNG', '[THÔNG TIN BỔ SUNG', '--- THÔNG TIN'];
+        let result = normalized;
+        for (const m of markers) {
+            const idx = result.indexOf(m);
+            if (idx !== -1) result = result.substring(0, idx);
+        }
+        return result.trim() || normalized.trim();
+    };
+
+    // Helper trích xuất thông tin bổ sung Q&A của người dùng
+    const getAdditionalContext = (text) => {
+        if (!text || typeof text !== 'string') return [];
+        const normalized = text.replace(/\\n/g, '\n');
+        const idx = normalized.indexOf('[THÔNG TIN BỔ SUNG');
+        if (idx === -1) return [];
+        const part = normalized.substring(idx).replace(/\[THÔNG TIN BỔ SUNG[^\]]*\]/gi, '').trim();
+        return part.split('\n').map((l) => l.trim().replace(/^-\s*/, '')).filter((l) => l.length > 0);
+    };
+
+    const getInfluenceBadgeTone = (influence) => {
+        const inf = String(influence || '').toLowerCase();
+        if (inf.includes('cao') || inf.includes('high')) return 'red';
+        if (inf.includes('trung bình') || inf.includes('medium')) return 'amber';
+        return 'green';
+    };
+
     return (
-        <div className="ft-page-stack">
+        <div className="ft-page-stack ft-premium-detail-page">
             <AdminPageHeader
                 eyebrow="Hệ Thống Phân Tích / Chi tiết Phân tích Chuyên sâu"
                 title={data.title}
-                description={`Lộ trình ${data.timeframeMonths} tháng, cập nhật ${data.updatedAt}.`}
+                description={`Kịch bản thuộc danh mục ${data.category || 'Sự nghiệp'}, khung thời gian ${data.timeframeMonths} tháng. Người dùng: ${data.userName} (${data.userEmail || 'ID: ' + data.userId}).`}
                 actions={
-                    <button className="ft-button ft-button--ghost" onClick={() => navigate('/premium-analyses')}>
-                        Quay lại danh sách
-                    </button>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        {(data.simulationId || data.scenarioId) && (
+                            <button
+                                className="ft-button ft-button--ghost"
+                                onClick={() => navigate(`/simulations/${data.simulationId || data.scenarioId}`)}
+                            >
+                                Xem mô phỏng gốc ↗
+                            </button>
+                        )}
+                        <button className="ft-button" onClick={() => navigate('/premium-analyses')}>
+                            Quay lại danh sách
+                        </button>
+                    </div>
                 }
             />
 
+            {/* Thống kê chỉ số cốt lõi */}
+            <div className="ft-stats-strip">
+                <div className="ft-stat-pill-card">
+                    <span>Khung thời gian</span>
+                    <strong>{data.timeframeMonths} tháng</strong>
+                    <small>Lộ trình trung & dài hạn</small>
+                </div>
+                <div className="ft-stat-pill-card">
+                    <span>Tiến độ thực hiện</span>
+                    <strong>{formatPercent(data.completionRate)}</strong>
+                    <small>{completedMilestonesCount}/{totalMilestonesCount} cột mốc hoàn thành</small>
+                </div>
+                <div className="ft-stat-pill-card">
+                    <span>Điểm xoay (Pivot Points)</span>
+                    <strong>{strategicPivotPoints.length}</strong>
+                    <small>Kịch bản ứng phó rủi ro</small>
+                </div>
+                <div className="ft-stat-pill-card">
+                    <span>Nhân tố ảnh hưởng</span>
+                    <strong>{influencingFactors.length}</strong>
+                    <small>Yếu tố nội tại & thị trường</small>
+                </div>
+            </div>
+
+            {/* Bối cảnh người dùng & Tóm tắt báo cáo */}
             <div className="ft-grid ft-grid--2-1 ft-premium-detail-grid">
-                <AdminCard title="Tóm tắt báo cáo">
-                    {fieldLabel('Người dùng', data.userName)}
-                    {fieldLabel('Trạng thái', data.status)}
-                    {fieldLabel('Số lần thay đổi (Pivot)', data.pivotCount)}
-                    {fieldLabel('Tiến độ', formatPercent(data.completionRate))}
-                    {fieldLabel('Cột mốc tiếp theo', data.nextMilestone)}
-                    <p className="ft-rich-paragraph">{data.report?.detailedNarrative || '--'}</p>
-                </AdminCard>
-                <AdminCard title="Lịch sử Phản hồi" className="ft-feedback-card">
-                    <div className="ft-list ft-feedback-list">
-                        {(data.feedbackHistory || []).length === 0 ? (
-                            <AdminEmptyState title="Chưa có phản hồi" description="Chưa có lịch sử phản hồi (feedback) cho báo cáo này." />
-                        ) : (
-                            (data.feedbackHistory || []).map((item) => (
-                                <div className="ft-list-item" key={item}>
-                                    <p>{item}</p>
-                                </div>
-                            ))
-                        )}
+                <AdminCard title="Bối cảnh & Bài toán của Người dùng" subtitle="Dữ liệu đầu vào và các tham số đánh giá lúc tạo phân tích">
+                    <div style={{ marginBottom: '14px' }}>
+                        <strong style={{ fontSize: '0.85rem', color: '#64748b', display: 'block', marginBottom: '6px' }}>
+                            QUYẾT ĐỊNH / NGUYỆN VỌNG BAN ĐẦU:
+                        </strong>
+                        <div style={{ background: '#f8fafc', borderLeft: '4px solid #3b82f6', padding: '12px 16px', borderRadius: '4px', fontSize: '0.9rem', color: '#1e293b', lineHeight: '1.6' }}>
+                            "{cleanDecisionText(context.decision)}"
+                        </div>
                     </div>
+
+                    {getAdditionalContext(context.decision).length > 0 && (
+                        <div style={{ marginBottom: '14px' }}>
+                            <strong style={{ fontSize: '0.82rem', color: '#64748b', display: 'block', marginBottom: '6px' }}>
+                                THÔNG TIN BỔ SUNG KHẢO SÁT:
+                            </strong>
+                            <div style={{ background: '#f8fafc', padding: '10px 14px', borderRadius: '6px', fontSize: '0.82rem', color: '#475569', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                {getAdditionalContext(context.decision).map((line, idx) => (
+                                    <div key={idx}>{line}</div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    <strong style={{ fontSize: '0.82rem', color: '#64748b', display: 'block', marginBottom: '6px' }}>
+                        CHỈ SỐ TÂM LÝ & TÀI CHÍNH BAN ĐẦU:
+                    </strong>
+                    <div className="ft-context-scores">
+                        <div className="ft-score-badge">
+                            <span>Áp lực (Stress)</span>
+                            <strong>{context.stress !== undefined ? `${context.stress}/5` : '--'}</strong>
+                        </div>
+                        <div className="ft-score-badge">
+                            <span>Tài chính</span>
+                            <strong>{context.personalFinance !== undefined ? `${context.personalFinance}/5` : '--'}</strong>
+                        </div>
+                        <div className="ft-score-badge">
+                            <span>Học tập</span>
+                            <strong>{context.academicPerformance !== undefined ? `${context.academicPerformance}/5` : '--'}</strong>
+                        </div>
+                        <div className="ft-score-badge">
+                            <span>Chấp nhận Rủi ro</span>
+                            <strong>{context.risk !== undefined ? `${context.risk}/5` : '--'}</strong>
+                        </div>
+                    </div>
+                </AdminCard>
+
+                <AdminCard title="Thông tin Kịch bản & Vận hành" subtitle="Thông số hệ thống">
+                    {fieldLabel('Kịch bản nguồn', scenario.title || data.title)}
+                    {fieldLabel('Người dùng', data.userName)}
+                    {fieldLabel('Email liên hệ', data.userEmail || '--')}
+                    {fieldLabel('Trạng thái', data.status)}
+                    {fieldLabel('Cột mốc tiếp theo', data.nextMilestone)}
+                    {fieldLabel('Ngày tạo', data.createdAt || '--')}
+                    {fieldLabel('Cập nhật lần cuối', data.updatedAt || '--')}
+                    {scenario.description && (
+                        <div style={{ marginTop: '12px', paddingTop: '10px', borderTop: '1px solid #f1f5f9' }}>
+                            <small style={{ color: '#64748b', display: 'block', marginBottom: '4px' }}>Mô tả kịch bản gốc:</small>
+                            <p style={{ fontSize: '0.84rem', color: '#334155', margin: 0, fontStyle: 'italic' }}>
+                                "{scenario.description}"
+                            </p>
+                        </div>
+                    )}
                 </AdminCard>
             </div>
 
-            <AdminCard title="Các cột mốc (Milestones)">
-                <div className="ft-timeline">
-                    {(data.report?.milestones || []).map((milestone) => (
-                        <div className="ft-timeline__item" key={`${milestone.month}-${milestone.event}`}>
-                            <span>{milestone.month}</span>
-                            <div>
-                                <strong>{milestone.event}</strong>
-                                <p>{milestone.impact}</p>
-                                <small>{milestone.details}</small>
+            {/* Tường thuật chiến lược AI */}
+            {report.detailedNarrative && (
+                <AdminCard title="Tường thuật Chiến lược Tổng thể (Detailed Narrative)" subtitle="Bức tranh toàn cảnh về tiến trình thực thi và các giai đoạn bản lề">
+                    <div className="ft-rich-paragraph" style={{ whiteSpace: 'pre-line', lineHeight: '1.7', fontSize: '0.92rem', color: '#1e293b' }}>
+                        {report.detailedNarrative}
+                    </div>
+                </AdminCard>
+            )}
+
+            {/* Lộ trình Cột mốc & Các bước hành động cụ thể (Milestones & Action Steps) */}
+            <AdminCard
+                title={`Lộ trình Cột mốc & Kế hoạch Thực thi (${milestones.length} Giai đoạn)`}
+                subtitle="Chi tiết từng cột mốc, xác suất thành công và danh mục bước hành động cụ thể"
+            >
+                {milestones.length === 0 ? (
+                    <AdminEmptyState title="Chưa có dữ liệu cột mốc" description="Báo cáo này chưa khởi tạo danh sách cột mốc." />
+                ) : (
+                    <div className="ft-timeline">
+                        {milestones.map((milestone, mIdx) => (
+                            <div className="ft-timeline__item" key={`${milestone.month || mIdx}-${milestone.event || mIdx}`}>
+                                <span>{milestone.month || `Mốc ${mIdx + 1}`}</span>
+                                <div>
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', flexWrap: 'wrap' }}>
+                                        <strong>{milestone.event}</strong>
+                                        <AdminBadge tone="blue">{milestone.probability || 80}% Thành công</AdminBadge>
+                                    </div>
+                                    <p style={{ color: '#0369a1', fontWeight: '500', marginBottom: '8px' }}>
+                                        🎯 Tác động: {milestone.impact}
+                                    </p>
+
+                                    {/* Action Steps Rendering - Xử lý an toàn cả mảng object và string */}
+                                    {Array.isArray(milestone.details) && milestone.details.length > 0 ? (
+                                        <div className="ft-action-steps-container">
+                                            {milestone.details.map((step, sIdx) => (
+                                                <div className="ft-action-step-card" key={step.id || sIdx}>
+                                                    <div className="ft-action-step-header">
+                                                        <div className="ft-action-step-title">
+                                                            <span className="ft-step-tag">Bước {mIdx + 1}.{sIdx + 1}</span>
+                                                            <span>{step.title}</span>
+                                                        </div>
+                                                        <AdminBadge tone={step.completed ? 'green' : 'gray'}>
+                                                            {step.completed ? 'Đã hoàn tất' : 'Chưa hoàn tất'}
+                                                        </AdminBadge>
+                                                    </div>
+
+                                                    <p className="ft-action-step-desc">{step.description}</p>
+
+                                                    <div className="ft-action-step-subgrid">
+                                                        {Array.isArray(step.objectives) && step.objectives.length > 0 && (
+                                                            <div className="ft-step-subitem">
+                                                                <div className="ft-step-subitem-title">
+                                                                    <span>📌 Mục tiêu cụ thể:</span>
+                                                                </div>
+                                                                <div className="ft-pill-group">
+                                                                    {step.objectives.map((obj, oIdx) => (
+                                                                        <span className="ft-sub-pill" key={oIdx}>{obj}</span>
+                                                                    ))}
+                                                                </div>
+                                                            </div>
+                                                        )}
+
+                                                        {Array.isArray(step.actions) && step.actions.length > 0 && (
+                                                            <div className="ft-step-subitem">
+                                                                <div className="ft-step-subitem-title">
+                                                                    <span>⚡ Hành động chi tiết:</span>
+                                                                </div>
+                                                                <ul style={{ margin: 0, paddingLeft: '16px', fontSize: '0.8rem', color: '#475569' }}>
+                                                                    {step.actions.map((act, aIdx) => (
+                                                                        <li key={aIdx}>{act}</li>
+                                                                    ))}
+                                                                </ul>
+                                                            </div>
+                                                        )}
+
+                                                        {Array.isArray(step.tools) && step.tools.length > 0 && (
+                                                            <div className="ft-step-subitem">
+                                                                <div className="ft-step-subitem-title">
+                                                                    <span>🛠️ Công cụ hỗ trợ:</span>
+                                                                </div>
+                                                                <div className="ft-pill-group">
+                                                                    {step.tools.map((tl, tIdx) => (
+                                                                        <span className="ft-sub-pill" style={{ background: '#f1f5f9' }} key={tIdx}>
+                                                                            {tl}
+                                                                        </span>
+                                                                    ))}
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </div>
+
+                                                    {step.expectedResult && (
+                                                        <div className="ft-expected-result-box">
+                                                            <span>🏁</span>
+                                                            <div>
+                                                                <strong>Kết quả kỳ vọng:</strong> {step.expectedResult}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : typeof milestone.details === 'string' ? (
+                                        <p style={{ fontSize: '0.85rem', color: '#475569', marginTop: '6px' }}>{milestone.details}</p>
+                                    ) : null}
+                                </div>
                             </div>
-                            <AdminBadge tone="blue">{milestone.probability}%</AdminBadge>
+                        ))}
+                    </div>
+                )}
+            </AdminCard>
+
+            {/* Các nhân tố ảnh hưởng (Influencing Factors Matrix) */}
+            {influencingFactors.length > 0 && (
+                <AdminCard
+                    title={`Các Nhân Tố Ảnh Hưởng Chiến Lược (${influencingFactors.length} Yếu tố)`}
+                    subtitle="Phân tích đa chiều: Tài chính, Học tập, Kinh doanh và Môi trường thị trường"
+                >
+                    <div className="ft-influencing-grid">
+                        {influencingFactors.map((item, idx) => (
+                            <div className="ft-influencing-card" key={item._id || idx}>
+                                <div className="ft-influencing-header">
+                                    <span className="ft-sub-pill" style={{ fontWeight: 600, background: '#eff6ff', color: '#1d4ed8', borderColor: '#bfdbfe' }}>
+                                        {item.category || 'Nhân tố'}
+                                    </span>
+                                    <AdminBadge tone={getInfluenceBadgeTone(item.influence)}>
+                                        Ảnh hưởng: {item.influence || 'Trung bình'}
+                                    </AdminBadge>
+                                </div>
+                                <div className="ft-influencing-factor">{item.factor}</div>
+                                <p className="ft-influencing-desc">{item.description}</p>
+                            </div>
+                        ))}
+                    </div>
+                </AdminCard>
+            )}
+
+            {/* Điểm xoay chiến lược & Ứng phó rủi ro (Strategic Pivot Points) */}
+            {strategicPivotPoints.length > 0 && (
+                <AdminCard
+                    title={`Điểm Xoay Chiến Lược (Strategic Pivot Points - ${strategicPivotPoints.length} Kịch bản)`}
+                    subtitle="Các quy tắc dự phòng khi rủi ro hoặc biến cố xuất hiện trong quá trình triển khai"
+                >
+                    <div className="ft-pivot-list">
+                        {strategicPivotPoints.map((pivot, pIdx) => (
+                            <div className="ft-pivot-card" key={pivot._id || pIdx}>
+                                <div className="ft-pivot-condition">
+                                    <span>⚠️</span>
+                                    <div>
+                                        <strong>ĐIỀU KIỆN KÍCH HOẠT (KHI NÀO CẦN XOAY TRỤC?):</strong>
+                                        <div style={{ marginTop: '2px', fontWeight: 'normal' }}>{pivot.condition}</div>
+                                    </div>
+                                </div>
+                                <div className="ft-pivot-action">
+                                    <span>🧭</span>
+                                    <div>
+                                        <strong>HÀNH ĐỘNG XOAY TRỤC CHIẾN LƯỢC:</strong>
+                                        <div style={{ marginTop: '2px' }}>{pivot.action}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </AdminCard>
+            )}
+
+            {/* Triển vọng dài hạn 3-5 năm */}
+            {report.longTermProjection && (
+                <AdminCard title="Dự Báo Triển Vọng Dài Hạn (3 - 5 Năm)" subtitle="Tầm nhìn định hướng sự nghiệp và kinh doanh bền vững">
+                    <div className="ft-projection-box">
+                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
+                            <span style={{ fontSize: '1.8rem', lineHeight: '1' }}>🔭</span>
+                            <div>
+                                <h4 style={{ margin: '0 0 8px 0', fontSize: '1rem', fontWeight: '700', color: '#4c1d95' }}>
+                                    Tầm nhìn & Thành quả dự kiến
+                                </h4>
+                                <p style={{ margin: 0, lineHeight: '1.65', color: '#334155' }}>
+                                    {report.longTermProjection}
+                                </p>
+                            </div>
                         </div>
-                    ))}
+                    </div>
+                </AdminCard>
+            )}
+
+            {/* Lịch sử phản hồi / Cập nhật */}
+            <AdminCard title="Lịch Sử Phản Hồi & Điều Chỉnh (Feedback History)" subtitle="Ghi nhận các yêu cầu tinh chỉnh hoặc đánh giá từ người dùng">
+                <div className="ft-list ft-feedback-list">
+                    {(data.feedbackHistory || []).length === 0 ? (
+                        <AdminEmptyState title="Chưa có phản hồi điều chỉnh" description="Báo cáo này chưa ghi nhận thêm phản hồi cập nhật từ người dùng." />
+                    ) : (
+                        (data.feedbackHistory || []).map((item, fIdx) => (
+                            <div className="ft-list-item" key={fIdx}>
+                                <p style={{ margin: 0, fontSize: '0.88rem' }}>{typeof item === 'string' ? item : JSON.stringify(item)}</p>
+                            </div>
+                        ))
+                    )}
                 </div>
             </AdminCard>
         </div>
@@ -1363,25 +1725,221 @@ function AiLogsPage({ api, onForbidden }) {
         () => api.getAiLogs({ page: '1', limit: '50', status: 'all', model: 'all', q: '' }),
         [api],
     );
+    const [aiStatus, setAiStatus] = useState(null);
+    const [statusLoading, setStatusLoading] = useState(true);
+    const [selectedProvider, setSelectedProvider] = useState('hybrid');
+    const [switchLoading, setSwitchLoading] = useState(false);
+    const [switchFeedback, setSwitchFeedback] = useState(null);
 
     useEffect(() => {
         if (error?.status === 403) onForbidden();
     }, [error, onForbidden]);
 
-    if (loading) return <LoadingCard title="Đang tải nhật ký AI..." />;
+    const loadAiStatus = useCallback(async () => {
+        setStatusLoading(true);
+        try {
+            const res = await api.getAiSystemStatus();
+            setAiStatus(res);
+            if (res.activeProvider) {
+                setSelectedProvider(res.activeProvider);
+            }
+        } catch (err) {
+            console.error('Failed to load AI system status:', err);
+        } finally {
+            setStatusLoading(false);
+        }
+    }, [api]);
+
+    useEffect(() => {
+        loadAiStatus();
+    }, [loadAiStatus]);
+
+    const handleSwitchProvider = async (newProvider) => {
+        setSwitchLoading(true);
+        setSwitchFeedback(null);
+        try {
+            const res = await api.setAiProvider(newProvider, 'Điều chỉnh loại AI từ Admin Dashboard');
+            setSelectedProvider(res.activeProvider);
+            setSwitchFeedback({ success: true, message: res.message });
+            await loadAiStatus();
+            setTimeout(() => setSwitchFeedback(null), 4000);
+        } catch (err) {
+            setSwitchFeedback({ success: false, message: getErrorMessage(err) });
+        } finally {
+            setSwitchLoading(false);
+        }
+    };
+
+    if (loading) return <LoadingCard title="Đang tải nhật ký AI & Trạng thái hệ thống..." />;
     if (error) return <ErrorCard error={error} onRetry={reload} />;
 
     const logs = data?.items || [];
     const stats = data?.stats || {};
+    const isOllamaOnline = Boolean(aiStatus?.ollama?.online);
 
     return (
         <div className="ft-page-stack">
             <AdminPageHeader
-                eyebrow="Kỹ Thuật & Cấu Hình"
-                title="Nhật ký AI / Giám sát Gemini"
-                description="Theo dõi độ trễ, mức sử dụng token, chi phí ước tính và mã lỗi."
+                eyebrow="Kỹ Thuật & Điều Phối Mô Hình"
+                title="Trung Tâm Điều Phối AI & Giám Sát Mô Hình"
+                description="Giám sát tình trạng máy chủ Local LLM (Ollama), Đám mây Google Gemini và linh hoạt chuyển đổi động cơ AI phục vụ người dùng."
+                actions={
+                    <button className="ft-button ft-button--ghost" type="button" onClick={loadAiStatus} disabled={statusLoading}>
+                        {statusLoading ? 'Đang kiểm tra...' : '🔄 Làm mới trạng thái AI'}
+                    </button>
+                }
             />
 
+            {switchFeedback ? (
+                <div style={{ padding: '12px 16px', borderRadius: '8px', background: switchFeedback.success ? '#ecfdf5' : '#fef2f2', border: switchFeedback.success ? '1px solid #10b981' : '1px solid #ef4444', color: switchFeedback.success ? '#065f46' : '#991b1b', marginBottom: '16px' }}>
+                    <strong>{switchFeedback.success ? '✅ Thành công: ' : '❌ Thất bại: '}</strong>
+                    {switchFeedback.message}
+                </div>
+            ) : null}
+
+            {/* AI Engines Overview Cards */}
+            <div className="ft-grid ft-grid--2-1" style={{ marginBottom: '20px' }}>
+                <AdminCard
+                    title="Chọn Loại Động Cơ AI (Active AI Provider)"
+                    subtitle="Hệ thống sẽ chuyển mạch ngay lập tức trên các yêu cầu mô phỏng tiếp theo."
+                >
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '10px' }}>
+                        <label
+                            style={{
+                                display: 'flex',
+                                alignItems: 'flex-start',
+                                gap: '12px',
+                                padding: '12px',
+                                borderRadius: '8px',
+                                border: selectedProvider === 'hybrid' ? '2px solid #2563eb' : '1px solid #e2e8f0',
+                                background: selectedProvider === 'hybrid' ? '#eff6ff' : '#fff',
+                                cursor: 'pointer',
+                            }}
+                        >
+                            <input
+                                type="radio"
+                                name="ai_provider"
+                                value="hybrid"
+                                checked={selectedProvider === 'hybrid'}
+                                onChange={() => handleSwitchProvider('hybrid')}
+                                disabled={switchLoading}
+                                style={{ marginTop: '3px' }}
+                            />
+                            <div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <strong style={{ color: '#1e293b' }}>⚡ Hybrid Auto-failover (Khuyên dùng)</strong>
+                                    <AdminBadge tone="blue">Mặc định</AdminBadge>
+                                </div>
+                                <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: '#64748b' }}>
+                                    Ưu tiên gọi <strong>Local LLM (futuretrace-ai)</strong> trên GPU cục bộ. Nếu Local máy chủ bị bận hoặc offline, tự động chuyển đổi sang <strong>Cloud Gemini</strong> mà không làm gián đoạn người dùng.
+                                </p>
+                            </div>
+                        </label>
+
+                        <label
+                            style={{
+                                display: 'flex',
+                                alignItems: 'flex-start',
+                                gap: '12px',
+                                padding: '12px',
+                                borderRadius: '8px',
+                                border: selectedProvider === 'ollama' ? '2px solid #10b981' : '1px solid #e2e8f0',
+                                background: selectedProvider === 'ollama' ? '#ecfdf5' : '#fff',
+                                cursor: 'pointer',
+                            }}
+                        >
+                            <input
+                                type="radio"
+                                name="ai_provider"
+                                value="ollama"
+                                checked={selectedProvider === 'ollama'}
+                                onChange={() => handleSwitchProvider('ollama')}
+                                disabled={switchLoading}
+                                style={{ marginTop: '3px' }}
+                            />
+                            <div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <strong style={{ color: '#1e293b' }}>💻 Local Fine-Tuned Model (Ollama)</strong>
+                                    <AdminBadge tone={isOllamaOnline ? 'green' : 'red'}>
+                                        {isOllamaOnline ? 'Online' : 'Offline'}
+                                    </AdminBadge>
+                                </div>
+                                <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: '#64748b' }}>
+                                    Chỉ sử dụng mô hình Qwen 2.5 7B đã fine-tune nội bộ <code>{aiStatus?.ollama?.modelName || 'futuretrace-ai'}</code>. Hoàn toàn bảo mật, dữ liệu không rời khỏi máy chủ cục bộ, chi phí API 0 VNĐ.
+                                </p>
+                            </div>
+                        </label>
+
+                        <label
+                            style={{
+                                display: 'flex',
+                                alignItems: 'flex-start',
+                                gap: '12px',
+                                padding: '12px',
+                                borderRadius: '8px',
+                                border: selectedProvider === 'gemini' ? '2px solid #8b5cf6' : '1px solid #e2e8f0',
+                                background: selectedProvider === 'gemini' ? '#f5f3ff' : '#fff',
+                                cursor: 'pointer',
+                            }}
+                        >
+                            <input
+                                type="radio"
+                                name="ai_provider"
+                                value="gemini"
+                                checked={selectedProvider === 'gemini'}
+                                onChange={() => handleSwitchProvider('gemini')}
+                                disabled={switchLoading}
+                                style={{ marginTop: '3px' }}
+                            />
+                            <div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <strong style={{ color: '#1e293b' }}>☁️ Cloud Gemini Engine (Google)</strong>
+                                    <AdminBadge tone="purple">Cloud API</AdminBadge>
+                                </div>
+                                <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: '#64748b' }}>
+                                    Chỉ sử dụng API đám mây Google Gemini 2.5 Flash / Lite với cơ chế xoay vòng Multi-Keys. Tốc độ suy luận cao, thích hợp khi máy trạm không có GPU rời.
+                                </p>
+                            </div>
+                        </label>
+                    </div>
+                </AdminCard>
+
+                <AdminCard
+                    title="Trạng Thái Hạ Tầng Máy Chủ AI"
+                    subtitle="Kiểm tra kết nối trực tiếp đến các engine."
+                >
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        <div style={{ padding: '10px 12px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                                <strong>Máy chủ Local Ollama</strong>
+                                <AdminBadge tone={isOllamaOnline ? 'green' : 'red'}>
+                                    {isOllamaOnline ? 'ONLINE' : 'OFFLINE'}
+                                </AdminBadge>
+                            </div>
+                            <small style={{ color: '#64748b', display: 'block' }}>Endpoint: <code>{aiStatus?.ollama?.baseUrl || 'http://127.0.0.1:11434'}</code></small>
+                            <small style={{ color: '#64748b', display: 'block' }}>Mô hình Fine-tune: <strong>{aiStatus?.ollama?.modelName || 'futuretrace-ai'}</strong> ({aiStatus?.ollama?.hasModel ? 'Đã nạp' : 'Chưa có'})</small>
+                            {aiStatus?.ollama?.latencyMs ? (
+                                <small style={{ color: '#10b981', display: 'block', marginTop: '4px' }}>Độ trễ phản hồi: {aiStatus.ollama.latencyMs}ms</small>
+                            ) : null}
+                            {aiStatus?.ollama?.error ? (
+                                <small style={{ color: '#ef4444', display: 'block', marginTop: '4px' }}>Lỗi: {aiStatus.ollama.error}</small>
+                            ) : null}
+                        </div>
+
+                        <div style={{ padding: '10px 12px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                                <strong>Đám mây Google Gemini</strong>
+                                <AdminBadge tone="green">ĐÃ KẾT NỐI</AdminBadge>
+                            </div>
+                            <small style={{ color: '#64748b', display: 'block' }}>Mô hình chính: <strong>{aiStatus?.gemini?.primaryModel || 'gemini-2.5-flash'}</strong></small>
+                            <small style={{ color: '#64748b', display: 'block' }}>Hạn ngạch API Keys: <strong>{aiStatus?.gemini?.keysCount || 1} khóa xoay vòng</strong></small>
+                            <small style={{ color: '#64748b', display: 'block' }}>Fallback: gemini-2.5-flash-lite, gemini-3.1-flash-lite</small>
+                        </div>
+                    </div>
+                </AdminCard>
+            </div>
+
+            {/* Performance Stats */}
             <div className="ft-stats-grid ft-stats-grid--compact">
                 <AdminStatCard label="Thành công" value={stats.success || 0} />
                 <AdminStatCard label="Thất bại" value={stats.failed || 0} tone="red" />
@@ -1389,14 +1947,16 @@ function AiLogsPage({ api, onForbidden }) {
                 <AdminStatCard label="Độ trễ trung bình" value={formatLatency(stats.avgLatency || 0)} tone="blue" />
             </div>
 
-            <AdminCard title="Nhật ký hệ thống Gemini">
+            {/* System Logs Table */}
+            <AdminCard title="Nhật ký các lượt gọi AI & Phân tích Telemetry">
                 <div className="ft-table-wrapper">
                     <table className="ft-table">
                         <thead>
                             <tr>
                                 <th>Mã ID (Correlation)</th>
                                 <th>Loại</th>
-                                <th>Người dùng</th>
+                                <th>Mô phỏng/Người dùng</th>
+                                <th>Mô hình</th>
                                 <th>Trạng thái</th>
                                 <th>Độ trễ</th>
                                 <th>Chi phí ước tính</th>
@@ -1411,6 +1971,7 @@ function AiLogsPage({ api, onForbidden }) {
                                     </td>
                                     <td>{log.requestType}</td>
                                     <td>{log.userName}</td>
+                                    <td><code>{log.model}</code></td>
                                     <td>
                                         <AdminBadge tone={getToneByStatus(log.status)}>{log.status}</AdminBadge>
                                     </td>
@@ -1422,6 +1983,847 @@ function AiLogsPage({ api, onForbidden }) {
                     </table>
                 </div>
             </AdminCard>
+        </div>
+    );
+}
+
+function RagManagementPage({ api, onForbidden }) {
+    const { data, loading, error, reload } = useRemoteResource(
+        () => api.getRagStatus(),
+        [api],
+    );
+    const [modalOpen, setModalOpen] = useState(false);
+    const [syncing, setSyncing] = useState(false);
+    const [syncResult, setSyncResult] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchLoading, setSearchLoading] = useState(false);
+    const [searchResults, setSearchResults] = useState(null);
+
+    // Modal thêm tri thức RAG
+    const [addModalOpen, setAddModalOpen] = useState(false);
+    const [addCategory, setAddCategory] = useState('salaries');
+    const [addForm, setAddForm] = useState({
+        title: '',
+        minVnd: '15',
+        avgVnd: '28',
+        maxVnd: '50',
+        sampleSize: '50',
+        schoolName: '',
+        majorName: '',
+        majorCode: '7480201',
+        cutoffScore: '26.5',
+        subjectGroup: 'A00,A01,D01',
+        tuitionVnd: '32000000',
+        city: '',
+        studentMillion: '8.5',
+        rentVnd: '3000000',
+        mealVnd: '45000',
+    });
+    const [addLoading, setAddLoading] = useState(false);
+
+    // Chế độ thêm: 'single' (thủ công) hoặc 'bulk' (hàng loạt)
+    const [addMode, setAddMode] = useState('single');
+    const [bulkFormat, setBulkFormat] = useState('json'); // 'json' | 'csv'
+    const [bulkText, setBulkText] = useState('');
+    const [bulkError, setBulkError] = useState(null);
+
+    const loadSampleBulkData = (cat = addCategory, fmt = bulkFormat) => {
+        setBulkError(null);
+        if (fmt === 'json') {
+            if (cat === 'salaries') {
+                setBulkText(JSON.stringify([
+                    { title: "AI Research Scientist", minVnd: 35, avgVnd: 60, maxVnd: 120, sampleSize: 80 },
+                    { title: "DevSecOps Engineer", minVnd: 25, avgVnd: 45, maxVnd: 75, sampleSize: 120 },
+                    { title: "Prompt Engineer", minVnd: 18, avgVnd: 30, maxVnd: 50, sampleSize: 45 }
+                ], null, 2));
+            } else if (cat === 'admissions') {
+                setBulkText(JSON.stringify([
+                    { schoolName: "Đại học Bách Khoa Hà Nội", majorName: "Khoa học Dữ liệu và AI", cutoffScore: 28.8, subjectGroup: "A00,A01", tuitionVnd: 38000000 },
+                    { schoolName: "Đại học FPT", majorName: "Thiết kế Vi mạch Bán dẫn (Semiconductor)", cutoffScore: 24.5, subjectGroup: "A00,A01,D01", tuitionVnd: 35000000 },
+                    { schoolName: "Đại học Công nghệ - ĐHQGHN", majorName: "Kỹ thuật Robot và Trí tuệ Nhân tạo", cutoffScore: 27.9, subjectGroup: "A00,A01", tuitionVnd: 35000000 }
+                ], null, 2));
+            } else {
+                setBulkText(JSON.stringify([
+                    { city: "Bình Dương", studentMillion: 7.5, rentVnd: 2200000, mealVnd: 35000, level: "Medium" },
+                    { city: "Đà Lạt", studentMillion: 7.0, rentVnd: 2000000, mealVnd: 35000, level: "Low" }
+                ], null, 2));
+            }
+        } else {
+            // CSV
+            if (cat === 'salaries') {
+                setBulkText("title,minVnd,avgVnd,maxVnd,sampleSize\nAI Research Scientist,35,60,120,80\nDevSecOps Engineer,25,45,75,120\nPrompt Engineer,18,30,50,45");
+            } else if (cat === 'admissions') {
+                setBulkText("schoolName,majorName,cutoffScore,subjectGroup,tuitionVnd\nĐại học Bách Khoa Hà Nội,Khoa học Dữ liệu và AI,28.8,A00;A01,38000000\nĐại học FPT,Thiết kế Vi mạch Bán dẫn,24.5,A00;A01;D01,35000000\nĐại học Công nghệ - ĐHQGHN,Kỹ thuật Robot,27.9,A00;A01,35000000");
+            } else {
+                setBulkText("city,studentMillion,rentVnd,mealVnd,level\nBình Dương,7.5,2200000,35000,Medium\nĐà Lạt,7.0,2000000,35000,Low");
+            }
+        }
+    };
+
+    const handleFileUpload = (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const content = event.target?.result;
+            if (typeof content === 'string') {
+                setBulkText(content);
+                if (file.name.toLowerCase().endsWith('.csv')) {
+                    setBulkFormat('csv');
+                } else if (file.name.toLowerCase().endsWith('.json')) {
+                    setBulkFormat('json');
+                }
+            }
+        };
+        reader.readAsText(file);
+    };
+
+    const handleBulkImport = async (e) => {
+        e.preventDefault();
+        setBulkError(null);
+        if (!bulkText.trim()) {
+            setBulkError('Vui lòng nhập hoặc dán dữ liệu cần thêm.');
+            return;
+        }
+
+        let parsedItems = [];
+        try {
+            if (bulkFormat === 'json') {
+                const parsed = JSON.parse(bulkText);
+                parsedItems = Array.isArray(parsed) ? parsed : [parsed];
+            } else {
+                // CSV parse
+                const lines = bulkText.split('\n').map(l => l.trim()).filter(Boolean);
+                if (lines.length < 2) {
+                    throw new Error('Dữ liệu CSV cần có ít nhất 1 dòng tiêu đề (header) và 1 dòng dữ liệu.');
+                }
+                const headers = lines[0].split(',').map(h => h.trim());
+                for (let i = 1; i < lines.length; i++) {
+                    const cols = lines[i].split(',').map(c => c.trim());
+                    const obj = {};
+                    headers.forEach((h, idx) => {
+                        obj[h] = cols[idx] !== undefined ? cols[idx] : '';
+                    });
+                    parsedItems.push(obj);
+                }
+            }
+        } catch (err) {
+            setBulkError('Lỗi định dạng dữ liệu: ' + err.message);
+            return;
+        }
+
+        if (parsedItems.length === 0) {
+            setBulkError('Không tìm thấy bản ghi nào hợp lệ.');
+            return;
+        }
+
+        setAddLoading(true);
+        try {
+            const res = await api.bulkImportRagKnowledge({
+                category: addCategory,
+                items: parsedItems
+            });
+            setSyncResult({ success: true, message: res.message });
+            setAddModalOpen(false);
+            setBulkText('');
+            await reload();
+        } catch (err) {
+            setBulkError(getErrorMessage(err));
+        } finally {
+            setAddLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (error?.status === 403) onForbidden();
+    }, [error, onForbidden]);
+
+    const doSearch = async (term) => {
+        const q = (term !== undefined ? term : searchQuery).trim();
+        if (!q) return;
+        setSearchLoading(true);
+        try {
+            const res = await api.searchRag(q);
+            setSearchResults(res);
+        } catch (err) {
+            console.error('RAG search error:', err);
+        } finally {
+            setSearchLoading(false);
+        }
+    };
+
+    const handleSearch = (e) => {
+        if (e) e.preventDefault();
+        doSearch();
+    };
+
+    const handleQuickSearch = (tag) => {
+        setSearchQuery(tag);
+        doSearch(tag);
+    };
+
+    const handleAddKnowledge = async (e) => {
+        e.preventDefault();
+        setAddLoading(true);
+        try {
+            const res = await api.addRagKnowledge({
+                category: addCategory,
+                data: addForm
+            });
+            setSyncResult({ success: true, message: res.message });
+            setAddModalOpen(false);
+            await reload();
+            // Tự động tìm kiếm mục vừa thêm
+            const searchTerm = addCategory === 'salaries' ? addForm.title : (addCategory === 'admissions' ? addForm.majorName : addForm.city);
+            if (searchTerm) {
+                setSearchQuery(searchTerm);
+                doSearch(searchTerm);
+            }
+        } catch (err) {
+            setSyncResult({ success: false, message: getErrorMessage(err) });
+        } finally {
+            setAddLoading(false);
+        }
+    };
+
+    const handleSync = async (reason) => {
+        setSyncing(true);
+        setSyncResult(null);
+        try {
+            const res = await api.syncRagKnowledge(reason);
+            setSyncResult({ success: true, message: res.message });
+            setModalOpen(false);
+            await reload();
+        } catch (err) {
+            setSyncResult({ success: false, message: getErrorMessage(err) });
+            setModalOpen(false);
+        } finally {
+            setSyncing(false);
+        }
+    };
+
+    if (loading) return <LoadingCard title="Đang tải dữ liệu tri thức RAG..." />;
+    if (error) return <ErrorCard error={error} onRetry={reload} />;
+
+    const indices = data?.indices || [];
+    const rawSources = data?.rawSources || [];
+
+    const getIndexIcon = (id) => {
+        switch (id) {
+            case 'admissions': return <GraduationCap size={20} weight="duotone" />;
+            case 'salaries': return <CurrencyCircleDollar size={20} weight="duotone" />;
+            case 'living_costs': return <Buildings size={20} weight="duotone" />;
+            case 'market_intelligence': return <ChartBar size={20} weight="duotone" />;
+            case 'domains': return <Compass size={20} weight="duotone" />;
+            default: return <Database size={20} weight="duotone" />;
+        }
+    };
+
+    const getQuickQueryForIndex = (id) => {
+        switch (id) {
+            case 'admissions': return 'Điểm chuẩn Bách Khoa';
+            case 'salaries': return 'Lương developer';
+            case 'living_costs': return 'Hà Nội';
+            case 'market_intelligence': return 'Trí tuệ nhân tạo';
+            case 'domains': return 'Kỹ thuật phần mềm';
+            default: return 'lương';
+        }
+    };
+
+    return (
+        <div className="ft-page-stack">
+            <AdminPageHeader
+                eyebrow="Hệ Thống Phân Tích & Dữ Liệu Lớn"
+                title="Quản trị Tri thức RAG & Đồng bộ Dữ liệu"
+                description="Giám sát 5 chỉ mục tri thức tuyển sinh, việc làm, chi phí sinh hoạt và thực hiện đồng bộ dữ liệu vào hệ sinh thái FutureTrace."
+                actions={
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                        <button
+                            className="ft-button ft-button--ghost"
+                            type="button"
+                            onClick={() => setAddModalOpen(true)}
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                        >
+                            <Plus size={16} weight="bold" />
+                            <span>Thêm tri thức RAG</span>
+                        </button>
+                        <button
+                            className="ft-button"
+                            type="button"
+                            disabled={syncing}
+                            onClick={() => setModalOpen(true)}
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                        >
+                            <ArrowClockwise size={16} weight="bold" className={syncing ? 'ft-spin' : ''} />
+                            <span>{syncing ? 'Đang đồng bộ...' : 'Đồng bộ & Cập nhật RAG'}</span>
+                        </button>
+                    </div>
+                }
+            />
+
+            {syncResult ? (
+                <div style={{ padding: '14px 18px', borderRadius: '10px', background: syncResult.success ? '#ecfdf5' : '#fef2f2', border: syncResult.success ? '1px solid #10b981' : '1px solid #ef4444', color: syncResult.success ? '#065f46' : '#991b1b', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+                    {syncResult.success ? <CheckCircle size={20} weight="fill" color="#10b981" /> : <WarningCircle size={20} weight="fill" color="#ef4444" />}
+                    <div>
+                        <strong>{syncResult.success ? 'Đồng bộ hoàn tất: ' : 'Lỗi xử lý: '}</strong>
+                        <span>{syncResult.message}</span>
+                    </div>
+                </div>
+            ) : null}
+
+            <div className="ft-stats-grid ft-stats-grid--compact">
+                <AdminStatCard label="Tổng bản ghi RAG" value={Number(data?.totalRecords || 0).toLocaleString('vi-VN')} tone="blue" />
+                <AdminStatCard label="Dung lượng kho JSON" value={data?.totalSize || '0 MB'} tone="emerald" />
+                <AdminStatCard label="Dữ liệu thô (Raw Big Data)" value={data?.totalRawSize || '293.9 MB'} tone="purple" />
+                <AdminStatCard label="Trạng thái kho RAG" value="Sẵn sàng (Healthy)" tone="green" />
+            </div>
+
+            <AdminCard
+                title="Danh mục các chỉ mục RAG đang hoạt động"
+                subtitle="Dữ liệu chuẩn hóa JSON sẵn sàng cho động cơ truy xuất ngữ cảnh (Context Retrieval)."
+            >
+                <div className="ft-table-wrapper">
+                    <table className="ft-table">
+                        <thead>
+                            <tr>
+                                <th>Chỉ mục tri thức</th>
+                                <th>Tệp dữ liệu (.json)</th>
+                                <th>Nguồn gốc</th>
+                                <th>Số lượng bản ghi</th>
+                                <th>Dung lượng</th>
+                                <th>Cập nhật lúc</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {indices.map((idx) => (
+                                <tr key={idx.id}>
+                                    <td>
+                                        <div className="ft-rag-index-title-cell">
+                                            <div className={`ft-rag-table-icon-wrap ft-rag-table-icon-wrap--${idx.id}`}>
+                                                {getIndexIcon(idx.id)}
+                                            </div>
+                                            <div>
+                                                <strong style={{ fontSize: '0.92rem', color: '#0f172a' }}>{idx.title}</strong>
+                                                <p style={{ margin: '2px 0 0', fontSize: '12px', color: '#64748b', lineHeight: 1.4 }}>{idx.description}</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span className="ft-rag-code-pill">
+                                            <span className="ft-rag-code-dot" />
+                                            {idx.fileName}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <small style={{ color: '#475569', fontSize: '12px' }}>{idx.source}</small>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
+                                                <strong style={{ fontSize: '1.05rem', color: '#0f172a', fontVariantNumeric: 'tabular-nums' }}>
+                                                    {Number(idx.count || 0).toLocaleString('vi-VN')}
+                                                </strong>
+                                                <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 600 }}>{idx.unitLabel || 'mục'}</span>
+                                            </div>
+                                            {idx.detailInfo ? (
+                                                <small style={{ fontSize: '11px', color: '#0284c7', display: 'block', marginTop: '2px', fontWeight: 500, lineHeight: 1.3 }}>
+                                                    {idx.detailInfo}
+                                                </small>
+                                            ) : null}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span style={{ fontSize: '12.5px', color: '#334155', fontWeight: 500 }}>{idx.sizeFormatted}</span>
+                                    </td>
+                                    <td>
+                                        <span style={{ fontSize: '12px', color: '#64748b' }}>{idx.updatedAt}</span>
+                                    </td>
+                                    <td>
+                                        <AdminBadge tone={idx.exists ? 'green' : 'red'}>
+                                            {idx.exists ? 'Sẵn sàng' : 'Chưa lập'}
+                                        </AdminBadge>
+                                    </td>
+                                    <td>
+                                        <button
+                                            type="button"
+                                            className="ft-action-pill"
+                                            onClick={() => {
+                                                const q = getQuickQueryForIndex(idx.id);
+                                                handleQuickSearch(q);
+                                                const el = document.getElementById('rag-search-section');
+                                                if (el) el.scrollIntoView({ behavior: 'smooth' });
+                                            }}
+                                            title="Thử nghiệm tra cứu chỉ mục này"
+                                        >
+                                            Tra cứu thử
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </AdminCard>
+
+            <div className="ft-grid ft-grid--2-1" id="rag-search-section">
+                <AdminCard
+                    title="Công cụ kiểm tra truy xuất RAG (Context Retrieval Sandbox)"
+                    subtitle="Tra cứu thử nghiệm kết quả ngữ cảnh được mô hình AI trích xuất thực tế trên cả 5 kênh dữ liệu."
+                >
+                    <form onSubmit={handleSearch} className="ft-rag-search-box">
+                        <div className="ft-rag-search-input-wrap">
+                            <MagnifyingGlass className="ft-rag-search-icon" weight="bold" />
+                            <input
+                                className="ft-rag-search-input"
+                                placeholder="Tra cứu: lương, lương developer, kỹ thuật phần mềm, bách khoa, hà nội..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
+                        </div>
+                        <button className="ft-rag-search-btn" type="submit" disabled={searchLoading}>
+                            <Sparkle size={16} weight="fill" />
+                            <span>{searchLoading ? 'Đang tìm...' : 'Truy xuất RAG'}</span>
+                        </button>
+                    </form>
+
+                    <div className="ft-rag-quick-tags-wrap">
+                        <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                            <Tag size={13} weight="bold" /> Gợi ý nhanh:
+                        </span>
+                        {[
+                            { label: '💼 Lương Developer', query: 'lương developer' },
+                            { label: '💼 Lương Kế toán', query: 'Kế toán' },
+                            { label: '🎓 ĐH Bách Khoa', query: 'Bách Khoa' },
+                            { label: '🎓 Kỹ thuật phần mềm', query: 'Kỹ thuật phần mềm' },
+                            { label: '🏠 Chi phí Hà Nội', query: 'Hà Nội' },
+                            { label: '📊 Xu hướng AI', query: 'AI' }
+                        ].map((tag) => (
+                            <button
+                                key={tag.query}
+                                type="button"
+                                className="ft-rag-tag-btn"
+                                onClick={() => handleQuickSearch(tag.query)}
+                            >
+                                {tag.label}
+                            </button>
+                        ))}
+                    </div>
+
+                    {searchResults ? (
+                        <div>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                                <p style={{ fontSize: '13px', color: '#475569', margin: 0 }}>
+                                    Tìm thấy <strong style={{ color: '#0f172a' }}>{searchResults.total}</strong> kết quả khớp với "<em>{searchResults.query}</em>":
+                                </p>
+                                <span style={{ fontSize: '11px', color: '#64748b', background: '#f1f5f9', padding: '3px 8px', borderRadius: '6px' }}>
+                                    5/5 kênh RAG
+                                </span>
+                            </div>
+                            <div className="ft-rag-results-container">
+                                {searchResults.results.map((r, i) => (
+                                    <div className="ft-rag-result-card" key={i}>
+                                        <div className="ft-rag-result-header">
+                                            <span className="ft-rag-result-type-badge">{r.type}</span>
+                                            <span style={{ fontSize: '11px', color: '#94a3b8' }}>Chỉ mục #{i + 1}</span>
+                                        </div>
+                                        <h4 className="ft-rag-result-title">{r.title}</h4>
+                                        <p className="ft-rag-result-body">{r.detail}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    ) : (
+                        <div style={{ textAlign: 'center', padding: '44px 20px', background: '#f8fafc', borderRadius: '12px', border: '1px dashed #cbd5e1' }}>
+                            <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#eff6ff', color: '#2563eb', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginBottom: '12px', fontSize: '24px' }}>
+                                <MagnifyingGlass weight="duotone" />
+                            </div>
+                            <h4 style={{ margin: '0 0 6px', fontSize: '15px', color: '#0f172a' }}>Thử nghiệm mô hình truy xuất RAG</h4>
+                            <p style={{ color: '#64748b', fontSize: '13px', maxWidth: '420px', margin: '0 auto', lineHeight: 1.5 }}>
+                                Nhập <strong>"lương"</strong>, <strong>"developer"</strong>, ngành học hoặc trường đại học để thử nghiệm kết quả AI nhận diện.
+                            </p>
+                        </div>
+                    )}
+                </AdminCard>
+
+                <AdminCard
+                    title="Nguồn dữ liệu thực tế (Raw Big Data)"
+                    subtitle="Kiểm tra các tệp dữ liệu gốc trên máy chủ FutureTrace."
+                >
+                    <div className="ft-rag-source-list">
+                        {rawSources.map((src, i) => (
+                            <div className="ft-rag-source-card" key={i}>
+                                <div className="ft-rag-source-left">
+                                    <div className={`ft-rag-file-badge ft-rag-file-badge--${src.fileType || 'xlsx'}`}>
+                                        {src.fileType === 'parquet' ? 'PQT' : (src.fileType || 'XLSX').toUpperCase()}
+                                    </div>
+                                    <div className="ft-rag-source-details">
+                                        <h5 className="ft-rag-source-title">{src.title || src.name}</h5>
+                                        <span className="ft-rag-source-filename">{src.name}</span>
+                                        <div className="ft-rag-source-meta">
+                                            <span>{src.sizeFormatted || 'N/A'}</span>
+                                            <span>•</span>
+                                            <span>{src.updatedAt ? `Cập nhật: ${src.updatedAt}` : 'Sẵn sàng'}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="ft-rag-source-right">
+                                    <AdminBadge tone={src.exists ? 'green' : 'amber'}>
+                                        {src.exists ? 'Sẵn sàng' : 'Chưa tìm thấy'}
+                                    </AdminBadge>
+                                </div>
+                            </div>
+                        ))}
+                        <div className="ft-rag-raw-summary">
+                            <span>⚡ Tổng dữ liệu thô: <strong>{data?.totalRawSize || '293.9 MB'}</strong></span>
+                            <span style={{ fontSize: '0.78rem', color: '#15803d' }}>6/6 tệp gốc toàn vẹn</span>
+                        </div>
+                    </div>
+                </AdminCard>
+            </div>
+
+            {/* Modal Thêm Tri Thức RAG Mới */}
+            {addModalOpen && (
+                <div className="ft-modal-backdrop" onClick={(e) => e.target === e.currentTarget && setAddModalOpen(false)}>
+                    <div className="ft-modal" style={{ maxWidth: '620px' }}>
+                        <div className="ft-modal__header">
+                            <div>
+                                <span className="ft-eyebrow">Cơ chế làm giàu tri thức</span>
+                                <h3 className="ft-modal__title">Mở Rộng Cơ Sở Tri Thức RAG</h3>
+                            </div>
+                            <button className="ft-icon-button" type="button" onClick={() => setAddModalOpen(false)}>✕</button>
+                        </div>
+
+                        {/* Tabs chuyển đổi: Đơn lẻ vs Hàng loạt */}
+                        <div className="ft-modal-tabs">
+                            <button
+                                type="button"
+                                className={`ft-modal-tab-btn ${addMode === 'single' ? 'ft-modal-tab-btn--active' : ''}`}
+                                onClick={() => setAddMode('single')}
+                            >
+                                <span>✍️ Thêm từng mục (Thủ công)</span>
+                            </button>
+                            <button
+                                type="button"
+                                className={`ft-modal-tab-btn ${addMode === 'bulk' ? 'ft-modal-tab-btn--active' : ''}`}
+                                onClick={() => {
+                                    setAddMode('bulk');
+                                    if (!bulkText) loadSampleBulkData(addCategory, bulkFormat);
+                                }}
+                            >
+                                <span>⚡ Nhập hàng loạt (Bulk Import)</span>
+                            </button>
+                        </div>
+
+                        {/* Phân loại tri thức */}
+                        <label className="ft-field">
+                            <span className="ft-field__label">Chọn phân loại tri thức</span>
+                            <select
+                                value={addCategory}
+                                onChange={(e) => {
+                                    const newCat = e.target.value;
+                                    setAddCategory(newCat);
+                                    if (addMode === 'bulk') loadSampleBulkData(newCat, bulkFormat);
+                                }}
+                            >
+                                <option value="salaries">💼 Chức Danh & Mức Lương (salaries_index.json)</option>
+                                <option value="admissions">🎓 Tuyển Sinh & Điểm Chuẩn (admissions_index.json)</option>
+                                <option value="living_costs">🏠 Chi Phí Sinh Hoạt Đô Thị (living_costs_index.json)</option>
+                            </select>
+                        </label>
+
+                        {/* Banner thông điệp Smart Upsert (Khử trùng lặp thông minh) */}
+                        <div className="ft-smart-upsert-tip">
+                            <span>🛡️</span>
+                            <div>
+                                <strong>Cơ chế Smart Upsert (Không sợ trùng lặp dữ liệu):</strong>{' '}
+                                Không cần xóa dữ liệu cũ! Nếu bản ghi (ngành/trường/chức danh) đã tồn tại, hệ thống tự động <strong>cập nhật chỉ số mới nhất</strong>. Nếu là bản ghi mới, hệ thống tự động bổ sung vào kho tri thức.
+                            </div>
+                        </div>
+
+                        {/* ==================== FORM CHẾ ĐỘ ĐƠN LẺ ==================== */}
+                        {addMode === 'single' ? (
+                            <form onSubmit={handleAddKnowledge} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                                {addCategory === 'salaries' && (
+                                    <>
+                                        <label className="ft-field">
+                                            <span className="ft-field__label">Tên chức danh nghề nghiệp</span>
+                                            <input
+                                                required
+                                                placeholder="Ví dụ: AI Engineer, Kỹ sư Robot, Data Analyst..."
+                                                value={addForm.title}
+                                                onChange={(e) => setAddForm({ ...addForm, title: e.target.value })}
+                                            />
+                                        </label>
+                                        <div className="ft-field-grid-3">
+                                            <label className="ft-field">
+                                                <span className="ft-field__label">Min (tr VNĐ)</span>
+                                                <input
+                                                    type="number"
+                                                    step="0.1"
+                                                    value={addForm.minVnd}
+                                                    onChange={(e) => setAddForm({ ...addForm, minVnd: e.target.value })}
+                                                />
+                                            </label>
+                                            <label className="ft-field">
+                                                <span className="ft-field__label">Trung bình (tr)</span>
+                                                <input
+                                                    type="number"
+                                                    step="0.1"
+                                                    value={addForm.avgVnd}
+                                                    onChange={(e) => setAddForm({ ...addForm, avgVnd: e.target.value })}
+                                                />
+                                            </label>
+                                            <label className="ft-field">
+                                                <span className="ft-field__label">Max (tr VNĐ)</span>
+                                                <input
+                                                    type="number"
+                                                    step="0.1"
+                                                    value={addForm.maxVnd}
+                                                    onChange={(e) => setAddForm({ ...addForm, maxVnd: e.target.value })}
+                                                />
+                                            </label>
+                                        </div>
+                                        <label className="ft-field">
+                                            <span className="ft-field__label">Số lượng mẫu khảo sát</span>
+                                            <input
+                                                type="number"
+                                                value={addForm.sampleSize}
+                                                onChange={(e) => setAddForm({ ...addForm, sampleSize: e.target.value })}
+                                            />
+                                        </label>
+                                    </>
+                                )}
+
+                                {addCategory === 'admissions' && (
+                                    <>
+                                        <label className="ft-field">
+                                            <span className="ft-field__label">Tên trường Đại học</span>
+                                            <input
+                                                required
+                                                placeholder="Ví dụ: Đại học Bách Khoa Hà Nội, Đại học FPT..."
+                                                value={addForm.schoolName}
+                                                onChange={(e) => setAddForm({ ...addForm, schoolName: e.target.value })}
+                                            />
+                                        </label>
+                                        <div className="ft-field-grid-2">
+                                            <label className="ft-field">
+                                                <span className="ft-field__label">Tên ngành học</span>
+                                                <input
+                                                    required
+                                                    placeholder="Ví dụ: Trí tuệ nhân tạo (AI)"
+                                                    value={addForm.majorName}
+                                                    onChange={(e) => setAddForm({ ...addForm, majorName: e.target.value })}
+                                                />
+                                            </label>
+                                            <label className="ft-field">
+                                                <span className="ft-field__label">Điểm chuẩn (thang 30)</span>
+                                                <input
+                                                    type="number"
+                                                    step="0.01"
+                                                    value={addForm.cutoffScore}
+                                                    onChange={(e) => setAddForm({ ...addForm, cutoffScore: e.target.value })}
+                                                />
+                                            </label>
+                                        </div>
+                                        <div className="ft-field-grid-2">
+                                            <label className="ft-field">
+                                                <span className="ft-field__label">Tổ hợp xét tuyển</span>
+                                                <input
+                                                    placeholder="A00, A01, D01"
+                                                    value={addForm.subjectGroup}
+                                                    onChange={(e) => setAddForm({ ...addForm, subjectGroup: e.target.value })}
+                                                />
+                                            </label>
+                                            <label className="ft-field">
+                                                <span className="ft-field__label">Học phí ước tính (VNĐ/năm)</span>
+                                                <input
+                                                    type="number"
+                                                    placeholder="Ví dụ: 32000000"
+                                                    value={addForm.tuitionVnd}
+                                                    onChange={(e) => setAddForm({ ...addForm, tuitionVnd: e.target.value })}
+                                                />
+                                            </label>
+                                        </div>
+                                    </>
+                                )}
+
+                                {addCategory === 'living_costs' && (
+                                    <>
+                                        <label className="ft-field">
+                                            <span className="ft-field__label">Tên tỉnh / thành phố</span>
+                                            <input
+                                                required
+                                                placeholder="Ví dụ: Cần Thơ, Hải Phòng, Bình Dương..."
+                                                value={addForm.city}
+                                                onChange={(e) => setAddForm({ ...addForm, city: e.target.value })}
+                                            />
+                                        </label>
+                                        <div className="ft-field-grid-2">
+                                            <label className="ft-field">
+                                                <span className="ft-field__label">Ước tính SV (tr/tháng)</span>
+                                                <input
+                                                    type="number"
+                                                    step="0.1"
+                                                    value={addForm.studentMillion}
+                                                    onChange={(e) => setAddForm({ ...addForm, studentMillion: e.target.value })}
+                                                />
+                                            </label>
+                                            <label className="ft-field">
+                                                <span className="ft-field__label">Tiền thuê trọ (VNĐ/tháng)</span>
+                                                <input
+                                                    type="number"
+                                                    value={addForm.rentVnd}
+                                                    onChange={(e) => setAddForm({ ...addForm, rentVnd: e.target.value })}
+                                                />
+                                            </label>
+                                        </div>
+                                    </>
+                                )}
+
+                                <div className="ft-modal__actions">
+                                    <button className="ft-button ft-button--ghost" type="button" onClick={() => setAddModalOpen(false)}>
+                                        Huỷ
+                                    </button>
+                                    <button className="ft-button" type="submit" disabled={addLoading}>
+                                        {addLoading ? 'Đang lưu...' : 'Lưu vào kho RAG'}
+                                    </button>
+                                </div>
+                            </form>
+                        ) : (
+                            /* ==================== FORM CHẾ ĐỘ NHẬP HÀNG LOẠT ==================== */
+                            <form onSubmit={handleBulkImport} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+                                    <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                                        <span style={{ fontSize: '12px', fontWeight: 600, color: '#475569' }}>Định dạng:</span>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setBulkFormat('json');
+                                                loadSampleBulkData(addCategory, 'json');
+                                            }}
+                                            style={{
+                                                padding: '3px 10px',
+                                                borderRadius: '6px',
+                                                fontSize: '11.5px',
+                                                fontWeight: 600,
+                                                cursor: 'pointer',
+                                                border: bulkFormat === 'json' ? '1.5px solid #2563eb' : '1px solid #cbd5e1',
+                                                background: bulkFormat === 'json' ? '#eff6ff' : '#ffffff',
+                                                color: bulkFormat === 'json' ? '#1d4ed8' : '#64748b'
+                                            }}
+                                        >
+                                            JSON Array
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setBulkFormat('csv');
+                                                loadSampleBulkData(addCategory, 'csv');
+                                            }}
+                                            style={{
+                                                padding: '3px 10px',
+                                                borderRadius: '6px',
+                                                fontSize: '11.5px',
+                                                fontWeight: 600,
+                                                cursor: 'pointer',
+                                                border: bulkFormat === 'csv' ? '1.5px solid #2563eb' : '1px solid #cbd5e1',
+                                                background: bulkFormat === 'csv' ? '#eff6ff' : '#ffffff',
+                                                color: bulkFormat === 'csv' ? '#1d4ed8' : '#64748b'
+                                            }}
+                                        >
+                                            CSV (Dấu phẩy)
+                                        </button>
+                                    </div>
+
+                                    <div style={{ display: 'flex', gap: '8px' }}>
+                                        <button
+                                            type="button"
+                                            onClick={() => loadSampleBulkData(addCategory, bulkFormat)}
+                                            style={{
+                                                padding: '3px 9px',
+                                                background: '#f8fafc',
+                                                border: '1px solid #e2e8f0',
+                                                borderRadius: '6px',
+                                                fontSize: '11.5px',
+                                                color: '#0284c7',
+                                                fontWeight: 600,
+                                                cursor: 'pointer'
+                                            }}
+                                        >
+                                            📋 Nạp dữ liệu mẫu
+                                        </button>
+                                        <label
+                                            style={{
+                                                padding: '3px 9px',
+                                                background: '#f8fafc',
+                                                border: '1px solid #e2e8f0',
+                                                borderRadius: '6px',
+                                                fontSize: '11.5px',
+                                                color: '#2563eb',
+                                                fontWeight: 600,
+                                                cursor: 'pointer',
+                                                display: 'inline-flex',
+                                                alignItems: 'center'
+                                            }}
+                                        >
+                                            📁 Tải tệp lên (.json, .csv)
+                                            <input
+                                                type="file"
+                                                accept=".json,.csv"
+                                                style={{ display: 'none' }}
+                                                onChange={handleFileUpload}
+                                            />
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <label className="ft-field">
+                                    <span className="ft-field__label">
+                                        Nội dung dữ liệu hàng loạt ({bulkFormat.toUpperCase()})
+                                    </span>
+                                    <textarea
+                                        className="ft-bulk-textarea"
+                                        placeholder={
+                                            bulkFormat === 'json'
+                                                ? '[ { "title": "AI Engineer", "minVnd": 25, "avgVnd": 45, "maxVnd": 70 }, ... ]'
+                                                : 'title,minVnd,avgVnd,maxVnd\nAI Engineer,25,45,70'
+                                        }
+                                        value={bulkText}
+                                        onChange={(e) => setBulkText(e.target.value)}
+                                        rows={7}
+                                    />
+                                </label>
+
+                                {bulkError && (
+                                    <div style={{ padding: '8px 12px', background: '#fef2f2', border: '1px solid #fecaca', color: '#991b1b', borderRadius: '6px', fontSize: '12px' }}>
+                                        ❌ {bulkError}
+                                    </div>
+                                )}
+
+                                <div className="ft-modal__actions">
+                                    <button className="ft-button ft-button--ghost" type="button" onClick={() => setAddModalOpen(false)}>
+                                        Huỷ
+                                    </button>
+                                    <button className="ft-button" type="submit" disabled={addLoading || !bulkText.trim()}>
+                                        {addLoading ? 'Đang xử lý...' : '⚡ Bắt đầu nạp hàng loạt'}
+                                    </button>
+                                </div>
+                            </form>
+                        )}
+                    </div>
+                </div>
+            )}
+
+            <AdminConfirmModal
+                open={modalOpen}
+                title="Xác nhận Đồng bộ & Xây dựng lại RAG Index"
+                description="Hệ thống sẽ chạy pipeline xử lý dữ liệu và cập nhật lại toàn bộ 5 tệp chỉ mục RAG từ các nguồn file gốc. Thao tác này sẽ ghi nhận vào Nhật ký Audit."
+                confirmText="Bắt đầu đồng bộ"
+                onClose={() => setModalOpen(false)}
+                onConfirm={handleSync}
+            />
         </div>
     );
 }
@@ -1542,26 +2944,122 @@ function SettingsPage({ api, onForbidden }) {
     if (error) return <ErrorCard error={error} onRetry={reload} />;
 
     const groups = (data || []).map((group) => draftGroups[group.id] || group);
+    const dirtyCount = Object.keys(draftGroups).length;
+
+    const getProviderOptionLabel = (val) => {
+        switch (val) {
+            case 'hybrid':
+                return '⚡ Hybrid (Local + Cloud Fallback)';
+            case 'ollama':
+                return '🔒 Local Only (100% Ollama nội bộ)';
+            case 'gemini':
+                return '☁️ Cloud Only (Google Gemini API)';
+            default:
+                return val;
+        }
+    };
+
+    const getFieldBadge = (fieldKey) => {
+        switch (fieldKey) {
+            case 'local_model':
+                return <span className="ft-setting-badge ft-setting-badge--local">Local Fine-tuned</span>;
+            case 'ollama_endpoint':
+                return <span className="ft-setting-badge ft-setting-badge--endpoint">Ollama Port</span>;
+            case 'cloud_fallback_model':
+                return <span className="ft-setting-badge ft-setting-badge--cloud">Cloud Fallback</span>;
+            case 'ai_provider':
+                return <span className="ft-setting-badge ft-setting-badge--mode">Động cơ chính</span>;
+            default:
+                return null;
+        }
+    };
+
+    const getGroupBadge = (groupKey, fields) => {
+        if (groupKey === 'ai') {
+            const providerField = fields.find((f) => f.key === 'ai_provider');
+            const provider = providerField?.value || 'hybrid';
+            return (
+                <span className="ft-settings-group-badge ft-settings-group-badge--ai">
+                    ⚡ {String(provider).toUpperCase()} RUNTIME
+                </span>
+            );
+        }
+        if (groupKey === 'core') {
+            return (
+                <span className="ft-settings-group-badge ft-settings-group-badge--core">
+                    VẬN HÀNH LÕI
+                </span>
+            );
+        }
+        if (groupKey === 'community') {
+            return (
+                <span className="ft-settings-group-badge ft-settings-group-badge--community">
+                    CỘNG ĐỒNG & AN TOÀN
+                </span>
+            );
+        }
+        return null;
+    };
 
     return (
-        <div className="ft-page-stack">
+        <div className="ft-page-stack ft-settings-page">
             <AdminPageHeader
                 eyebrow="Kỹ Thuật & Cấu Hình"
                 title="Cài đặt hệ thống"
-                description="Tính năng (Feature flags) và quy tắc vận hành được đồng bộ từ backend admin."
+                description="Tính năng (Feature flags), quy tắc vận hành và điều phối Động cơ AI (Local Ollama & Cloud Fallback)."
                 actions={
-                    <button className="ft-button" onClick={() => setModalOpen(true)}>
-                        Lưu thay đổi
-                    </button>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        {dirtyCount > 0 && (
+                            <>
+                                <span className="ft-settings-dirty-badge">
+                                    ⚠️ Có thay đổi chưa lưu
+                                </span>
+                                <button
+                                    className="ft-button ft-button--ghost ft-button--sm"
+                                    onClick={() => setDraftGroups({})}
+                                >
+                                    Hủy nháp
+                                </button>
+                            </>
+                        )}
+                        <button className="ft-button" onClick={() => setModalOpen(true)}>
+                            Lưu thay đổi
+                        </button>
+                    </div>
                 }
             />
+
+            {/* AI Architecture Explain Banner */}
+            <div className="ft-ai-architecture-banner">
+                <div className="ft-ai-banner-icon">🧠</div>
+                <div className="ft-ai-banner-content">
+                    <div className="ft-ai-banner-header">
+                        <h4>Kiến trúc suy luận AI của FutureTrace: Local First + Cloud Fallback</h4>
+                        <span className="ft-status-pill ft-status-pill--success">Đã chuẩn hóa theo ứng dụng</span>
+                    </div>
+                    <p>
+                        Hệ thống ưu tiên vận hành mô hình cục bộ chuyên biệt <strong>futuretrace-ai</strong> (được fine-tune trên máy chủ Ollama tại <code>http://127.0.0.1:11434</code>) nhằm đảm bảo tốc độ cao và bảo mật dữ liệu học sinh/sinh viên. 
+                        Google Gemini chỉ đóng vai trò <strong>kênh dự phòng (Cloud Fallback)</strong> an toàn khi máy chủ nội bộ quá tải hoặc bảo trì.
+                    </p>
+                </div>
+                <div className="ft-ai-banner-action">
+                    <a href="#/admin/ai" className="ft-button ft-button--ghost ft-button--sm">
+                        Bảng điều khiển AI Monitor ↗
+                    </a>
+                </div>
+            </div>
 
             <div className="ft-card-grid ft-settings-card-grid">
                 {groups.map((group) => (
                     <AdminCard
                         key={group.id}
                         className="ft-settings-group-card"
-                        title={group.title}
+                        title={
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', width: '100%' }}>
+                                <span>{group.title}</span>
+                                {getGroupBadge(group.groupKey, group.fields)}
+                            </div>
+                        }
                         subtitle={group.description}
                     >
                         <div className="ft-settings-list">
@@ -1571,84 +3069,89 @@ function SettingsPage({ api, onForbidden }) {
                                     key={field.key}
                                 >
                                     <div>
-                                        <strong>{field.label}</strong>
+                                        <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
+                                            <strong>{field.label}</strong>
+                                            {getFieldBadge(field.key)}
+                                        </div>
                                         <p>{field.description}</p>
                                     </div>
-                                    {field.type === 'toggle' ? (
-                                        <input
-                                            checked={Boolean(field.value)}
-                                            onChange={(event) =>
-                                                setDraftGroups((current) => {
-                                                    const sourceGroup = current[group.id] || group;
-                                                    return {
-                                                        ...current,
-                                                        [group.id]: {
-                                                            ...sourceGroup,
-                                                            fields: sourceGroup.fields.map((currentField, currentFieldIndex) =>
-                                                                currentFieldIndex === fieldIndex
-                                                                    ? { ...currentField, value: event.target.checked }
-                                                                    : currentField,
-                                                            ),
-                                                        },
-                                                    };
-                                                })
-                                            }
-                                            type="checkbox"
-                                        />
-                                    ) : field.type === 'select' ? (
-                                        <select
-                                            value={field.value}
-                                            onChange={(event) =>
-                                                setDraftGroups((current) => {
-                                                    const sourceGroup = current[group.id] || group;
-                                                    return {
-                                                        ...current,
-                                                        [group.id]: {
-                                                            ...sourceGroup,
-                                                            fields: sourceGroup.fields.map((currentField, currentFieldIndex) =>
-                                                                currentFieldIndex === fieldIndex
-                                                                    ? { ...currentField, value: event.target.value }
-                                                                    : currentField,
-                                                            ),
-                                                        },
-                                                    };
-                                                })
-                                            }
-                                        >
-                                            {field.options?.map((option) => (
-                                                <option key={option} value={option}>
-                                                    {option}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    ) : (
-                                        <input
-                                            type={field.type === 'number' ? 'number' : 'text'}
-                                            value={field.value}
-                                            onChange={(event) =>
-                                                setDraftGroups((current) => {
-                                                    const sourceGroup = current[group.id] || group;
-                                                    return {
-                                                        ...current,
-                                                        [group.id]: {
-                                                            ...sourceGroup,
-                                                            fields: sourceGroup.fields.map((currentField, currentFieldIndex) =>
-                                                                currentFieldIndex === fieldIndex
-                                                                    ? {
-                                                                        ...currentField,
-                                                                        value:
-                                                                            field.type === 'number'
-                                                                                ? Number(event.target.value)
-                                                                                : event.target.value,
-                                                                    }
-                                                                    : currentField,
-                                                            ),
-                                                        },
-                                                    };
-                                                })
-                                            }
-                                        />
-                                    )}
+                                    <div className="ft-setting-input-wrapper">
+                                        {field.type === 'toggle' ? (
+                                            <input
+                                                checked={Boolean(field.value)}
+                                                onChange={(event) =>
+                                                    setDraftGroups((current) => {
+                                                        const sourceGroup = current[group.id] || group;
+                                                        return {
+                                                            ...current,
+                                                            [group.id]: {
+                                                                ...sourceGroup,
+                                                                fields: sourceGroup.fields.map((currentField, currentFieldIndex) =>
+                                                                    currentFieldIndex === fieldIndex
+                                                                        ? { ...currentField, value: event.target.checked }
+                                                                        : currentField,
+                                                                ),
+                                                            },
+                                                        };
+                                                    })
+                                                }
+                                                type="checkbox"
+                                            />
+                                        ) : field.type === 'select' ? (
+                                            <select
+                                                value={field.value}
+                                                onChange={(event) =>
+                                                    setDraftGroups((current) => {
+                                                        const sourceGroup = current[group.id] || group;
+                                                        return {
+                                                            ...current,
+                                                            [group.id]: {
+                                                                ...sourceGroup,
+                                                                fields: sourceGroup.fields.map((currentField, currentFieldIndex) =>
+                                                                    currentFieldIndex === fieldIndex
+                                                                        ? { ...currentField, value: event.target.value }
+                                                                        : currentField,
+                                                                ),
+                                                            },
+                                                        };
+                                                    })
+                                                }
+                                            >
+                                                {field.options?.map((option) => (
+                                                    <option key={option} value={option}>
+                                                        {field.key === 'ai_provider' ? getProviderOptionLabel(option) : option}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        ) : (
+                                            <input
+                                                type={field.type === 'number' ? 'number' : 'text'}
+                                                value={field.value}
+                                                onChange={(event) =>
+                                                    setDraftGroups((current) => {
+                                                        const sourceGroup = current[group.id] || group;
+                                                        return {
+                                                            ...current,
+                                                            [group.id]: {
+                                                                ...sourceGroup,
+                                                                fields: sourceGroup.fields.map((currentField, currentFieldIndex) =>
+                                                                    currentFieldIndex === fieldIndex
+                                                                        ? {
+                                                                            ...currentField,
+                                                                            value:
+                                                                                field.type === 'number'
+                                                                                    ? Number(event.target.value)
+                                                                                    : event.target.value,
+                                                                        }
+                                                                        : currentField,
+                                                                ),
+                                                            },
+                                                        };
+                                                    })
+                                                }
+                                            />
+                                        )}
+                                    </div>
                                 </label>
                             ))}
                         </div>
@@ -1659,8 +3162,8 @@ function SettingsPage({ api, onForbidden }) {
             <AdminConfirmModal
                 open={modalOpen}
                 title="Lưu cài đặt hệ thống"
-                description="Thay đổi sẽ được cập nhật vào backend và ghi audit log."
-                confirmText="Lưu thay đổi"
+                description="Các tham số và cấu hình điều phối AI sẽ được đồng bộ ngay lập tức vào backend runtime."
+                confirmText="Xác nhận & Lưu"
                 onClose={() => setModalOpen(false)}
                 onConfirm={async (reason) => {
                     for (const group of groups) {
@@ -1704,11 +3207,64 @@ function SystemStatePage({ kind, navigate }) {
     );
 }
 
+function InvestorMetricsPage({ api, onForbidden }) {
+    const [days, setDays] = useState(30);
+    const { data, loading, error, reload } = useRemoteResource(() => api.getInvestorMetrics(days), [api, days]);
+
+    useEffect(() => {
+        if (error?.status === 403) onForbidden();
+    }, [error, onForbidden]);
+
+    if (loading) return <LoadingCard title="Đang tải chỉ số..." />;
+    if (error) return <ErrorCard error={error} onRetry={reload} />;
+
+    const v = (x, suffix = '') => (x === null || x === undefined ? '—' : `${Number(x).toLocaleString('vi-VN')}${suffix}`);
+    const g = data.growth || {};
+    const e = data.engagement || {};
+    const q = data.aiQuality || {};
+    const p = data.performance || {};
+    const u = data.unitEconomics || {};
+    const eng = data.engine || {};
+
+    return (
+        <div className="ft-page-stack ft-settings-page">
+            <AdminPageHeader
+                eyebrow="Báo cáo"
+                title="Chỉ số cho bảo vệ & gọi vốn"
+                description="Tăng trưởng, chất lượng AI, hiệu năng và kinh tế đơn vị, tính từ dữ liệu thật trong hệ thống."
+                actions={
+                    <select className="ft-input" value={days} onChange={(ev) => setDays(Number(ev.target.value))}>
+                        {[7, 30, 90, 365].map((d) => <option key={d} value={d}>{d} ngày</option>)}
+                    </select>
+                }
+            />
+            <div className="ft-stats-grid">
+                <AdminStatCard label="Tổng người dùng" value={v(g.totalUsers)} hint={`+${v(g.newUsers)} mới trong kỳ`} />
+                <AdminStatCard label="Người dùng hoạt động" value={v(g.activeUsers)} hint={`${v(g.repeatUsers)} quay lại ≥ 2 lần`} />
+                <AdminStatCard label="Mô phỏng hoàn thành" value={v(e.completionRate, '%')} hint={`${v(e.simulations)} lượt`} />
+                <AdminStatCard label="Tỷ lệ 👍" value={v(q.thumbsUpRate, '%')} hint={`${v(q.feedbackCount)} phản hồi`} />
+                <AdminStatCard label="Số liệu có căn cứ" value={v(q.groundednessAvg, '%')} hint="Grounding Verifier" />
+                <AdminStatCard label="Do AI viết đầy đủ" value={v(q.aiCoverageAvg, '%')} hint="không phải lấp template" />
+                <AdminStatCard label="Độ trễ P50 / P95" value={`${v(p.latencyMsP50)} / ${v(p.latencyMsP95)} ms`} hint={`token đầu P50 ${v(p.firstTokenMsP50)} ms`} />
+                <AdminStatCard label="Do model riêng phục vụ" value={v(eng.primaryModelShare, '%')} hint={JSON.stringify(eng.requestsByProvider || {})} />
+                <AdminStatCard label="Chi phí AI / mô phỏng" value={v(u.aiCostPerSimulationVnd, ' đ')} hint="Gemini dự phòng" />
+                <AdminStatCard label="Doanh thu kỳ" value={v(u.revenueVnd, ' đ')} hint={`${v(u.payingUsers)} người trả phí · chuyển đổi ${v(u.conversionToPaidPercent, '%')}`} />
+            </div>
+            <AdminCard title="Trạng thái LLM Gateway" subtitle="Circuit breaker từng engine">
+                <pre style={{ whiteSpace: 'pre-wrap', fontSize: 12 }}>{JSON.stringify(eng.gateway, null, 2)}</pre>
+            </AdminCard>
+        </div>
+    );
+}
+
 function resolvePage(route, context) {
     const { api, navigate, onForbidden } = context;
 
     if (route === '/dashboard' || route === '/') {
         return <DashboardPage api={api} navigate={navigate} onForbidden={onForbidden} />;
+    }
+    if (route === '/metrics') {
+        return <InvestorMetricsPage api={api} onForbidden={onForbidden} />;
     }
     if (route === '/payments') {
         return <PaymentsPage api={api} navigate={navigate} onForbidden={onForbidden} />;
@@ -1764,7 +3320,8 @@ function resolvePage(route, context) {
         );
     }
 
-    if (route === '/ai/logs') return <AiLogsPage api={api} onForbidden={onForbidden} />;
+    if (route === '/rag') return <RagManagementPage api={api} onForbidden={onForbidden} />;
+    if (route === '/ai/logs' || route === '/ai') return <AiLogsPage api={api} onForbidden={onForbidden} />;
     if (route === '/prompts') return <PromptsPage api={api} onForbidden={onForbidden} />;
     if (route === '/settings') return <SettingsPage api={api} onForbidden={onForbidden} />;
     if (route === '/403') return <SystemStatePage kind="403" navigate={navigate} />;

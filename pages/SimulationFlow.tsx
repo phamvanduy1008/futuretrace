@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -8,7 +8,6 @@ import {
   ScenarioResult,
 } from "../types";
 import {
-  generateSimulation,
   analyzeInputReadiness,
 } from "../services/geminiService";
 import { saveToHistory } from "../data/mockDatabase";
@@ -18,6 +17,11 @@ import { IconMapper } from "../components/IconMapper";
 import { AnimatedBackground } from "../components/AnimatedBackground";
 
 import { getLatestEvaluation } from "../services/evaluationService";
+import { streamSimulation, StreamFacts, StreamPartial } from "../services/simulationStream";
+import { warmupAI } from "../services/knowledgeApi";
+import StructuredInputs from "../components/StructuredInputs";
+import FactsPanel from "../components/FactsPanel";
+import ScenarioFeedback from "../components/ScenarioFeedback";
 
 const DECISION_TEMPLATES = [
   {
@@ -201,6 +205,15 @@ const SimulationFlow: React.FC = () => {
   }, [location.state]);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const abortRef = useRef<AbortController | null>(null);
+  // Streaming: số liệu có nguồn đến trước (~0,1s), văn bản AI đến dần
+  const [liveFacts, setLiveFacts] = useState<StreamFacts | null>(null);
+  const [livePartial, setLivePartial] = useState<StreamPartial | null>(null);
+
+  // Làm nóng GPU của model chính ngay khi mở form: cold start được giấu trong lúc người dùng nhập liệu
+  useEffect(() => {
+    warmupAI();
+  }, []);
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [clarificationQuestions, setClarificationQuestions] = useState<any[]>([]);
   const [clarificationAnswers, setClarificationAnswers] = useState<Record<number, string[]>>({});
@@ -268,20 +281,25 @@ const SimulationFlow: React.FC = () => {
     const additionalContext = clarificationQuestions.map((q, idx) => {
       const answers = clarificationAnswers[idx] || [];
       return `- ${q.question}: ${answers.join(', ') || 'Bỏ qua'}`;
-    }).join('\\n');
-    
-    setData(prev => ({
-      ...prev,
-      decision:
-        prev.decision +
-        "\\n\\n[THÔNG TIN BỔ SUNG TỪ NGƯỜI DÙNG]\\n" +
-        additionalContext,
-    }));
+    }).join('\n');
+
+    // Tính dữ liệu mới rồi truyền thẳng vào startSimulation: setData là bất đồng bộ,
+    // nếu đọc lại `data` ngay sẽ gửi bản cũ (câu trả lời làm rõ bị mất)
+    const enrichedData = {
+      ...data,
+      decision: `${data.decision}\n\n[THÔNG TIN BỔ SUNG TỪ NGƯỜI DÙNG]\n${additionalContext}`,
+    };
+    setData(enrichedData);
 
     setClarificationQuestions([]);
     setClarificationAnswers({});
+    setIsSubmitting(true);
     setStep(SimulationStep.PROCESSING);
-    startSimulation();
+    startSimulation(enrichedData);
+  };
+
+  const cancelSimulation = () => {
+    abortRef.current?.abort();
   };
 
   const handleSelectKey = async () => {
@@ -301,20 +319,32 @@ const SimulationFlow: React.FC = () => {
     }
   };
 
-  const startSimulation = async () => {
-    setLoadingProgress(0);
-    let progress = 0;
+  const startSimulation = async (payload: SimulationData = data) => {
+    setLoadingProgress(15);
+    let progress = 15;
+    setLiveFacts(null);
+    setLivePartial(null);
+    // Tiến độ nền chậm; các sự kiện thật (facts, văn bản AI) đẩy tiến độ lên nhanh hơn
     const interval = setInterval(() => {
-      progress += Math.random() * 8;
-      if (progress >= 95) {
-        progress = 95;
-        clearInterval(interval);
-      }
-      setLoadingProgress(Math.floor(progress));
-    }, 250);
+      progress += (90 - progress) * 0.02;
+      setLoadingProgress((prev) => Math.max(prev, Math.min(90, Math.floor(progress))));
+    }, 600);
 
+    abortRef.current = new AbortController();
     try {
-      const result = await generateSimulation(data);
+      const result = await streamSimulation(payload, {
+        onFacts: (f) => {
+          setLiveFacts(f);
+          setLoadingProgress((prev) => Math.max(prev, 35));
+        },
+        onPartial: (p) => {
+          setLivePartial(p);
+          const written = (p.summary?.length || 0) + p.scenarios.reduce((n, sc) => n + (sc.description?.length || 0), 0);
+          setLoadingProgress((prev) => Math.max(prev, Math.min(95, 35 + Math.round((written / 1600) * 60))));
+        },
+        onReset: () => setLivePartial(null),
+      }, abortRef.current.signal);
+      clearInterval(interval);
       // Assign IDs to scenarios if they don't have them
       const scenariosWithIds = result.scenarios.map((s, idx) => ({
         ...s,
@@ -324,10 +354,15 @@ const SimulationFlow: React.FC = () => {
 
       setResults(finalResult);
       setLoadingProgress(100);
-      setTimeout(() => setStep(SimulationStep.RESULTS), 800);
+      setTimeout(() => setStep(SimulationStep.RESULTS), 400);
     } catch (e: any) {
       clearInterval(interval);
-      if (e.code === "INSUFFICIENT_TOKENS") {
+      if (e.type === "CANCELLED") {
+        setError(null);
+      } else if (e.code === "CONSENT_REQUIRED") {
+        window.dispatchEvent(new CustomEvent("consent-required"));
+        setError({ message: e.message, type: "GENERAL" });
+      } else if (e.code === "INSUFFICIENT_TOKENS") {
         setError({ message: e.message, type: "AUTH" });
       } else {
         setError({ message: e.message, type: e.type || "GENERAL" });
@@ -434,6 +469,8 @@ const SimulationFlow: React.FC = () => {
                 </div>
               </div>
             </div>
+
+            <StructuredInputs data={data} onChange={(patch) => setData((prev) => ({ ...prev, ...patch }))} />
 
             <div id="tour-decision-hints" className="space-y-6">
               <div className="flex items-center gap-4">
@@ -569,16 +606,19 @@ const SimulationFlow: React.FC = () => {
                       Mua thêm token
                     </button>
                   )}
-                  <button
-                    onClick={() => {
-                      setError(null);
-                      setStep(SimulationStep.PROCESSING);
-                      startSimulation();
-                    }}
-                    className="bg-slate-900 text-white px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 transition-all flex items-center justify-center gap-2"
-                  >
-                    Thử lại ngay
-                  </button>
+                  {error.type !== "AUTH" && (
+                    <button
+                      onClick={() => {
+                        setError(null);
+                        setIsSubmitting(true);
+                        setStep(SimulationStep.PROCESSING);
+                        startSimulation();
+                      }}
+                      className="bg-slate-900 text-white px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 transition-all flex items-center justify-center gap-2"
+                    >
+                      {error.type === "RATE_LIMIT" ? "Thử lại sau ít phút" : "Thử lại ngay"}
+                    </button>
+                  )}
                 </div>
               </div>
             </motion.div>
@@ -871,10 +911,10 @@ const SimulationFlow: React.FC = () => {
             animate={{ scale: 1, opacity: 1 }}
             className="relative z-10"
           >
-            <div className="relative w-80 h-80 mb-20 flex items-center justify-center">
+            <div className="relative w-60 h-60 sm:w-80 sm:h-80 mb-12 sm:mb-20 flex items-center justify-center">
               <svg
                 viewBox="0 0 288 288"
-                className="absolute inset-0 w-full h-full -rotate-90 drop-shadow-[0_0_30px_rgba(37,99,235,0.4)]"
+                className="absolute inset-0 w-full h-full -rotate-90"
               >
                 <circle
                   cx="144"
@@ -899,7 +939,7 @@ const SimulationFlow: React.FC = () => {
                 />
               </svg>
               <div className="text-center relative z-20">
-                <span className="text-8xl font-black tracking-tighter text-white font-display block">
+                <span className="text-6xl sm:text-8xl font-black tracking-tighter text-white font-display block">
                   {loadingProgress}
                   <span className="text-3xl ml-1 text-blue-500">%</span>
                 </span>
@@ -916,19 +956,9 @@ const SimulationFlow: React.FC = () => {
             </h2>
             <div className="flex flex-col gap-6 mt-4 max-w-sm mx-auto text-left">
               {[
-                {
-                  label: "Phân tích từ khóa mô tả",
-                  done: loadingProgress > 30,
-                },
-                {
-                  label: "Mô phỏng 10,000 kịch bản",
-                  done: loadingProgress > 60,
-                },
-                {
-                  label:
-                    "Tính toán Hiệu quả tài chính (ROI) & Chỉ số Hạnh phúc",
-                  done: loadingProgress > 85,
-                },
+                { label: "Tra cứu điểm chuẩn, học phí, lương có nguồn", done: !!liveFacts },
+                { label: "Tính lương P25/P50/P75 & ROI bằng mô hình FT-Salary", done: !!liveFacts },
+                { label: "AI viết phân tích 3 kịch bản", done: loadingProgress >= 95 },
               ].map((task, i) => (
                 <div
                   key={i}
@@ -944,6 +974,32 @@ const SimulationFlow: React.FC = () => {
                 </div>
               ))}
             </div>
+            {liveFacts?.scenarios?.Neutral && (
+              <div className="grid grid-cols-3 gap-3 max-w-xl mx-auto text-left">
+                {[
+                  { k: "Lương khởi điểm (P50)", v: `${liveFacts.scenarios.Neutral.salary.startMonthlyMillion} tr` },
+                  { k: "Sau 5 năm (P50)", v: `${liveFacts.scenarios.Neutral.salary.year5MonthlyMillion} tr` },
+                  { k: "Chi phí học / năm", v: `${liveFacts.scenarios.Neutral.affordability.cashNeedPerYearMillion} tr` },
+                ].map((m) => (
+                  <div key={m.k} className="bg-white/5 border border-white/10 rounded-2xl p-3">
+                    <div className="text-lg sm:text-2xl font-black text-white">{m.v}</div>
+                    <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 mt-1">{m.k}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+            {livePartial?.summary && (
+              <p className="max-w-xl mx-auto text-sm text-slate-300 leading-relaxed text-left bg-white/5 border border-white/10 rounded-2xl p-4">
+                {livePartial.summary}
+                <span className="inline-block w-2 h-4 bg-blue-400 ml-1 align-middle animate-pulse" />
+              </p>
+            )}
+            <button
+              onClick={cancelSimulation}
+              className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-white border border-slate-700 hover:border-slate-400 px-6 py-3 rounded-xl transition-colors"
+            >
+              Hủy phân tích
+            </button>
           </div>
         </main>
       </div>
@@ -969,7 +1025,7 @@ const SimulationFlow: React.FC = () => {
               className="px-6 py-2 bg-slate-900 text-white rounded-full text-[10px] font-black uppercase tracking-widest mb-12 shadow-2xl shadow-slate-200"
             >
               Phân tích hoàn tất • Report FT-
-              {Math.floor(Math.random() * 9000) + 1000}
+              {String((results as any).simulationId || "").slice(-6).toUpperCase() || "LOCAL"}
             </motion.div>
             <h1 className="text-5xl md:text-8xl font-black tracking-tighter mb-12 font-display text-slate-900 leading-[0.95] max-w-5xl">
               {results.isEnterprise ? (
@@ -1141,11 +1197,23 @@ const SimulationFlow: React.FC = () => {
                           Phân tích sâu{" "}
                           <IconMapper name="science" className=" text-lg" />
                         </button>
+                        <ScenarioFeedback simulationId={results.simulationId} scenarioId={scenario.id} />
                       </div>
                     </motion.div>
                   ))}
                 </AnimatePresence>
               </div>
+
+              {results.facts && results.facts.length > 0 && (
+                <div className="mb-24 max-w-4xl mx-auto">
+                  <FactsPanel facts={results.facts} />
+                  {results.quality?.groundedness != null && (
+                    <p className="text-[11px] text-slate-500 mt-3 text-center">
+                      Kiểm chứng tự động: {Math.round(results.quality.groundedness * 100)}% con số trong phân tích khớp với nguồn dữ liệu ở trên.
+                    </p>
+                  )}
+                </div>
+              )}
 
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
@@ -1238,7 +1306,10 @@ const SimulationFlow: React.FC = () => {
                    <IconMapper name={isSaved ? 'check_circle' : 'save'} className=" text-xl" /> 
                    {isSaved ? 'Đã lưu vào lịch sử' : 'Lưu vào lịch sử'}
                  </button> */}
-                <button className="px-16 py-6 bg-slate-900 text-white font-black text-[11px] uppercase tracking-widest hover:bg-slate-800 rounded-2xl transition-all shadow-2xl shadow-slate-200 flex items-center gap-5">
+                <button
+                  onClick={() => window.print()}
+                  className="no-print px-8 sm:px-16 py-5 sm:py-6 bg-slate-900 text-white font-black text-[11px] uppercase tracking-widest hover:bg-slate-800 rounded-2xl transition-all shadow-2xl shadow-slate-200 flex items-center gap-5"
+                >
                   <IconMapper name="download" className=" text-xl" /> Xuất chiến
                   lược (.PDF)
                 </button>

@@ -8,6 +8,7 @@ import { ProgressItem } from '../types';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { apiFetch } from '../services/apiClient';
 import { IconMapper } from '../components/IconMapper';
+import { tidyMonth } from '../services/premiumFormat';
 
 const syncRemainingToken = (remainingToken?: number) => {
   if (typeof remainingToken !== 'number') return;
@@ -326,7 +327,7 @@ const ProgressPage: React.FC = () => {
                               : 'bg-slate-50 border-slate-100'
                           }`}>
                           <div className="flex flex-col flex-1 min-w-0">
-                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{m.month}</span>
+                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{tidyMonth(m.month)}</span>
                             <span className={`text-base font-black break-words leading-snug ${status === 'Đã hoàn thành' ? 'text-emerald-700 line-through' : 'text-slate-900'}`}>{m.event}</span>
                           </div>
                           <div className={`w-12 h-12 rounded-2xl flex-shrink-0 flex items-center justify-center border transition-all ${status === 'Đã hoàn thành' ? 'bg-emerald-500 text-white border-emerald-500 shadow-lg shadow-emerald-200' :

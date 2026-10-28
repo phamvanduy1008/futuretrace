@@ -1,3 +1,4 @@
+import { storeSession, clearSession } from './authSession';
 const API_BASE_URL = (import.meta as any).env.VITE_API_BASE_URL || 'https://futuretrace-server.onrender.com';
 
 const normalizeUser = (user: any) => {
@@ -29,7 +30,7 @@ export const login = async (email: string, password: string) => {
 
   const data = await response.json();
   const user = normalizeUser(data.user);
-  localStorage.setItem('token', data.accessToken);
+  storeSession(data.accessToken, data.refreshToken);
   localStorage.setItem('user', JSON.stringify(user));
   // Removed futuretrace_auth as we now use token as source of truth
   return { ...data, user };
@@ -55,7 +56,7 @@ export const register = async (userData: any) => {
 
   const data = await response.json();
   const user = normalizeUser(data.user);
-  localStorage.setItem('token', data.accessToken);
+  storeSession(data.accessToken, data.refreshToken);
   localStorage.setItem('user', JSON.stringify(user));
   return { ...data, user };
 };
@@ -95,13 +96,13 @@ export const verifyRegisterOtp = async (email: string, otp: string) => {
 
   const data = await response.json();
   const user = normalizeUser(data.user);
-  localStorage.setItem('token', data.accessToken);
+  storeSession(data.accessToken, data.refreshToken);
   localStorage.setItem('user', JSON.stringify(user));
   return { ...data, user };
 };
 
 export const logout = () => {
-  localStorage.removeItem('token');
+  clearSession();
   localStorage.removeItem('user');
   localStorage.removeItem('futuretrace_auth');
 };

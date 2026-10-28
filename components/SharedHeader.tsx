@@ -71,7 +71,7 @@ const SharedHeader: React.FC = () => {
           <div className="flex items-center gap-10">
             <div className="flex items-center gap-3 cursor-pointer group" onClick={() => navigate('/')}>
               <div className="w-10 h-10 rounded-xl overflow-hidden shadow-lg shadow-blue-900/20 border border-slate-800 transition-all group-hover:scale-105 group-hover:border-blue-500/50">
-                <img src="/logo.png" alt="Logo" className="w-full h-full object-cover" />
+                <img src="/logo-192.png" width="40" height="40" alt="Logo" className="w-full h-full object-cover" />
               </div>
               <div className="flex flex-col leading-none relative">
                 <div className="absolute -inset-x-6 inset-y-0 bg-blue-600/20 blur-[24px] rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>

@@ -282,11 +282,11 @@ const DashboardPage: React.FC = () => {
                           <div className="flex items-center gap-2 relative">
                             <IconMapper name="verified" className="text-emerald-500 text-lg" />
                             <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest flex items-center gap-1">
-                              Tỉ lệ khớp 98.4%
+                              Có kiểm chứng dữ liệu
                               <span className="group/tooltip relative inline-block">
                                 <IconMapper name="help" className="text-slate-400 hover:text-blue-600 cursor-help text-[12px]" />
                                 <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-3 bg-slate-900 text-white text-[10px] rounded-xl shadow-xl opacity-0 group-hover/tooltip:opacity-100 transition-all duration-200 pointer-events-none z-50 normal-case tracking-normal font-medium leading-relaxed border border-slate-800 block text-center">
-                                  Mức độ tin cậy và sự trùng khớp của kịch bản so với dữ liệu thực tế.
+                                  Lương và ROI được tính bằng mô hình FT-Salary huấn luyện trên gần 500.000 tin tuyển dụng thật; xem nguồn và độ tin cậy trong trang chi tiết kịch bản.
                                   <span className="absolute top-full left-1/2 -translate-x-1/2 border-[6px] border-transparent border-t-slate-900 block"></span>
                                 </span>
                               </span>

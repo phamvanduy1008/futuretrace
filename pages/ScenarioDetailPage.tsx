@@ -119,6 +119,12 @@ const ScenarioDetailPage: React.FC = () => {
     fetchFullData();
   }, [id, scenario?.deepAnalysis, state.fromCommunity]);
 
+  // Hook phải được gọi trước mọi lệnh return sớm (Rules of Hooks)
+  const [isTimeframeModalOpen, setIsTimeframeModalOpen] = useState(false);
+  const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
+  const [isCheckingTier, setIsCheckingTier] = useState(false);
+  const [timeframe, setTimeframe] = useState(12);
+
   if (!scenario) return null;
 
   const displayRoi = scenario.roi ?? scenario.metrics?.roi ?? 0;
@@ -126,12 +132,13 @@ const ScenarioDetailPage: React.FC = () => {
   const displayHappiness =
     scenario.happiness ?? scenario.metrics?.happiness ?? 0;
   const displayType = scenario.type || "Positive";
+  // Độ tin cậy lấy từ mô hình định lượng thay vì con số cố định 95
+  const reliabilityByConfidence: Record<string, number> = { high: 85, medium: 65, low: 40 };
+  const displayReliability = scenario.quant?.confidence
+    ? reliabilityByConfidence[scenario.quant.confidence]
+    : scenario.reliability ?? null;
 
-  const [isTimeframeModalOpen, setIsTimeframeModalOpen] = useState(false);
-  const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
-  const [isCheckingTier, setIsCheckingTier] = useState(false);
-  const [timeframe, setTimeframe] = useState(12);
-  const PREMIUM_ANALYSIS_COST = 80;
+  const PREMIUM_ANALYSIS_COST = 120; // khớp routes/premium.js
   const canPayPremiumAnalysis = (user: any) => (
     (user?.token ?? 0) >= PREMIUM_ANALYSIS_COST
   );
@@ -181,7 +188,7 @@ const ScenarioDetailPage: React.FC = () => {
         career_growth: displayCareer,
         happiness: displayHappiness,
         roi: displayRoi,
-        reliability: 95,
+        reliability: displayReliability ?? undefined,
         deep_analysis: scenario.deepAnalysis,
         scenario_id: scenario.id,
       });
@@ -284,10 +291,11 @@ const ScenarioDetailPage: React.FC = () => {
               </span>
               <div className="absolute inset-0 bg-blue-600/5 rounded-[2.5rem] sm:rounded-[3.5rem] opacity-0 group-hover:opacity-100 transition-opacity"></div>
               <span className="text-5xl sm:text-6xl font-black text-blue-500 mb-2 relative z-10">
-                {displayRoi}%
+                {displayRoi}
+                {scenario.quant ? <span className="text-2xl text-blue-300">/100</span> : "%"}
               </span>
               <span className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest relative z-10">
-                HIỆU QUẢ TÀI CHÍNH DỰ BÁO (ROI) 5 NĂM
+                {scenario.quant ? `ĐIỂM ROI (KHUNG ${scenario.quant.roi.lensYears} NĂM)` : "HIỆU QUẢ TÀI CHÍNH DỰ BÁO (ROI)"}
               </span>
             </motion.div>
           </div>
@@ -315,10 +323,10 @@ const ScenarioDetailPage: React.FC = () => {
                 },
                 {
                   label: "Tin cậy",
-                  val: scenario.reliability || 95,
+                  val: displayReliability ?? "—",
                   icon: "verified",
                   color: "text-amber-600",
-                  tooltip: "Độ tin cậy của mô hình dự báo AI dựa trên lượng dữ liệu thực tế thu thập được."
+                  tooltip: "Mức khớp dữ liệu của mô hình định lượng: cao khi khớp được cả ngành và chức danh trong dữ liệu tuyển dụng, thấp khi phải ước lượng chung."
                 },
               ].map((m, i) => (
                 <div
@@ -383,6 +391,45 @@ const ScenarioDetailPage: React.FC = () => {
                     </p>
                   </div>
                 </div>
+              </section>
+            )}
+
+            {/* Quant Evidence Section (FT-Salary + Career ROI Engine) */}
+            {scenario.quant && (
+              <section className="bg-white p-8 sm:p-10 rounded-[2.5rem] border border-slate-100 shadow-sm">
+                <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+                  <div>
+                    <h3 className="text-2xl font-black text-slate-900 font-display uppercase tracking-tight">Bằng chứng định lượng</h3>
+                    <p className="text-sm font-medium text-slate-500">
+                      Tính từ {scenario.quant.market?.postingsAnalyzed?.toLocaleString("vi-VN") ?? "dữ liệu"} tin tuyển dụng thực tế · lương phân vị {scenario.quant.salary.quantile.toUpperCase()}
+                    </p>
+                  </div>
+                  <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${scenario.quant.confidence === "high" ? "bg-emerald-50 text-emerald-600" : scenario.quant.confidence === "medium" ? "bg-amber-50 text-amber-600" : "bg-rose-50 text-rose-600"}`}>
+                    Độ tin cậy: {scenario.quant.confidence === "high" ? "cao" : scenario.quant.confidence === "medium" ? "trung bình" : "thấp"}
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                  {[
+                    { label: "Lương khởi điểm", val: `${scenario.quant.salary.startMonthlyMillion} tr/tháng` },
+                    { label: "Sau 5 năm", val: `${scenario.quant.salary.year5MonthlyMillion} tr/tháng` },
+                    { label: `ROI ${scenario.quant.roi.lensYears} năm`, val: `${Math.round(scenario.quant.roi.ratio * 100)}%` },
+                    { label: "Hoàn vốn", val: scenario.quant.roi.paybackYearFromNow ? `Năm thứ ${scenario.quant.roi.paybackYearFromNow}` : `> ${scenario.quant.roi.lensYears} năm` },
+                  ].map((m) => (
+                    <div key={m.label} className="bg-slate-50 p-5 rounded-2xl">
+                      <div className="text-xl font-black text-slate-900">{m.val}</div>
+                      <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">{m.label}</div>
+                    </div>
+                  ))}
+                </div>
+                <p className={`mt-5 text-sm font-medium ${scenario.quant.affordability.affordable ? "text-slate-600" : "text-rose-600"}`}>
+                  Nhu cầu tiền mặt khi đi học ~{scenario.quant.affordability.cashNeedPerYearMillion} triệu/năm
+                  {scenario.quant.affordability.affordable
+                    ? " — nằm trong khả năng tài chính bạn khai báo."
+                    : ` — vượt khả năng khai báo ~${scenario.quant.affordability.gapPerYearMillion} triệu/năm, cần học bổng hoặc vay sinh viên.`}
+                </p>
+                <p className="mt-2 text-xs text-slate-400">
+                  Giả định: học phí {scenario.quant.assumptions.tuitionPerYearMillion} tr/năm, chiết khấu {Math.round(scenario.quant.assumptions.discountRate * 100)}%/năm, so với người tốt nghiệp THPT đi làm ngay (~{scenario.quant.salary.counterfactualStartMillion} tr/tháng). Chỉ số hạnh phúc: {scenario.quant.metricSources.happiness === "ai" ? "do AI ước lượng" : "ước lượng từ mức áp lực và tài chính"}.
+                </p>
               </section>
             )}
 

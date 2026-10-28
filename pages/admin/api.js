@@ -116,6 +116,7 @@ export function createAdminApi({
       }, false),
 
     getDashboardOverview: () => request('/admin/dashboard/overview', { method: 'GET' }),
+    getInvestorMetrics: (days = 30) => request(`/admin/metrics/investor?days=${days}`, { method: 'GET' }),
 
     getUsers: (params) =>
       request(`/admin/users?${new URLSearchParams(params).toString()}`, { method: 'GET' }),
@@ -183,5 +184,36 @@ export function createAdminApi({
 
     getPayments: (params) =>
       request(`/admin/payments?${new URLSearchParams(params).toString()}`, { method: 'GET' }),
+
+    getRagStatus: () => request('/admin/rag/status', { method: 'GET' }),
+
+    syncRagKnowledge: (reason) =>
+      request('/admin/rag/sync', {
+        method: 'POST',
+        body: JSON.stringify({ reason }),
+      }),
+
+    searchRag: (q) =>
+      request(`/admin/rag/search?q=${encodeURIComponent(q)}`, { method: 'GET' }),
+
+    addRagKnowledge: (payload) =>
+      request('/admin/rag/add-entry', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      }),
+
+    bulkImportRagKnowledge: (payload) =>
+      request('/admin/rag/bulk-import', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      }),
+
+    getAiSystemStatus: () => request('/admin/ai/status', { method: 'GET' }),
+
+    setAiProvider: (provider, reason) =>
+      request('/admin/ai/provider', {
+        method: 'POST',
+        body: JSON.stringify({ provider, reason }),
+      }),
   };
 }

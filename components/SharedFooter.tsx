@@ -76,7 +76,8 @@ const SharedFooter: React.FC = () => {
             © 2024 FutureTrace AI System. Thiết kế cho sự tiến liệu.
           </p>
           <div className="flex gap-8 text-[10px] font-black text-slate-600 uppercase tracking-widest">
-            <a href="#" className="hover:text-white transition-colors">Quyền riêng tư</a>
+            <a href="#/privacy" className="hover:text-white transition-colors">Quyền riêng tư</a>
+            <a href="#/methodology" className="hover:text-white transition-colors">Phương pháp luận</a>
             <a href="#" className="hover:text-white transition-colors">Điều khoản dịch vụ</a>
             <a href="#" className="hover:text-white transition-colors">Cookie Policy</a>
           </div>
