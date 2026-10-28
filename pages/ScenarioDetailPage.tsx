@@ -9,17 +9,12 @@ import { communityService } from "../services/communityService";
 import { getCurrentUser, getUserProfile } from "../services/authService";
 import { apiGetSimulation } from "../services/api";
 import { IconMapper } from "../components/IconMapper";
-import { InteractiveDecisionTree } from "../components/InteractiveDecisionTree";
-import { calculateRealisticRoi } from "../services/roiCalculator";
-import { RoiFinancialBreakdownModal } from "../components/RoiFinancialBreakdownModal";
-import { ParentPerspectiveView } from "../components/ParentPerspectiveView";
 
 const ScenarioDetailPage: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [activeTab, setActiveTab] = useState<"overview" | "decisionTree" | "parent">("overview");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [saveForm, setSaveForm] = useState({
     title: "",
@@ -33,7 +28,6 @@ const ScenarioDetailPage: React.FC = () => {
   const [isCommentsLoading, setIsCommentsLoading] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [existingProgress, setExistingProgress] = useState<any>(null);
-  const [isRoiBreakdownOpen, setIsRoiBreakdownOpen] = useState(false);
 
   const state = (location.state as {
     scenario: any;
@@ -75,103 +69,76 @@ const ScenarioDetailPage: React.FC = () => {
     }
   }, [id, state?.fromCommunity]);
 
-  const [scenario, setScenario] = useState<any>(state.scenario);
-  const [isLoading, setIsLoading] = useState<boolean>(!state.scenario);
-  const [loadError, setLoadError] = useState<string | null>(null);
-
   useEffect(() => {
     window.scrollTo(0, 0);
-    if (state.scenario) {
-      setScenario(state.scenario);
-      setIsLoading(false);
-      if (state.scenario.id) {
+    if (!state.scenario) {
+      navigate("/history");
+    } else {
+      if (state.scenario && state.scenario.id) {
         setSaveForm((prev) => ({ ...prev, title: state.scenario.title || "" }));
+        // If not from community, check if it has progress
         if (!state.fromCommunity) {
           fetchProgress(state.scenario.id);
         }
       }
+
       if (state.fromCommunity) {
         loadComments();
       }
-      return;
     }
+  }, [state, navigate, id, loadComments]);
 
-    if (!id) {
-      navigate("/history");
-      return;
+  const [scenario, setScenario] = useState<any>(state.scenario);
+  const [isLoadingFull, setIsLoadingFull] = useState(false);
+
+  useEffect(() => {
+    if (state.scenario) {
+      setScenario(state.scenario);
     }
+  }, [state.scenario]);
 
-    setIsLoading(true);
-    setLoadError(null);
-
-    apiGetSimulation(id)
-      .then((fullData) => {
-        let matched = null;
-        if (fullData.matchedScenario) {
-          matched = fullData.matchedScenario;
-        } else if (fullData.scenarios && fullData.scenarios.length > 0) {
-          matched = fullData.scenarios.find(
-            (s: any) =>
-              String(s.id) === String(id) ||
-              String(s._id) === String(id) ||
-              String(s.type?.toLowerCase()) === String(id.toLowerCase())
-          ) || fullData.scenarios[0];
-        } else {
-          matched = fullData;
-        }
-
-        if (matched) {
-          setScenario(matched);
-          setSaveForm((prev) => ({ ...prev, title: matched.title || "" }));
-          if (matched.id) {
-            fetchProgress(matched.id);
-          }
-        } else {
-          setLoadError("Không tìm thấy thông tin kịch bản.");
-        }
-      })
-      .catch((err) => {
-        console.error("Error loading scenario by id:", err);
+  useEffect(() => {
+    const fetchFullData = async () => {
+      if (id && scenario && !scenario.deepAnalysis && !state.fromCommunity) {
+        setIsLoadingFull(true);
         try {
-          const localHistory = JSON.parse(localStorage.getItem('futuretrace_history') || '[]');
-          let found = null;
-          for (const item of localHistory) {
-            if (item.id === id) { found = item; break; }
-            if (item.scenarios) {
-              const sub = item.scenarios.find(
-                (s: any) =>
-                  s.id === id ||
-                  s._id === id ||
-                  s.type?.toLowerCase() === id.toLowerCase()
-              );
-              if (sub) { found = sub; break; }
-            }
+          const fullData = await apiGetSimulation(id);
+          if (fullData.scenarios) {
+            const sub = fullData.scenarios.find((s: any) => String(s.id) === String(id) || String(s._id) === String(id)) || fullData.scenarios[0];
+            if (sub) setScenario((prev: any) => ({ ...prev, ...sub }));
+          } else {
+            setScenario((prev: any) => ({ ...prev, ...fullData }));
           }
-          if (found) {
-            setScenario(found);
-            return;
-          }
-        } catch (e) { }
-        setLoadError("Không thể tải thông tin kịch bản.");
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [id, state.scenario, state.fromCommunity, navigate, loadComments]);
+        } catch (err) {
+          console.error("Error fetching full scenario data", err);
+        } finally {
+          setIsLoadingFull(false);
+        }
+      }
+    };
+    fetchFullData();
+  }, [id, scenario?.deepAnalysis, state.fromCommunity]);
 
-  const displayCareer = scenario.careerGrowth ?? scenario.metrics?.career ?? 0;
-  const displayHappiness =
-    scenario.happiness ?? scenario.metrics?.happiness ?? 0;
-  const displayType = scenario.type || "Positive";
-  const timeHorizon = state.context?.timeHorizon || 5;
-  const computedRoi = calculateRealisticRoi(scenario, timeHorizon);
-  const displayRoi = computedRoi.annualizedRoi;
-
+  // Hook phải được gọi trước mọi lệnh return sớm (Rules of Hooks)
   const [isTimeframeModalOpen, setIsTimeframeModalOpen] = useState(false);
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
   const [isCheckingTier, setIsCheckingTier] = useState(false);
   const [timeframe, setTimeframe] = useState(12);
-  const PREMIUM_ANALYSIS_COST = 80;
+
+  if (!scenario) return null;
+
+  const displayRoi = scenario.roi ?? scenario.metrics?.roi ?? 0;
+  const displayCareer = scenario.careerGrowth ?? scenario.metrics?.career ?? 0;
+  const displayHappiness =
+    scenario.happiness ?? scenario.metrics?.happiness ?? 0;
+  const displayType = scenario.type || "Positive";
+  // Độ tin cậy lấy từ mô hình định lượng thay vì con số cố định 95
+  const reliabilityByConfidence: Record<string, number> = { high: 85, medium: 65, low: 40 };
+  const displayReliability = scenario.quant?.confidence
+    ? reliabilityByConfidence[scenario.quant.confidence]
+    : scenario.reliability ?? null;
+
+  const PREMIUM_ANALYSIS_COST = 120; // khớp routes/premium.js
   const canPayPremiumAnalysis = (user: any) => (
     (user?.token ?? 0) >= PREMIUM_ANALYSIS_COST
   );
@@ -221,7 +188,7 @@ const ScenarioDetailPage: React.FC = () => {
         career_growth: displayCareer,
         happiness: displayHappiness,
         roi: displayRoi,
-        reliability: 95,
+        reliability: displayReliability ?? undefined,
         deep_analysis: scenario.deepAnalysis,
         scenario_id: scenario.id,
       });
@@ -269,44 +236,9 @@ const ScenarioDetailPage: React.FC = () => {
     }
   };
 
-  if (isLoading) {
-    return (
-      <AnimatedBackground className="min-h-screen bg-[#f8fafc] flex flex-col font-sans relative">
-        <SharedHeader />
-        <div className="flex-1 flex flex-col items-center justify-center p-8">
-          <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4" />
-          <p className="text-slate-500 font-medium text-sm">Đang tải chi tiết kịch bản...</p>
-        </div>
-        <SharedFooter />
-      </AnimatedBackground>
-    );
-  }
-
-  if (loadError || !scenario) {
-    return (
-      <AnimatedBackground className="min-h-screen bg-[#f8fafc] flex flex-col font-sans relative">
-        <SharedHeader />
-        <div className="flex-1 flex flex-col items-center justify-center p-8 text-center max-w-md mx-auto">
-          <div className="w-16 h-16 bg-rose-50 text-rose-500 rounded-3xl flex items-center justify-center mb-6 shadow-sm border border-rose-100 mx-auto">
-            <IconMapper name="search_off" className="text-3xl" />
-          </div>
-          <h2 className="text-2xl font-black text-slate-900 mb-2 font-display uppercase italic">Không tìm thấy kịch bản</h2>
-          <p className="text-slate-500 text-sm mb-8">{loadError || "Kịch bản này có thể chưa được lưu hoặc không tồn tại."}</p>
-          <button
-            onClick={() => navigate('/history')}
-            className="px-8 py-4 bg-slate-900 text-white text-[11px] font-black uppercase tracking-widest rounded-2xl hover:bg-blue-600 transition-colors shadow-lg"
-          >
-            Về Kho Lịch Sử
-          </button>
-        </div>
-        <SharedFooter />
-      </AnimatedBackground>
-    );
-  }
-
   const currentUser = getCurrentUser();
   // Robust ID check: handle both nested objects and direct strings
-  const scenarioUserId = scenario?.user_id?._id || scenario?.user_id;
+  const scenarioUserId = scenario.user_id?._id || scenario.user_id;
   const isOwner =
     currentUser &&
     ((state.fromCommunity &&
@@ -345,156 +277,31 @@ const ScenarioDetailPage: React.FC = () => {
             </div>
 
             <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
+              initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className="bg-white p-7 sm:p-8 rounded-[2.5rem] border-2 border-slate-100 shadow-[0_20px_50px_-10px_rgba(37,99,235,0.08)] hover:shadow-[0_25px_60px_-10px_rgba(37,99,235,0.15)] hover:border-blue-200 transition-all duration-300 flex flex-col min-w-[280px] sm:min-w-[320px] max-w-[360px] relative group"
+              className="bg-slate-950 p-8 mb-[65px] sm:p-10 lg:p-12 rounded-[2.5rem] sm:rounded-[3.5rem] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.3)] flex flex-col items-center justify-center min-w-[240px] sm:min-w-[280px] border border-slate-800 relative"
             >
-              {/* Top Header inside Card */}
-              <div className="flex items-center justify-between gap-3 mb-6">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shadow-sm">
-                    <IconMapper name="trending_up" className="text-base" />
-                  </div>
-                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                    HIỆU QUẢ TÀI CHÍNH (ROI)
-                  </span>
-                </div>
-
-                <div className="relative group/tooltip">
-                  <button
-                    type="button"
-                    onClick={() => setIsRoiBreakdownOpen(true)}
-                    className="w-7 h-7 rounded-lg bg-slate-50 hover:bg-blue-50 text-slate-400 hover:text-blue-600 flex items-center justify-center transition-colors border border-slate-100"
-                    title="Cơ sở tính toán"
-                  >
-                    <IconMapper name="help" className="text-sm" />
-                  </button>
-                  <span className="absolute bottom-full right-0 mb-2 w-64 p-3 bg-slate-900 text-white text-[10px] rounded-xl shadow-xl opacity-0 group-hover/tooltip:opacity-100 transition-all duration-200 pointer-events-none normal-case tracking-normal font-medium leading-relaxed border border-slate-800 block text-center z-50">
-                    Bấm để xem bảng bóc tách chi phí đầu tư, mức tăng thu nhập và thời gian hoàn vốn minh bạch.
-                    <span className="absolute top-full right-2 border-[6px] border-transparent border-t-slate-900 block"></span>
-                  </span>
-                </div>
-              </div>
-
-              {/* Main Number Presentation */}
-              <div className="mb-5">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-5xl sm:text-6xl font-black font-display tracking-tight text-slate-900">
-                    +{computedRoi.annualizedRoi}%
-                  </span>
-                  <span className="text-sm font-bold text-slate-400">
-                    / năm
-                  </span>
-                </div>
-                <p className="text-[11px] text-slate-500 font-medium mt-1">
-                  Tỷ suất sinh lời bình quân kép (CAGR)
-                </p>
-              </div>
-
-              {/* Sub Metrics / Pills */}
-              <div className="space-y-2 mb-6">
-                <div className="flex items-center justify-between px-3.5 py-2 rounded-xl bg-slate-50 border border-slate-100 text-xs">
-                  <span className="text-slate-500 font-medium">Lũy kế {computedRoi.timeHorizon} năm:</span>
-                  <span className="font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100">
-                    +{computedRoi.cumulativeRoi}%
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between px-3.5 py-2 rounded-xl bg-slate-50 border border-slate-100 text-xs">
-                  <span className="text-slate-500 font-medium">Hòa vốn dự kiến:</span>
-                  <span className="font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100">
-                    ~ {computedRoi.paybackPeriodYears} năm
-                  </span>
-                </div>
-              </div>
-
-              {/* Action Button */}
-              <button
-                type="button"
-                onClick={() => setIsRoiBreakdownOpen(true)}
-                className="w-full py-3.5 px-4 rounded-xl bg-slate-900 hover:bg-blue-600 text-white text-[10px] font-black uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg shadow-slate-900/10 hover:shadow-blue-500/20 active:scale-[0.98] group/btn"
-              >
-                <IconMapper name="receipt_long" className="text-sm" />
-                <span>Chi Tiết Bóc Tách Chi Phí</span>
-                <IconMapper name="arrow_forward" className="text-xs group-hover/btn:translate-x-1 transition-transform" />
-              </button>
-
-              {/* Disclaimer Caption */}
-              <p className="text-[10px] text-slate-400 font-medium text-center mt-3.5 italic leading-tight">
-                * Mọi dữ liệu thông số chỉ mang tính chất tham khảo dựa vào bối cảnh cá nhân của người dùng.
-              </p>
+              <span className="absolute top-4 right-4 z-20 group/tooltip inline-block">
+                <IconMapper name="help" className="text-slate-600 hover:text-blue-400 cursor-help text-[16px] transition-colors" />
+                <span className="absolute bottom-full right-0 mb-2 w-64 p-3 bg-slate-900 text-white text-[10px] rounded-xl shadow-xl opacity-0 group-hover/tooltip:opacity-100 transition-all duration-200 pointer-events-none normal-case tracking-normal font-medium leading-relaxed border border-slate-800 block text-center z-50">
+                  Tỷ suất hoàn vốn dự kiến sau {state.context?.timeHorizon || 5} năm từ quyết định này, được AI tính toán dựa trên mức đầu tư tài chính và nỗ lực cá nhân của bạn.
+                  <span className="absolute top-full right-2 border-[6px] border-transparent border-t-slate-900 block"></span>
+                </span>
+              </span>
+              <div className="absolute inset-0 bg-blue-600/5 rounded-[2.5rem] sm:rounded-[3.5rem] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <span className="text-5xl sm:text-6xl font-black text-blue-500 mb-2 relative z-10">
+                {displayRoi}
+                {scenario.quant ? <span className="text-2xl text-blue-300">/100</span> : "%"}
+              </span>
+              <span className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest relative z-10">
+                {scenario.quant ? `ĐIỂM ROI (KHUNG ${scenario.quant.roi.lensYears} NĂM)` : "HIỆU QUẢ TÀI CHÍNH DỰ BÁO (ROI)"}
+              </span>
             </motion.div>
           </div>
         </header>
 
-        {/* View Switcher Tabs */}
-        <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-10 p-1.5 bg-slate-200/50 rounded-2xl w-fit border border-slate-200/80 shadow-inner">
-          <button
-            type="button"
-            onClick={() => setActiveTab("overview")}
-            className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 ${
-              activeTab === "overview"
-                ? "bg-white text-slate-900 shadow-md border border-slate-100"
-                : "text-slate-600 hover:text-slate-900"
-            }`}
-          >
-            <IconMapper name="dashboard" className="text-sm" />
-            Phân Tích Chi Tiết & SWOT
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab("parent")}
-            className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 relative ${
-              activeTab === "parent"
-                ? "bg-gradient-to-r from-blue-600 via-indigo-600 to-sky-600 text-white shadow-md shadow-blue-500/20"
-                : "text-slate-600 hover:text-slate-900"
-            }`}
-          >
-            <IconMapper name="favorite" className={`text-sm ${activeTab === "parent" ? "text-rose-300" : "text-rose-500"}`} />
-            Góc Nhìn Phụ Huynh
-            <span className="ml-1 px-1.5 py-0.5 rounded-full text-[9px] bg-amber-400 text-amber-950 font-black shadow-sm">
-              MỚI
-            </span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab("decisionTree")}
-            className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 ${
-              activeTab === "decisionTree"
-                ? "bg-blue-600 text-white shadow-md shadow-blue-500/20"
-                : "text-slate-600 hover:text-slate-900"
-            }`}
-          >
-            <IconMapper name="account_tree" className="text-sm" />
-            Cây Quyết Định (Decision Tree)
-          </button>
-        </div>
-
-        {activeTab === "decisionTree" ? (
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-16"
-          >
-            <InteractiveDecisionTree
-              decisionTitle={scenario.title}
-              scenarios={[scenario]}
-            />
-          </motion.div>
-        ) : activeTab === "parent" ? (
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-16"
-          >
-            <ParentPerspectiveView
-              scenario={scenario}
-              context={state.context}
-            />
-          </motion.div>
-        ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
           {/* Left Column: Analysis */}
           <div className="lg:col-span-7 space-y-8 lg:space-y-12">
             {/* Metrics Grid */}
@@ -516,10 +323,10 @@ const ScenarioDetailPage: React.FC = () => {
                 },
                 {
                   label: "Tin cậy",
-                  val: scenario.reliability || 95,
+                  val: displayReliability ?? "—",
                   icon: "verified",
                   color: "text-amber-600",
-                  tooltip: "Độ tin cậy của mô hình dự báo AI dựa trên lượng dữ liệu thực tế thu thập được."
+                  tooltip: "Mức khớp dữ liệu của mô hình định lượng: cao khi khớp được cả ngành và chức danh trong dữ liệu tuyển dụng, thấp khi phải ước lượng chung."
                 },
               ].map((m, i) => (
                 <div
@@ -584,6 +391,45 @@ const ScenarioDetailPage: React.FC = () => {
                     </p>
                   </div>
                 </div>
+              </section>
+            )}
+
+            {/* Quant Evidence Section (FT-Salary + Career ROI Engine) */}
+            {scenario.quant && (
+              <section className="bg-white p-8 sm:p-10 rounded-[2.5rem] border border-slate-100 shadow-sm">
+                <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+                  <div>
+                    <h3 className="text-2xl font-black text-slate-900 font-display uppercase tracking-tight">Bằng chứng định lượng</h3>
+                    <p className="text-sm font-medium text-slate-500">
+                      Tính từ {scenario.quant.market?.postingsAnalyzed?.toLocaleString("vi-VN") ?? "dữ liệu"} tin tuyển dụng thực tế · lương phân vị {scenario.quant.salary.quantile.toUpperCase()}
+                    </p>
+                  </div>
+                  <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${scenario.quant.confidence === "high" ? "bg-emerald-50 text-emerald-600" : scenario.quant.confidence === "medium" ? "bg-amber-50 text-amber-600" : "bg-rose-50 text-rose-600"}`}>
+                    Độ tin cậy: {scenario.quant.confidence === "high" ? "cao" : scenario.quant.confidence === "medium" ? "trung bình" : "thấp"}
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                  {[
+                    { label: "Lương khởi điểm", val: `${scenario.quant.salary.startMonthlyMillion} tr/tháng` },
+                    { label: "Sau 5 năm", val: `${scenario.quant.salary.year5MonthlyMillion} tr/tháng` },
+                    { label: `ROI ${scenario.quant.roi.lensYears} năm`, val: `${Math.round(scenario.quant.roi.ratio * 100)}%` },
+                    { label: "Hoàn vốn", val: scenario.quant.roi.paybackYearFromNow ? `Năm thứ ${scenario.quant.roi.paybackYearFromNow}` : `> ${scenario.quant.roi.lensYears} năm` },
+                  ].map((m) => (
+                    <div key={m.label} className="bg-slate-50 p-5 rounded-2xl">
+                      <div className="text-xl font-black text-slate-900">{m.val}</div>
+                      <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">{m.label}</div>
+                    </div>
+                  ))}
+                </div>
+                <p className={`mt-5 text-sm font-medium ${scenario.quant.affordability.affordable ? "text-slate-600" : "text-rose-600"}`}>
+                  Nhu cầu tiền mặt khi đi học ~{scenario.quant.affordability.cashNeedPerYearMillion} triệu/năm
+                  {scenario.quant.affordability.affordable
+                    ? " — nằm trong khả năng tài chính bạn khai báo."
+                    : ` — vượt khả năng khai báo ~${scenario.quant.affordability.gapPerYearMillion} triệu/năm, cần học bổng hoặc vay sinh viên.`}
+                </p>
+                <p className="mt-2 text-xs text-slate-400">
+                  Giả định: học phí {scenario.quant.assumptions.tuitionPerYearMillion} tr/năm, chiết khấu {Math.round(scenario.quant.assumptions.discountRate * 100)}%/năm, so với người tốt nghiệp THPT đi làm ngay (~{scenario.quant.salary.counterfactualStartMillion} tr/tháng). Chỉ số hạnh phúc: {scenario.quant.metricSources.happiness === "ai" ? "do AI ước lượng" : "ước lượng từ mức áp lực và tài chính"}.
+                </p>
               </section>
             )}
 
@@ -811,19 +657,6 @@ const ScenarioDetailPage: React.FC = () => {
                 )
               )}
 
-              {/* Nút Chuyển Góc Nhìn Phụ Huynh */}
-              <button
-                type="button"
-                onClick={() => {
-                  setActiveTab("parent");
-                  window.scrollTo({ top: 400, behavior: "smooth" });
-                }}
-                className="w-full py-5 bg-gradient-to-r from-blue-50 via-indigo-50 to-sky-50 border-2 border-blue-200 text-blue-900 font-black text-[10px] uppercase tracking-widest rounded-[1.5rem] sm:rounded-[2rem] hover:bg-blue-100 hover:border-blue-300 transition-all shadow-sm flex items-center justify-center gap-3 group"
-              >
-                GÓC NHÌN PHỤ HUYNH & CHIA SẺ
-                <IconMapper name="favorite" className="text-rose-500 text-lg group-hover:scale-125 transition-transform" />
-              </button>
-
               {/* 2. Nút Xuất bản (Chỉ hiện nếu đang ở xem từ lịch sử) */}
               {!state.fromCommunity && (
                 <button onClick={() => setIsModalOpen(true)} className="w-full py-6 bg-slate-900 text-white font-black text-[10px] uppercase tracking-widest rounded-[1.5rem] sm:rounded-[2rem] hover:bg-blue-600 transition-all shadow-xl flex items-center justify-center gap-4 group">
@@ -844,7 +677,6 @@ const ScenarioDetailPage: React.FC = () => {
             </div>
           </div>
         </div>
-        )}
       </main>
 
       <AnimatePresence>
@@ -1008,13 +840,6 @@ const ScenarioDetailPage: React.FC = () => {
           </div>
         )}
       </AnimatePresence>
-
-      <RoiFinancialBreakdownModal
-        isOpen={isRoiBreakdownOpen}
-        onClose={() => setIsRoiBreakdownOpen(false)}
-        roiData={computedRoi}
-        scenarioTitle={scenario.title || "Kịch bản dự báo"}
-      />
 
       <SharedFooter />
     </AnimatedBackground>

@@ -5,6 +5,7 @@ import SharedHeader from '../components/SharedHeader';
 import SharedFooter from '../components/SharedFooter';
 import { AnimatedBackground } from '../components/AnimatedBackground';
 import { IconMapper } from '../components/IconMapper';
+import DeleteAccountSection from '../components/DeleteAccountSection';
 import { getCurrentUser, getUserProfile, updateProfile, changePassword, redeemInviteCode } from '../services/authService';
 
 const ProfilePage: React.FC = () => {
@@ -425,6 +426,7 @@ const ProfilePage: React.FC = () => {
 
       </main>
 
+      <DeleteAccountSection />
       <SharedFooter />
     </AnimatedBackground>
   );

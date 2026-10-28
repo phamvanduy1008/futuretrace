@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -8,21 +8,134 @@ import {
   ScenarioResult,
 } from "../types";
 import {
-  generateSimulation,
   analyzeInputReadiness,
 } from "../services/geminiService";
 import { saveToHistory } from "../data/mockDatabase";
-import { apiFetch } from "../services/apiClient";
 import SharedHeader from "../components/SharedHeader";
 import SharedFooter from "../components/SharedFooter";
 import { IconMapper } from "../components/IconMapper";
 import { AnimatedBackground } from "../components/AnimatedBackground";
-import { DecisionTemplatesModal } from "../components/DecisionTemplatesModal";
-import { RadarComparisonChart } from "../components/RadarComparisonChart";
-import { InteractiveDecisionTree } from "../components/InteractiveDecisionTree";
-import { calculateRealisticRoi } from "../services/roiCalculator";
 
 import { getLatestEvaluation } from "../services/evaluationService";
+import { streamSimulation, StreamFacts, StreamPartial } from "../services/simulationStream";
+import { warmupAI } from "../services/knowledgeApi";
+import StructuredInputs from "../components/StructuredInputs";
+import FactsPanel from "../components/FactsPanel";
+import ScenarioFeedback from "../components/ScenarioFeedback";
+
+const DECISION_TEMPLATES = [
+  {
+    id: "highschool_choice",
+    label: "Chọn ngành & Trường ĐH",
+    icon: "school",
+    theme: {
+      bg: "bg-blue-50/80",
+      text: "text-blue-600",
+      border: "border-blue-100/50",
+      activeBg: "bg-blue-600",
+      activeShadow: "shadow-blue-600/20",
+      hoverBg: "group-hover:bg-blue-50 group-hover:text-blue-600 group-hover:border-blue-100/50"
+    },
+    content: `[BỐI CẢNH CHỌN NGÀNH & TRƯỜNG ĐH]
+- Quyết định: Phân vân giữa [Lựa chọn A: Ví dụ học ngành CNTT tại ĐH Bách Khoa] và [Lựa chọn B: Học ngành Thiết kế Đồ họa tại ĐH Mỹ thuật].
+- Hiện trạng học tập: Học sinh lớp [Lớp 11/12], khối học sở trường là [Khối A00/A01/D01...], điểm trung bình (GPA) khoảng [Điểm số].
+- Năng lực nổi trội: [Ví dụ: Tư duy logic toán tốt, thích vẽ, biết giao tiếp ngoại ngữ].
+- Ngân sách học phí: Bố mẹ có thể hỗ trợ khoảng [Số tiền] triệu/năm.
+- Định hướng nghề nghiệp mong muốn: Trở thành [Vị trí mong muốn] sau khi tốt nghiệp.
+- Lo ngại lớn nhất: [Sợ không đủ điểm chuẩn / Học phí quá cao / Ngành học không phù hợp thực tế].`,
+  },
+  {
+    id: "university_career",
+    label: "Định hướng việc làm ra trường",
+    icon: "work",
+    theme: {
+      bg: "bg-emerald-50/80",
+      text: "text-emerald-600",
+      border: "border-emerald-100/50",
+      activeBg: "bg-emerald-600",
+      activeShadow: "shadow-emerald-600/20",
+      hoverBg: "group-hover:bg-emerald-50 group-hover:text-emerald-600 group-hover:border-emerald-100/50"
+    },
+    content: `[BỐI CẢNH ĐỊNH HƯỚNG RA TRƯỜNG]
+- Quyết định: Sau khi tốt nghiệp ngành [Tên ngành hiện tại] sẽ chọn đi làm ngay ở vị trí [Lựa chọn A: Ví dụ Nhân viên Marketing tại Agency] hay học tiếp lên [Lựa chọn B: Học Thạc sĩ hoặc đổi sang ngành Quản trị nhân sự].
+- Hiện trạng học tập: Sinh viên năm [Năm 3/Năm cuối] trường [Tên trường], GPA hiện tại là [Điểm số/4.0]. Đã có kinh nghiệm [Thực tập/Làm thêm/Dự án CLB].
+- Mục tiêu 3 năm đầu ra trường: Đạt mức lương [Thu nhập kỳ vọng] triệu/tháng và thăng tiến lên [Vị trí].
+- Lo ngại lớn nhất: [Thiếu kinh nghiệm thực tế / Thị trường việc làm cạnh tranh / Sợ chọn sai hướng đi đầu đời].`,
+  },
+  {
+    id: "study_abroad",
+    label: "Du học vs Học trong nước",
+    icon: "rocket_launch",
+    theme: {
+      bg: "bg-violet-50/80",
+      text: "text-violet-600",
+      border: "border-violet-100/50",
+      activeBg: "bg-violet-600",
+      activeShadow: "shadow-violet-600/20",
+      hoverBg: "group-hover:bg-violet-50 group-hover:text-violet-650 group-hover:border-violet-100/50"
+    },
+    content: `[BỐI CẢNH DU HỌC VS TRONG NƯỚC]
+- Quyết định: Đi du học bậc [Đại học/Thạc sĩ] tại [Tên quốc gia: Ví dụ Đức, Úc, Nhật] hay học chương trình liên kết/chính quy trong nước tại [Tên trường].
+- Hiện trạng năng lực: GPA đạt [Điểm GPA], chứng chỉ ngoại ngữ đạt [Ví dụ: IELTS 6.5, JLPT N3].
+- Điều kiện tài chính: Cần tìm học bổng [Toàn phần/Bán phần] vì ngân sách gia đình chỉ tự túc được khoảng [Số tiền] triệu/năm.
+- Định hướng sau tốt nghiệp: [Muốn ở lại làm việc định cư nước ngoài / Trở về Việt Nam cống hiến].
+- Lo ngại lớn nhất: [Rủi ro trượt học bổng / Chi phí sinh hoạt đắt đỏ / Sốc văn hóa và cô đơn].`,
+  },
+  {
+    id: "work_study_balance",
+    label: "Học tập vs Đi làm thêm",
+    icon: "account_balance_wallet",
+    theme: {
+      bg: "bg-amber-50/80",
+      text: "text-amber-600",
+      border: "border-amber-100/50",
+      activeBg: "bg-amber-600",
+      activeShadow: "shadow-amber-600/20",
+      hoverBg: "group-hover:bg-amber-50 group-hover:text-amber-650 group-hover:border-amber-100/50"
+    },
+    content: `[BỐI CẢNH HỌC TẬP VS ĐI LÀM THÊM]
+- Quyết định: Dành thời gian [Số giờ] giờ/tuần để đi làm thêm [Tên việc làm thêm: Ví dụ gia sư, phục vụ, chạy grab] kiếm tiền tự trang trải hay tập trung 100% thời gian cho việc học để giành học bổng của trường.
+- Hiện trạng tài chính: [Khó khăn/Tự túc một phần], học phí mỗi kỳ là [Số tiền] triệu đồng.
+- Mục tiêu học tập: Duy trì GPA trên [GPA mong muốn] để không bị ảnh hưởng bằng tốt nghiệp.
+- Lo ngại lớn nhất: [Đi làm thêm gây kiệt sức, sụt giảm điểm số / Thiếu chi phí sinh hoạt hàng ngày nếu không đi làm].`,
+  },
+  {
+    id: "relocation_hometown",
+    label: "Thành phố lớn vs Quê nhà",
+    icon: "balance",
+    theme: {
+      bg: "bg-indigo-50/80",
+      text: "text-indigo-600",
+      border: "border-indigo-100/50",
+      activeBg: "bg-indigo-600",
+      activeShadow: "shadow-indigo-600/20",
+      hoverBg: "group-hover:bg-indigo-50 group-hover:text-indigo-650 group-hover:border-indigo-100/50"
+    },
+    content: `[BỐI CẢNH LẬP NGHIỆP XA NHÀ VS QUÊ NHÀ]
+- Quyết định: Ở lại lập nghiệp tại [Lựa chọn A: Thành phố lớn như Hà Nội, TP.HCM] hay trở về quê hương [Lựa chọn B: Tên tỉnh/thành phố quê nhà] để làm việc gần bố mẹ.
+- Hiện trạng: Sinh viên sắp tốt nghiệp, chưa có nhà riêng ở thành phố lớn, chi phí thuê nhà và ăn uống tốn khoảng [Số tiền] triệu/tháng.
+- Sự ủng hộ từ gia đình: [Bố mẹ muốn ở gần / Bố mẹ ủng hộ tự lập ở thành phố].
+- Lo ngại lớn nhất: [Chi phí đắt đỏ và áp lực cạnh tranh ở thành phố / Cơ hội việc làm hạn chế ở quê nhà].`,
+  },
+  {
+    id: "student_startup",
+    label: "Dự án Khởi nghiệp sinh viên",
+    icon: "psychology",
+    theme: {
+      bg: "bg-rose-50/80",
+      text: "text-rose-600",
+      border: "border-rose-100/50",
+      activeBg: "bg-rose-600",
+      activeShadow: "shadow-rose-600/20",
+      hoverBg: "group-hover:bg-rose-50 group-hover:text-rose-650 group-hover:border-rose-100/50"
+    },
+    content: `[BỐI CẢNH KHỞI NGHIỆP/NGHIÊN CỨU SINH VIÊN]
+- Quyết định: Thành lập nhóm khởi nghiệp dự án sinh viên [Mô hình: Ví dụ Phát triển ứng dụng học tập, kinh doanh đồ handmade online] hay tập trung tham gia Nghiên cứu Khoa học tại trường.
+- Hiện trạng nguồn lực: Số vốn ban đầu tự góp là [Số tiền] triệu đồng, có nhóm [Số người] sinh viên cùng tham gia. Có sự bảo trợ/hướng dẫn từ giảng viên [Có/Không].
+- Mục tiêu ngắn hạn: [Tham gia cuộc thi khởi nghiệp sinh viên / Công bố bài báo khoa học / Có doanh thu nhỏ].
+- Lo ngại lớn nhất: [Thiếu kiến thức thực tế / Nhóm tan vỡ vì xung đột thời gian học / Mất số vốn tích lũy].`,
+  },
+];
 
 const SimulationFlow: React.FC = () => {
   const navigate = useNavigate();
@@ -92,6 +205,15 @@ const SimulationFlow: React.FC = () => {
   }, [location.state]);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const abortRef = useRef<AbortController | null>(null);
+  // Streaming: số liệu có nguồn đến trước (~0,1s), văn bản AI đến dần
+  const [liveFacts, setLiveFacts] = useState<StreamFacts | null>(null);
+  const [livePartial, setLivePartial] = useState<StreamPartial | null>(null);
+
+  // Làm nóng GPU của model chính ngay khi mở form: cold start được giấu trong lúc người dùng nhập liệu
+  useEffect(() => {
+    warmupAI();
+  }, []);
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [clarificationQuestions, setClarificationQuestions] = useState<any[]>([]);
   const [clarificationAnswers, setClarificationAnswers] = useState<Record<number, string[]>>({});
@@ -101,7 +223,6 @@ const SimulationFlow: React.FC = () => {
     type: "AUTH" | "NETWORK" | "LOCAL_CONFIG" | "GENERAL" | "OVERLOADED" | "RATE_LIMIT";
   } | null>(null);
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
-  const [isTemplatesModalOpen, setIsTemplatesModalOpen] = useState(false);
   const [folderName, setFolderName] = useState("");
   const [isSaved, setIsSaved] = useState(false);
   const [selectedScenario, setSelectedScenario] =
@@ -160,20 +281,25 @@ const SimulationFlow: React.FC = () => {
     const additionalContext = clarificationQuestions.map((q, idx) => {
       const answers = clarificationAnswers[idx] || [];
       return `- ${q.question}: ${answers.join(', ') || 'Bỏ qua'}`;
-    }).join('\\n');
-    
-    setData(prev => ({
-      ...prev,
-      decision:
-        prev.decision +
-        "\\n\\n[THÔNG TIN BỔ SUNG TỪ NGƯỜI DÙNG]\\n" +
-        additionalContext,
-    }));
+    }).join('\n');
+
+    // Tính dữ liệu mới rồi truyền thẳng vào startSimulation: setData là bất đồng bộ,
+    // nếu đọc lại `data` ngay sẽ gửi bản cũ (câu trả lời làm rõ bị mất)
+    const enrichedData = {
+      ...data,
+      decision: `${data.decision}\n\n[THÔNG TIN BỔ SUNG TỪ NGƯỜI DÙNG]\n${additionalContext}`,
+    };
+    setData(enrichedData);
 
     setClarificationQuestions([]);
     setClarificationAnswers({});
+    setIsSubmitting(true);
     setStep(SimulationStep.PROCESSING);
-    startSimulation();
+    startSimulation(enrichedData);
+  };
+
+  const cancelSimulation = () => {
+    abortRef.current?.abort();
   };
 
   const handleSelectKey = async () => {
@@ -193,20 +319,32 @@ const SimulationFlow: React.FC = () => {
     }
   };
 
-  const startSimulation = async () => {
-    setLoadingProgress(0);
-    let progress = 0;
+  const startSimulation = async (payload: SimulationData = data) => {
+    setLoadingProgress(15);
+    let progress = 15;
+    setLiveFacts(null);
+    setLivePartial(null);
+    // Tiến độ nền chậm; các sự kiện thật (facts, văn bản AI) đẩy tiến độ lên nhanh hơn
     const interval = setInterval(() => {
-      progress += Math.random() * 8;
-      if (progress >= 95) {
-        progress = 95;
-        clearInterval(interval);
-      }
-      setLoadingProgress(Math.floor(progress));
-    }, 250);
+      progress += (90 - progress) * 0.02;
+      setLoadingProgress((prev) => Math.max(prev, Math.min(90, Math.floor(progress))));
+    }, 600);
 
+    abortRef.current = new AbortController();
     try {
-      const result = await generateSimulation(data);
+      const result = await streamSimulation(payload, {
+        onFacts: (f) => {
+          setLiveFacts(f);
+          setLoadingProgress((prev) => Math.max(prev, 35));
+        },
+        onPartial: (p) => {
+          setLivePartial(p);
+          const written = (p.summary?.length || 0) + p.scenarios.reduce((n, sc) => n + (sc.description?.length || 0), 0);
+          setLoadingProgress((prev) => Math.max(prev, Math.min(95, 35 + Math.round((written / 1600) * 60))));
+        },
+        onReset: () => setLivePartial(null),
+      }, abortRef.current.signal);
+      clearInterval(interval);
       // Assign IDs to scenarios if they don't have them
       const scenariosWithIds = result.scenarios.map((s, idx) => ({
         ...s,
@@ -216,10 +354,15 @@ const SimulationFlow: React.FC = () => {
 
       setResults(finalResult);
       setLoadingProgress(100);
-      setTimeout(() => setStep(SimulationStep.RESULTS), 800);
+      setTimeout(() => setStep(SimulationStep.RESULTS), 400);
     } catch (e: any) {
       clearInterval(interval);
-      if (e.code === "INSUFFICIENT_TOKENS") {
+      if (e.type === "CANCELLED") {
+        setError(null);
+      } else if (e.code === "CONSENT_REQUIRED") {
+        window.dispatchEvent(new CustomEvent("consent-required"));
+        setError({ message: e.message, type: "GENERAL" });
+      } else if (e.code === "INSUFFICIENT_TOKENS") {
         setError({ message: e.message, type: "AUTH" });
       } else {
         setError({ message: e.message, type: e.type || "GENERAL" });
@@ -238,40 +381,10 @@ const SimulationFlow: React.FC = () => {
     });
   };
 
-  const [isSavingHistory, setIsSavingHistory] = useState(false);
-
-  const handleSaveToHistory = async () => {
+  const handleSaveToHistory = () => {
     if (!results) return;
-    setIsSavingHistory(true);
-    try {
-      if (results.simulationId) {
-        await apiFetch(`/simulations/${results.simulationId}/save`, { method: "POST" });
-      }
-      if (results.historyItem) {
-        try {
-          const currentHistory = JSON.parse(localStorage.getItem('futuretrace_history') || '[]');
-          const itemToSave = { ...results.historyItem, isSaved: true };
-          if (folderName.trim()) {
-            itemToSave.title = folderName.trim();
-          }
-          const exists = currentHistory.some((h: any) => h.id === itemToSave.id);
-          if (!exists) {
-            localStorage.setItem('futuretrace_history', JSON.stringify([itemToSave, ...currentHistory]));
-          } else {
-            const updated = currentHistory.map((h: any) => h.id === itemToSave.id ? { ...h, isSaved: true, title: itemToSave.title } : h);
-            localStorage.setItem('futuretrace_history', JSON.stringify(updated));
-          }
-        } catch (e) { }
-      }
-      setIsSaved(true);
-      setIsSaveModalOpen(false);
-    } catch (err) {
-      console.error("Lỗi khi lưu vào lịch sử:", err);
-      setIsSaved(true);
-      setIsSaveModalOpen(false);
-    } finally {
-      setIsSavingHistory(false);
-    }
+    setIsSaved(true);
+    setIsSaveModalOpen(false);
   };
 
   const pageVariants = {
@@ -357,34 +470,68 @@ const SimulationFlow: React.FC = () => {
               </div>
             </div>
 
-            {/* Decision Templates Callout */}
-            <div
-              id="tour-decision-hints"
-              className="flex flex-col sm:flex-row items-center justify-between gap-4 p-5 rounded-3xl bg-gradient-to-r from-blue-50/70 via-indigo-50/40 to-slate-50/60 border border-blue-100/70 shadow-sm"
-            >
-              <div className="flex items-center gap-3.5">
-                <div className="w-11 h-11 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-md shadow-blue-500/20 shrink-0">
-                  <IconMapper name="auto_stories" className="text-xl" />
-                </div>
-                <div>
-                  <h4 className="text-xs font-black uppercase tracking-wider text-slate-800">
-                    Thư Viện Kịch Bản Quyết Định
-                  </h4>
-                  <p className="text-xs text-slate-500 font-medium mt-0.5">
-                    Khám phá các kịch bản chi tiết (Chọn ngành & trường ĐH, Du học, Khởi nghiệp, Định hướng việc làm...)
-                  </p>
-                </div>
+            <StructuredInputs data={data} onChange={(patch) => setData((prev) => ({ ...prev, ...patch }))} />
+
+            <div id="tour-decision-hints" className="space-y-6">
+              <div className="flex items-center gap-4">
+                <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 whitespace-nowrap">
+                  Hoặc chọn biểu mẫu gợi ý chi tiết
+                </span>
+                <span className="h-px bg-slate-200/60 flex-1"></span>
               </div>
-              <motion.button
-                type="button"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => setIsTemplatesModalOpen(true)}
-                className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-white hover:bg-blue-600 text-blue-600 hover:text-white border border-blue-200 hover:border-transparent text-xs font-black uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-2.5 shadow-sm hover:shadow-lg hover:shadow-blue-500/20 shrink-0"
-              >
-                <IconMapper name="auto_stories" className="text-sm" />
-                <span>Mở Thư Viện Kịch Bản</span>
-              </motion.button>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {DECISION_TEMPLATES.map((tmpl) => {
+                  const isActive = data.decision === tmpl.content;
+                  const theme = tmpl.theme;
+                  return (
+                    <motion.button
+                      key={tmpl.id}
+                      whileHover={{ y: -2 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() =>
+                        setData({ ...data, decision: tmpl.content })
+                      }
+                      className={`group flex items-center gap-3 p-3 rounded-2xl border text-left transition-all duration-300 ${
+                        isActive
+                          ? "border-blue-500 bg-blue-50/20 ring-2 ring-blue-500/10 shadow-sm"
+                          : "border-slate-200/60 bg-white/50 backdrop-blur-sm hover:border-slate-300 hover:bg-white/90 shadow-sm"
+                      }`}
+                    >
+                      <div
+                        className={`w-8 h-8 rounded-xl flex items-center justify-center border shrink-0 transition-all duration-300 ${
+                          isActive
+                            ? `${theme.activeBg} text-white border-transparent`
+                            : "bg-slate-50/85 text-slate-500 border-slate-100 group-hover:bg-blue-50/40 group-hover:text-blue-600 group-hover:border-blue-100/50"
+                        }`}
+                      >
+                        <IconMapper name={tmpl.icon} className="text-sm" />
+                      </div>
+                      <div className="min-w-0 flex-1 flex items-center justify-between gap-2">
+                        <span
+                          className={`text-[10px] font-black uppercase tracking-wide truncate transition-colors duration-300 ${
+                            isActive
+                              ? "text-blue-750"
+                              : "text-slate-700 group-hover:text-blue-600"
+                          }`}
+                        >
+                          {tmpl.label}
+                        </span>
+                        {isActive ? (
+                          <IconMapper
+                            name="check_circle"
+                            className="text-blue-600 text-sm shrink-0"
+                          />
+                        ) : (
+                          <IconMapper
+                            name="arrow_forward"
+                            className="text-slate-300 group-hover:text-blue-500 text-xs shrink-0 transition-all duration-300 translate-x-[-2px] group-hover:translate-x-0 opacity-0 group-hover:opacity-100"
+                          />
+                        )}
+                      </div>
+                    </motion.button>
+                  );
+                })}
+              </div>
             </div>
 
             <div className="flex flex-col sm:flex-row items-center justify-end gap-8 pt-4">
@@ -401,23 +548,6 @@ const SimulationFlow: React.FC = () => {
               </motion.button>
             </div>
           </div>
-
-          {/* Detailed Decision Templates Modal */}
-          <DecisionTemplatesModal
-            isOpen={isTemplatesModalOpen}
-            onClose={() => setIsTemplatesModalOpen(false)}
-            onSelectTemplate={(tmpl) => {
-              setData((prev) => ({
-                ...prev,
-                decision: tmpl.content || (tmpl as any).promptTemplate || "",
-                stress: tmpl.defaultParams?.stress ?? (tmpl as any).presetParameters?.stress ?? prev.stress,
-                personalFinance: tmpl.defaultParams?.personalFinance ?? (tmpl as any).presetParameters?.personalFinance ?? prev.personalFinance,
-                risk: tmpl.defaultParams?.risk ?? (tmpl as any).presetParameters?.risk ?? prev.risk,
-                academicPerformance: tmpl.defaultParams?.academicPerformance ?? (tmpl as any).presetParameters?.academicPerformance ?? prev.academicPerformance,
-              }));
-              setIsTemplatesModalOpen(false);
-            }}
-          />
         </motion.div>
       </AnimatedBackground>
     );
@@ -476,16 +606,19 @@ const SimulationFlow: React.FC = () => {
                       Mua thêm token
                     </button>
                   )}
-                  <button
-                    onClick={() => {
-                      setError(null);
-                      setStep(SimulationStep.PROCESSING);
-                      startSimulation();
-                    }}
-                    className="bg-slate-900 text-white px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 transition-all flex items-center justify-center gap-2"
-                  >
-                    Thử lại ngay
-                  </button>
+                  {error.type !== "AUTH" && (
+                    <button
+                      onClick={() => {
+                        setError(null);
+                        setIsSubmitting(true);
+                        setStep(SimulationStep.PROCESSING);
+                        startSimulation();
+                      }}
+                      className="bg-slate-900 text-white px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 transition-all flex items-center justify-center gap-2"
+                    >
+                      {error.type === "RATE_LIMIT" ? "Thử lại sau ít phút" : "Thử lại ngay"}
+                    </button>
+                  )}
                 </div>
               </div>
             </motion.div>
@@ -778,10 +911,10 @@ const SimulationFlow: React.FC = () => {
             animate={{ scale: 1, opacity: 1 }}
             className="relative z-10"
           >
-            <div className="relative w-80 h-80 mb-20 flex items-center justify-center">
+            <div className="relative w-60 h-60 sm:w-80 sm:h-80 mb-12 sm:mb-20 flex items-center justify-center">
               <svg
                 viewBox="0 0 288 288"
-                className="absolute inset-0 w-full h-full -rotate-90 drop-shadow-[0_0_30px_rgba(37,99,235,0.4)]"
+                className="absolute inset-0 w-full h-full -rotate-90"
               >
                 <circle
                   cx="144"
@@ -806,7 +939,7 @@ const SimulationFlow: React.FC = () => {
                 />
               </svg>
               <div className="text-center relative z-20">
-                <span className="text-8xl font-black tracking-tighter text-white font-display block">
+                <span className="text-6xl sm:text-8xl font-black tracking-tighter text-white font-display block">
                   {loadingProgress}
                   <span className="text-3xl ml-1 text-blue-500">%</span>
                 </span>
@@ -823,19 +956,9 @@ const SimulationFlow: React.FC = () => {
             </h2>
             <div className="flex flex-col gap-6 mt-4 max-w-sm mx-auto text-left">
               {[
-                {
-                  label: "Phân tích từ khóa mô tả",
-                  done: loadingProgress > 30,
-                },
-                {
-                  label: "Mô phỏng 10,000 kịch bản",
-                  done: loadingProgress > 60,
-                },
-                {
-                  label:
-                    "Tính toán Hiệu quả tài chính (ROI) & Chỉ số Hạnh phúc",
-                  done: loadingProgress > 85,
-                },
+                { label: "Tra cứu điểm chuẩn, học phí, lương có nguồn", done: !!liveFacts },
+                { label: "Tính lương P25/P50/P75 & ROI bằng mô hình FT-Salary", done: !!liveFacts },
+                { label: "AI viết phân tích 3 kịch bản", done: loadingProgress >= 95 },
               ].map((task, i) => (
                 <div
                   key={i}
@@ -851,6 +974,32 @@ const SimulationFlow: React.FC = () => {
                 </div>
               ))}
             </div>
+            {liveFacts?.scenarios?.Neutral && (
+              <div className="grid grid-cols-3 gap-3 max-w-xl mx-auto text-left">
+                {[
+                  { k: "Lương khởi điểm (P50)", v: `${liveFacts.scenarios.Neutral.salary.startMonthlyMillion} tr` },
+                  { k: "Sau 5 năm (P50)", v: `${liveFacts.scenarios.Neutral.salary.year5MonthlyMillion} tr` },
+                  { k: "Chi phí học / năm", v: `${liveFacts.scenarios.Neutral.affordability.cashNeedPerYearMillion} tr` },
+                ].map((m) => (
+                  <div key={m.k} className="bg-white/5 border border-white/10 rounded-2xl p-3">
+                    <div className="text-lg sm:text-2xl font-black text-white">{m.v}</div>
+                    <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 mt-1">{m.k}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+            {livePartial?.summary && (
+              <p className="max-w-xl mx-auto text-sm text-slate-300 leading-relaxed text-left bg-white/5 border border-white/10 rounded-2xl p-4">
+                {livePartial.summary}
+                <span className="inline-block w-2 h-4 bg-blue-400 ml-1 align-middle animate-pulse" />
+              </p>
+            )}
+            <button
+              onClick={cancelSimulation}
+              className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-white border border-slate-700 hover:border-slate-400 px-6 py-3 rounded-xl transition-colors"
+            >
+              Hủy phân tích
+            </button>
           </div>
         </main>
       </div>
@@ -876,7 +1025,7 @@ const SimulationFlow: React.FC = () => {
               className="px-6 py-2 bg-slate-900 text-white rounded-full text-[10px] font-black uppercase tracking-widest mb-12 shadow-2xl shadow-slate-200"
             >
               Phân tích hoàn tất • Report FT-
-              {Math.floor(Math.random() * 9000) + 1000}
+              {String((results as any).simulationId || "").slice(-6).toUpperCase() || "LOCAL"}
             </motion.div>
             <h1 className="text-5xl md:text-8xl font-black tracking-tighter mb-12 font-display text-slate-900 leading-[0.95] max-w-5xl">
               {results.isEnterprise ? (
@@ -910,19 +1059,6 @@ const SimulationFlow: React.FC = () => {
         <main className="max-w-7xl mx-auto px-6 py-24 w-full">
           {!results.isEnterprise && (
             <>
-              {/* Radar Comparison Chart - 5 Trục */}
-              <motion.div
-                initial={{ opacity: 0, y: 25 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-                className="mb-16"
-              >
-                <RadarComparisonChart
-                  scenarios={results.scenarios}
-                  title="So Sánh Đa Chiều 3 Kịch Bản Tương Lai"
-                />
-              </motion.div>
-
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
                 <AnimatePresence>
                   {results.scenarios.map((scenario, idx) => (
@@ -995,35 +1131,28 @@ const SimulationFlow: React.FC = () => {
                       </div>
 
                       <div className="p-10 space-y-12 flex-grow">
-                        {(() => {
-                          const realisticRoi = calculateRealisticRoi(scenario, data.timeHorizon || 5);
-                          return [
-                            {
-                              label: "Tăng trưởng sự nghiệp",
-                              val: scenario.careerGrowth,
-                              suffix: "%",
-                              color: "bg-blue-600",
-                              tooltip:
-                                "Đánh giá mức độ thăng tiến chuyên môn và cơ hội nghề nghiệp trong kịch bản.",
-                            },
-                            {
-                              label: "Chỉ số Hạnh phúc",
-                              val: scenario.happiness,
-                              suffix: "%",
-                              color: "bg-emerald-500",
-                              tooltip:
-                                "Đo lường mức độ thỏa mãn tinh thần, giảm áp lực và cân bằng cuộc sống.",
-                            },
-                            {
-                              label: `Tỷ suất hoàn vốn (ROI bình quân năm)`,
-                              val: realisticRoi.annualizedRoi,
-                              suffix: "% / năm",
-                              subBadge: `Lũy kế ${realisticRoi.timeHorizon} năm: +${realisticRoi.cumulativeRoi}%`,
-                              color: "bg-indigo-600",
-                              tooltip: `Tỷ suất sinh lời bình quân +${realisticRoi.annualizedRoi}%/năm (Tổng tích lũy ${realisticRoi.timeHorizon} năm: +${realisticRoi.cumulativeRoi}%). Điểm hòa vốn dự kiến: ~${realisticRoi.paybackPeriodYears} năm.`,
-                            },
-                          ];
-                        })().map((metric, mi) => (
+                        {[
+                          {
+                            label: "Tăng trưởng sự nghiệp",
+                            val: scenario.careerGrowth,
+                            color: "bg-blue-600",
+                            tooltip:
+                              "Đánh giá mức độ thăng tiến chuyên môn và cơ hội nghề nghiệp trong kịch bản.",
+                          },
+                          {
+                            label: "Chỉ số Hạnh phúc",
+                            val: scenario.happiness,
+                            color: "bg-emerald-500",
+                            tooltip:
+                              "Đo lường mức độ thỏa mãn tinh thần, giảm áp lực và cân bằng cuộc sống.",
+                          },
+                          {
+                            label: `Hiệu quả tài chính dự kiến (ROI) (${data.timeHorizon || 5} năm)`,
+                            val: scenario.roi,
+                            color: "bg-indigo-600",
+                            tooltip: `Tỷ suất hoàn vốn đầu tư từ tiền bạc và thời gian của bạn sau đúng ${data.timeHorizon || 5} năm.`,
+                          },
+                        ].map((metric, mi) => (
                           <div key={mi} className="space-y-4">
                             <div className="flex justify-between items-end">
                               <div className="flex items-center gap-1.5">
@@ -1041,21 +1170,14 @@ const SimulationFlow: React.FC = () => {
                                   </span>
                                 </span>
                               </div>
-                              <div className="text-right">
-                                <p className="text-xl font-black text-slate-900">
-                                  +{metric.val}{metric.suffix}
-                                </p>
-                                {metric.subBadge && (
-                                  <span className="text-[10px] font-bold text-blue-600 block -mt-0.5">
-                                    {metric.subBadge}
-                                  </span>
-                                )}
-                              </div>
+                              <p className="text-xl font-black text-slate-900">
+                                +{metric.val}%
+                              </p>
                             </div>
                             <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
                               <motion.div
                                 initial={{ width: 0 }}
-                                animate={{ width: `${Math.min(100, Math.max(0, metric.val))}%` }}
+                                animate={{ width: `${metric.val}%` }}
                                 transition={{
                                   duration: 1.5,
                                   delay: 0.8 + idx * 0.2 + mi * 0.1,
@@ -1075,11 +1197,23 @@ const SimulationFlow: React.FC = () => {
                           Phân tích sâu{" "}
                           <IconMapper name="science" className=" text-lg" />
                         </button>
+                        <ScenarioFeedback simulationId={results.simulationId} scenarioId={scenario.id} />
                       </div>
                     </motion.div>
                   ))}
                 </AnimatePresence>
               </div>
+
+              {results.facts && results.facts.length > 0 && (
+                <div className="mb-24 max-w-4xl mx-auto">
+                  <FactsPanel facts={results.facts} />
+                  {results.quality?.groundedness != null && (
+                    <p className="text-[11px] text-slate-500 mt-3 text-center">
+                      Kiểm chứng tự động: {Math.round(results.quality.groundedness * 100)}% con số trong phân tích khớp với nguồn dữ liệu ở trên.
+                    </p>
+                  )}
+                </div>
+              )}
 
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
@@ -1152,19 +1286,6 @@ const SimulationFlow: React.FC = () => {
                   ))}
                 </div>
               </motion.div>
-
-              {/* Interactive Decision Tree */}
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="mb-24"
-              >
-                <InteractiveDecisionTree
-                  decisionTitle={data.decision}
-                  scenarios={results.scenarios}
-                />
-              </motion.div>
             </>
           )}
 
@@ -1177,17 +1298,17 @@ const SimulationFlow: React.FC = () => {
             </button>
             {!results.isEnterprise && (
               <>
-                <button 
+                {/* <button 
                    onClick={() => !isSaved && setIsSaveModalOpen(true)}
-                   disabled={isSaved || isSavingHistory}
+                   disabled={isSaved}
                    className={`px-16 py-6 ${isSaved ? 'bg-emerald-500' : 'bg-blue-600 hover:bg-blue-700'} text-white font-black text-[11px] uppercase tracking-widest rounded-2xl transition-all shadow-2xl shadow-blue-200 flex items-center gap-5`}
                  >
                    <IconMapper name={isSaved ? 'check_circle' : 'save'} className=" text-xl" /> 
-                   {isSaved ? 'Đã lưu vào lịch sử' : isSavingHistory ? 'Đang lưu...' : 'Lưu vào lịch sử'}
-                 </button>
+                   {isSaved ? 'Đã lưu vào lịch sử' : 'Lưu vào lịch sử'}
+                 </button> */}
                 <button
                   onClick={() => window.print()}
-                  className="px-16 py-6 bg-slate-900 text-white font-black text-[11px] uppercase tracking-widest hover:bg-slate-800 rounded-2xl transition-all shadow-2xl shadow-slate-200 flex items-center gap-5"
+                  className="no-print px-8 sm:px-16 py-5 sm:py-6 bg-slate-900 text-white font-black text-[11px] uppercase tracking-widest hover:bg-slate-800 rounded-2xl transition-all shadow-2xl shadow-slate-200 flex items-center gap-5"
                 >
                   <IconMapper name="download" className=" text-xl" /> Xuất chiến
                   lược (.PDF)
@@ -1243,11 +1364,10 @@ const SimulationFlow: React.FC = () => {
 
                 <div className="flex flex-col gap-4">
                   <button
-                    disabled={isSavingHistory}
                     onClick={handleSaveToHistory}
-                    className="w-full py-6 bg-blue-600 disabled:opacity-50 text-white font-black text-[12px] uppercase tracking-widest rounded-2xl hover:bg-blue-700 shadow-2xl shadow-blue-100 transition-all flex items-center justify-center gap-4"
+                    className="w-full py-6 bg-blue-600 text-white font-black text-[12px] uppercase tracking-widest rounded-2xl hover:bg-blue-700 shadow-2xl shadow-blue-100 transition-all flex items-center justify-center gap-4"
                   >
-                    {isSavingHistory ? "ĐANG LƯU..." : "LƯU NGAY"} <IconMapper name="save" className=" text-xl" />
+                    LƯU NGAY <IconMapper name="save" className=" text-xl" />
                   </button>
                   <button
                     onClick={() => setIsSaveModalOpen(false)}
