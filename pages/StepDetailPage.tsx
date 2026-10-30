@@ -8,11 +8,13 @@ import { IconMapper } from '../components/IconMapper';
 import { AnimatedBackground } from '../components/AnimatedBackground';
 import { motion } from 'framer-motion';
 import { expandStepDetail } from '../services/geminiService';
+import { useAlert } from '../components/CustomAlert';
 
 const StepDetailPage: React.FC = () => {
   const { scenarioId, stepId } = useParams<{ scenarioId: string; stepId: string }>();
   const navigate = useNavigate();
   const location = useLocation();
+  const { showAlert } = useAlert();
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -154,7 +156,7 @@ const StepDetailPage: React.FC = () => {
         }
       }
       setReport(revertedReport);
-      alert('Lỗi kết nối khi cập nhật trạng thái. Vui lòng thử lại.');
+      showAlert('Lỗi kết nối khi cập nhật trạng thái. Vui lòng thử lại.', 'error');
     } finally {
       setIsUpdating(false);
     }

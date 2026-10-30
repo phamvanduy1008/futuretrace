@@ -9,11 +9,13 @@ import { communityService } from "../services/communityService";
 import { getCurrentUser, getUserProfile } from "../services/authService";
 import { apiGetSimulation } from "../services/api";
 import { IconMapper } from "../components/IconMapper";
+import { useAlert } from "../components/CustomAlert";
 
 const ScenarioDetailPage: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+  const { showAlert, showConfirm } = useAlert();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [saveForm, setSaveForm] = useState({
@@ -201,7 +203,7 @@ const ScenarioDetailPage: React.FC = () => {
       }, 1500);
     } catch (err: any) {
       console.error(err);
-      alert(err.message || "Lỗi khi xuất bản báo cáo.");
+      showAlert(err.message || "Lỗi khi xuất bản báo cáo.", "error");
       setIsSaving(false);
     }
   };
@@ -216,23 +218,29 @@ const ScenarioDetailPage: React.FC = () => {
       setNewComment("");
     } catch (err: any) {
       console.error(err);
-      alert(err.message || "Lỗi khi gửi bình luận.");
+      showAlert(err.message || "Lỗi khi gửi bình luận.", "error");
     }
   };
 
   const handleDeletePost = async () => {
-    if (
-      !id ||
-      !window.confirm("Bạn có chắc chắn muốn xóa bài viết này khỏi cộng đồng?")
-    )
-      return;
+    if (!id) return;
+    const confirmed = await showConfirm(
+      "Bạn có chắc chắn muốn xóa bài viết này khỏi cộng đồng?",
+      {
+        title: "Xóa bài viết cộng đồng",
+        type: "danger",
+        confirmText: "Xóa bài viết",
+        cancelText: "Hủy bỏ",
+      }
+    );
+    if (!confirmed) return;
     try {
       await communityService.deletePost(id);
-      alert("Đã xóa bài viết thành công.");
+      await showAlert("Đã xóa bài viết thành công.", "success");
       navigate("/community");
     } catch (err: any) {
       console.error(err);
-      alert(err.message || "Lỗi khi xóa bài viết.");
+      showAlert(err.message || "Lỗi khi xóa bài viết.", "error");
     }
   };
 

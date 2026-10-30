@@ -43,6 +43,7 @@ import ConsentGate from "./components/ConsentGate";
 import { getUserProfile, logout } from "./services/authService";
 const AdminApp = lazy(() => import("./pages/admin/AdminApp"));
 import { TourProvider } from "./components/GuideTour";
+import { AlertProvider } from "./components/CustomAlert";
 
 // Mỗi trang tải riêng (code-splitting): người dùng không phải tải trang admin, thanh toán... khi mở trang chủ
 const RouteFallback: React.FC = () => (
@@ -110,6 +111,7 @@ const App: React.FC = () => {
 
   return (
     <MotionConfig reducedMotion="user">
+    <AlertProvider>
     <HashRouter>
       <ScrollToTop />
       <TourProvider>
@@ -235,6 +237,7 @@ const App: React.FC = () => {
         </Suspense>
       </TourProvider>
     </HashRouter>
+    </AlertProvider>
     </MotionConfig>
   );
 };

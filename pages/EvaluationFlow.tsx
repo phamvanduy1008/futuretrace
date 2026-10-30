@@ -7,6 +7,7 @@ import SharedHeader from '../components/SharedHeader';
 import SharedFooter from '../components/SharedFooter';
 import { IconMapper } from '../components/IconMapper';
 import { AnimatedBackground } from '../components/AnimatedBackground';
+import { useAlert } from '../components/CustomAlert';
 
 type EvaluationStep = 'loading' | 'onboarding' | 'questionnaire' | 'result';
 
@@ -64,6 +65,7 @@ const getCategoryDiagnostic = (category: string, score: number) => {
 const EvaluationFlow: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { showAlert } = useAlert();
   const isFromSimulate = location.state?.from === 'simulate';
 
   const [step, setStep] = useState<EvaluationStep>('loading');
@@ -126,7 +128,7 @@ const EvaluationFlow: React.FC = () => {
 
   const handleStart = () => {
     if (evaluationQuestions.length === 0) {
-      alert("Không tải được danh sách câu hỏi. Vui lòng tải lại trang.");
+      showAlert("Không tải được danh sách câu hỏi. Vui lòng tải lại trang.", "error");
       return;
     }
     setStep('questionnaire');
@@ -208,7 +210,7 @@ const EvaluationFlow: React.FC = () => {
       clearTimeout(transitionTimeoutRef.current);
     }
     if (missingQuestionIndices.length > 0) {
-      alert("Vui lòng trả lời đầy đủ tất cả các câu hỏi trước khi gửi.");
+      showAlert("Vui lòng trả lời đầy đủ tất cả các câu hỏi trước khi gửi.", "warning");
       return;
     }
     setIsSubmitting(true);

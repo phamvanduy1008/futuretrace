@@ -13,6 +13,7 @@ import SharedFooter from "../components/SharedFooter";
 import { IconMapper } from "../components/IconMapper";
 import { AnimatedBackground } from "../components/AnimatedBackground";
 import { tidyMonth, levelVi, categoryVi, percent, parsePhaseParagraphs } from "../services/premiumFormat";
+import { useAlert } from "../components/CustomAlert";
 
 const formatNarrative = (text: string) => {
   if (!text) return [];
@@ -224,6 +225,7 @@ const renderNarrative = (text: string) => {
 const PremiumAnalysisPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { showAlert } = useAlert();
   const [loading, setLoading] = useState(true);
   const [report, setReport] = useState<PremiumAnalysisReport | null>(null);
   const [error, setError] = useState<{ message: string; type?: string } | null>(
@@ -402,7 +404,7 @@ const PremiumAnalysisPage: React.FC = () => {
         }
         setSelectedMilestone(revertedSelected);
       }
-      alert("Lỗi khi cập nhật trạng thái nhiệm vụ.");
+      showAlert("Lỗi khi cập nhật trạng thái nhiệm vụ.", "error");
     }
   };
 
@@ -460,7 +462,7 @@ const PremiumAnalysisPage: React.FC = () => {
         // Update progress on backend
         await updateBackendProgress(newIndex, newReport);
       } catch (e: any) {
-        alert("Lỗi khi điều chỉnh lộ trình: " + e.message);
+        showAlert("Lỗi khi điều chỉnh lộ trình: " + e.message, "error");
       } finally {
         setIsPivoting(false);
       }

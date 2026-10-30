@@ -9,6 +9,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { apiFetch } from '../services/apiClient';
 import { IconMapper } from '../components/IconMapper';
 import { tidyMonth } from '../services/premiumFormat';
+import { useAlert } from '../components/CustomAlert';
 
 const syncRemainingToken = (remainingToken?: number) => {
   if (typeof remainingToken !== 'number') return;
@@ -29,6 +30,7 @@ const ProgressPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { showAlert, showConfirm } = useAlert();
 
   const [isPivotModalOpen, setIsPivotModalOpen] = useState(false);
   const [pivotFeedback, setPivotFeedback] = useState('');
@@ -92,7 +94,7 @@ const ProgressPage: React.FC = () => {
       console.error(err);
       // Rollback on error
       fetchProgress();
-      alert('Không thể cập nhật trạng thái cột mốc. Vui lòng thử lại sau.');
+      showAlert('Không thể cập nhật trạng thái cột mốc. Vui lòng thử lại sau.', 'error');
     }
   };
 
@@ -133,10 +135,10 @@ const ProgressPage: React.FC = () => {
 
       setIsPivotModalOpen(false);
       setPivotFeedback('');
-      alert('Lộ trình của bạn đã được điều chỉnh thành công dựa trên phản hồi mới!');
+      showAlert('Lộ trình của bạn đã được điều chỉnh thành công dựa trên phản hồi mới!', 'success');
     } catch (err: any) {
       console.error(err);
-      alert(err.message || 'Lỗi khi điều chỉnh lộ trình.');
+      showAlert(err.message || 'Lỗi khi điều chỉnh lộ trình.', 'error');
     } finally {
       setIsPivoting(false);
     }
@@ -144,7 +146,13 @@ const ProgressPage: React.FC = () => {
 
   const handleDelete = async (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
-    if (window.confirm('Bạn có chắc chắn muốn xóa tiến trình này?')) {
+    const confirmed = await showConfirm('Bạn có chắc chắn muốn xóa tiến trình này?', {
+      title: 'Xóa tiến trình',
+      type: 'danger',
+      confirmText: 'Xóa tiến trình',
+      cancelText: 'Hủy bỏ',
+    });
+    if (confirmed) {
       try {
         const res = await apiFetch(`/premium/progress/${id}`, {
           method: 'DELETE'
@@ -161,7 +169,7 @@ const ProgressPage: React.FC = () => {
         }
       } catch (err) {
         console.error('Lỗi khi xóa tiến trình:', err);
-        alert('Đã xảy ra lỗi khi xóa tiến trình. Vui lòng thử lại sau.');
+        showAlert('Đã xảy ra lỗi khi xóa tiến trình. Vui lòng thử lại sau.', 'error');
       }
     }
   };

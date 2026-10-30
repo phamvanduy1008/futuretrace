@@ -7,11 +7,13 @@ import SharedFooter from "../components/SharedFooter";
 
 import { apiFetch } from "../services/apiClient";
 import { IconMapper } from "../components/IconMapper";
+import { useAlert } from "../components/CustomAlert";
 
 const ITEMS_PER_PAGE = 5;
 
 const HistoryPage: React.FC = () => {
   const navigate = useNavigate();
+  const { showAlert, showConfirm } = useAlert();
   const [searchTerm, setSearchTerm] = useState("");
   const [historyItems, setHistoryItems] = useState<any[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -107,9 +109,16 @@ const HistoryPage: React.FC = () => {
 
   const handleDelete = async (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
-    if (
-      window.confirm("Bạn có chắc chắn muốn xóa kịch bản này khỏi lịch sử?")
-    ) {
+    const confirmed = await showConfirm(
+      "Bạn có chắc chắn muốn xóa kịch bản này khỏi lịch sử?",
+      {
+        title: "Xóa kịch bản mô phỏng",
+        type: "danger",
+        confirmText: "Xóa kịch bản",
+        cancelText: "Hủy bỏ",
+      }
+    );
+    if (confirmed) {
       try {
         const response = await apiFetch(`/simulations/${id}`, {
           method: "DELETE",
@@ -117,11 +126,11 @@ const HistoryPage: React.FC = () => {
         if (response.ok) {
           fetchHistory();
         } else {
-          alert("Không thể xóa kịch bản.");
+          await showAlert("Không thể xóa kịch bản.", "error");
         }
       } catch (err) {
         console.error("Error deleting simulation:", err);
-        alert("Có lỗi xảy ra khi xóa.");
+        await showAlert("Có lỗi xảy ra khi xóa.", "error");
       }
     }
   };

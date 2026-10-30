@@ -11,6 +11,7 @@ import {
   BookmarkSimple,
   Brain,
   Briefcase,
+  Buildings,
   CaretDown,
   CaretLeft,
   CaretRight,
@@ -56,6 +57,7 @@ import {
   LockKey,
   MagicWand,
   MagnifyingGlass,
+  MapPin,
   Nut,
   Package,
   PaperPlaneRight,
@@ -88,6 +90,7 @@ import {
   Wallet,
   Warning,
   WarningCircle,
+  X,
   type Icon,
 } from '@phosphor-icons/react';
 
@@ -102,6 +105,7 @@ const PHOSPHOR_ICONS: Record<string, Icon> = {
   BookmarkSimple,
   Brain,
   Briefcase,
+  Buildings,
   CaretDown,
   CaretLeft,
   CaretRight,
@@ -147,6 +151,7 @@ const PHOSPHOR_ICONS: Record<string, Icon> = {
   LockKey,
   MagicWand,
   MagnifyingGlass,
+  MapPin,
   Nut,
   Package,
   PaperPlaneRight,
@@ -179,6 +184,7 @@ const PHOSPHOR_ICONS: Record<string, Icon> = {
   Wallet,
   Warning,
   WarningCircle,
+  X,
 };
 
 const materialToPhosphor: Record<string, string> = {
@@ -282,7 +288,8 @@ const materialToPhosphor: Record<string, string> = {
   'storefront': 'Storefront',
   'hourglass_empty': 'HourglassLow',
   'block': 'Prohibit',
-
+  'location_on': 'MapPin',
+  'apartment': 'Buildings',
 };
 
 interface IconMapperProps {

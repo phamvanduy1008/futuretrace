@@ -7,11 +7,13 @@ import SharedHeader from '../components/SharedHeader';
 import SharedFooter from '../components/SharedFooter';
 import { IconMapper } from '../components/IconMapper';
 import { AnimatedBackground } from '../components/AnimatedBackground';
+import { useAlert } from '../components/CustomAlert';
 
 
 const PaymentPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { showAlert } = useAlert();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<'momo' | 'vnpay'>('momo');
@@ -89,7 +91,7 @@ const PaymentPage: React.FC = () => {
     }
 
     if (paymentMethod === 'vnpay') {
-      alert('Chức năng thanh toán qua VNPay đang được phát triển!');
+      showAlert('Chức năng thanh toán qua VNPay đang được phát triển!', 'warning', 'Tính năng đang phát triển');
       return;
     }
 

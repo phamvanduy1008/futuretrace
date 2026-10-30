@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 const API_BASE_URL = (import.meta as any).env.VITE_API_BASE_URL || 'http://localhost:5000';
 import { IconMapper } from '../components/IconMapper';
 import { AnimatedBackground } from '../components/AnimatedBackground';
+import { useAlert } from '../components/CustomAlert';
 
 const TOKEN_PACKS = [
   {
@@ -94,6 +95,7 @@ const FEATURE_COSTS = [
 
 const StorePage: React.FC = () => {
   const navigate = useNavigate();
+  const { showAlert } = useAlert();
   const [userToken, setUserToken] = useState<number | null>(null);
   const [hasClaimedFreePack, setHasClaimedFreePack] = useState<boolean>(true);
 
@@ -177,14 +179,14 @@ const StorePage: React.FC = () => {
         });
         const data = await res.json();
         if (res.ok) {
-          alert('Nhận gói 0đ thành công!');
+          showAlert('Nhận gói 0đ thành công!', 'success');
           setUserToken(data.token);
           setHasClaimedFreePack(true);
         } else {
-          alert(data.message || 'Có lỗi xảy ra');
+          showAlert(data.message || 'Có lỗi xảy ra', 'error');
         }
       } catch (e) {
-        alert('Lỗi hệ thống');
+        showAlert('Lỗi hệ thống', 'error');
       }
       return;
     }
