@@ -12,7 +12,7 @@ export interface TourStep {
 }
 
 const TOUR_STEPS: TourStep[] = [
- 
+
   {
     target: '#tour-nav-dashboard',
     route: '/dashboard',
@@ -48,7 +48,7 @@ const TOUR_STEPS: TourStep[] = [
     content: 'Nơi lưu trữ tất cả các quyết định và các lộ trình kịch bản bạn từng giả lập để bạn dễ dàng quản lý hoặc so sánh.',
     placement: 'bottom'
   },
-   {
+  {
     target: '#tour-nav-store',
     route: '/store',
     title: 'Siêu Thị Tri Thức ',
@@ -223,7 +223,7 @@ const GuideTourOverlay: React.FC = () => {
   const isCenter = !rect || activeStep.placement === 'center';
   const tooltipWidth = 420;
   const gap = 16;
-  
+
   let tooltipStyle: React.CSSProperties = {};
   if (rect) {
     const viewportHeight = window.innerHeight;
@@ -335,11 +335,10 @@ const GuideTourOverlay: React.FC = () => {
           exit={{ scale: 0.9, opacity: 0 }}
           transition={{ type: 'spring', damping: 25, stiffness: 200 }}
           style={isCenter ? undefined : tooltipStyle}
-          className={`z-[200] ${
-            isCenter
+          className={`z-[200] ${isCenter
               ? 'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'
               : ''
-          } w-[420px] max-w-[95vw] bg-slate-900 border border-slate-700/80 p-8 sm:p-10 rounded-[2.5rem] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.6),0_0_40px_rgba(37,99,235,0.25)] flex flex-col gap-8`}
+            } w-[420px] max-w-[95vw] bg-slate-900 border border-slate-700/80 p-8 sm:p-10 rounded-[2.5rem] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.6),0_0_40px_rgba(37,99,235,0.25)] flex flex-col gap-8`}
         >
           {/* Progress step dots */}
           <div className="flex justify-between items-center mb-2">
@@ -350,11 +349,10 @@ const GuideTourOverlay: React.FC = () => {
               {TOUR_STEPS.map((_, i) => (
                 <div
                   key={i}
-                  className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                    i === currentStepIndex
+                  className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${i === currentStepIndex
                       ? 'bg-blue-500 w-3.5'
                       : 'bg-slate-700'
-                  }`}
+                    }`}
                 />
               ))}
             </div>
