@@ -2,6 +2,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
+import { installAuthInterceptor } from './services/authSession';
+import './index.css';
+
+installAuthInterceptor();
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {

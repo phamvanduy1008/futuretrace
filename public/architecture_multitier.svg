@@ -1,0 +1,238 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 820" width="100%" height="100%" style="background:#0f172a;font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+  <defs>
+    <!-- Gradients -->
+    <linearGradient id="gradClient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="gradServer" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="gradAI" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e1b4b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="gradDB" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1c1917"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+
+    <!-- Arrow Markers -->
+    <marker id="arrowBlue" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#38bdf8"/>
+    </marker>
+    <marker id="arrowGreen" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#34d399"/>
+    </marker>
+    <marker id="arrowPurple" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#a855f7"/>
+    </marker>
+    <marker id="arrowAmber" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#f59e0b"/>
+    </marker>
+
+    <!-- Drop Shadows -->
+    <filter id="cardShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#000000" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <!-- Title Header -->
+  <text x="600" y="45" text-anchor="middle" fill="#f8fafc" font-size="22" font-weight="700" letter-spacing="0.5">
+    HÌNH 3.1: SƠ ĐỒ KIẾN TRÚC PHÂN TẦNG MULTI-TIER HỆ THỐNG FUTURETRACE
+  </text>
+  <text x="600" y="70" text-anchor="middle" fill="#94a3b8" font-size="13">
+    Kiến trúc tách rời (Decoupled Architecture) giữa Web Platform và Hybrid AI Inference Engine
+  </text>
+
+  <!-- ================= TIER 1: CLIENT TIER ================= -->
+  <g transform="translate(60, 95)">
+    <rect width="1080" height="155" rx="12" fill="url(#gradClient)" stroke="#38bdf8" stroke-width="2" filter="url(#cardShadow)"/>
+    <rect x="0" y="0" width="1080" height="36" rx="12" fill="#0284c7" fill-opacity="0.25"/>
+    <circle cx="24" cy="18" r="6" fill="#ef4444"/>
+    <circle cx="42" cy="18" r="6" fill="#f59e0b"/>
+    <circle cx="60" cy="18" r="6" fill="#10b981"/>
+    <text x="85" y="23" fill="#38bdf8" font-size="14" font-weight="700">
+      1. TẦNG GIAO DIỆN NGƯỜI DÙNG (PRESENTATION TIER - CLIENT / SPA)
+    </text>
+    <text x="1050" y="23" text-anchor="end" fill="#94a3b8" font-size="12">React 18 • Vite • TailwindCSS • Zustand</text>
+
+    <!-- Component 1.1 -->
+    <g transform="translate(25, 52)">
+      <rect width="240" height="85" rx="8" fill="#1e293b" stroke="#475569" stroke-width="1"/>
+      <text x="120" y="25" text-anchor="middle" fill="#f1f5f9" font-size="13" font-weight="600">Decision Dashboard UI</text>
+      <text x="120" y="45" text-anchor="middle" fill="#94a3b8" font-size="11">Khảo sát &amp; Lượng hóa 5 chỉ số</text>
+      <text x="120" y="62" text-anchor="middle" fill="#38bdf8" font-size="11">Stress • Finance • Risk • Acad • Ext</text>
+    </g>
+
+    <!-- Component 1.2 -->
+    <g transform="translate(285, 52)">
+      <rect width="245" height="85" rx="8" fill="#1e293b" stroke="#475569" stroke-width="1"/>
+      <text x="122" y="25" text-anchor="middle" fill="#f1f5f9" font-size="13" font-weight="600">Scenario Visualization</text>
+      <text x="122" y="45" text-anchor="middle" fill="#94a3b8" font-size="11">Hiển thị đồng thời 3 kịch bản</text>
+      <text x="122" y="62" text-anchor="middle" fill="#34d399" font-size="11">Tích cực • Trung lập • Rủi ro</text>
+    </g>
+
+    <!-- Component 1.3 -->
+    <g transform="translate(550, 52)">
+      <rect width="245" height="85" rx="8" fill="#1e293b" stroke="#475569" stroke-width="1"/>
+      <text x="122" y="25" text-anchor="middle" fill="#f1f5f9" font-size="13" font-weight="600">Premium Hub &amp; Pivot</text>
+      <text x="122" y="45" text-anchor="middle" fill="#94a3b8" font-size="11">SWOT • Sprint 90 ngày</text>
+      <text x="122" y="62" text-anchor="middle" fill="#a855f7" font-size="11">Strategic Pivot Interaction</text>
+    </g>
+
+    <!-- Component 1.4 -->
+    <g transform="translate(815, 52)">
+      <rect width="240" height="85" rx="8" fill="#1e293b" stroke="#475569" stroke-width="1"/>
+      <text x="120" y="25" text-anchor="middle" fill="#f1f5f9" font-size="13" font-weight="600">Community &amp; Admin UI</text>
+      <text x="120" y="45" text-anchor="middle" fill="#94a3b8" font-size="11">Chia sẻ kịch bản • Kiểm duyệt</text>
+      <text x="120" y="62" text-anchor="middle" fill="#f59e0b" font-size="11">Thanh toán MoMo / VNPay</text>
+    </g>
+  </g>
+
+  <!-- Connection: Client -> Server -->
+  <g>
+    <path d="M 600,250 L 600,295" stroke="#38bdf8" stroke-width="2.5" stroke-dasharray="6,4" marker-end="url(#arrowBlue)"/>
+    <rect x="490" y="260" width="220" height="24" rx="12" fill="#0f172a" stroke="#38bdf8" stroke-width="1"/>
+    <text x="600" y="276" text-anchor="middle" fill="#38bdf8" font-size="11" font-weight="600">
+      HTTPS / RESTful APIs / JSON Web Token
+    </text>
+  </g>
+
+  <!-- ================= TIER 2: SERVER TIER ================= -->
+  <g transform="translate(60, 300)">
+    <rect width="1080" height="175" rx="12" fill="url(#gradServer)" stroke="#10b981" stroke-width="2" filter="url(#cardShadow)"/>
+    <rect x="0" y="0" width="1080" height="36" rx="12" fill="#059669" fill-opacity="0.25"/>
+    <text x="25" y="23" fill="#34d399" font-size="14" font-weight="700">
+      2. TẦNG DỊCH VỤ &amp; CỔNG API (APPLICATION &amp; API GATEWAY TIER)
+    </text>
+    <text x="1050" y="23" text-anchor="end" fill="#94a3b8" font-size="12">Node.js • Express.js • Stateless Event-Driven</text>
+
+    <!-- Submodule 2.1 -->
+    <g transform="translate(25, 50)">
+      <rect width="240" height="105" rx="8" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+      <text x="120" y="25" text-anchor="middle" fill="#f1f5f9" font-size="13" font-weight="600">Security &amp; Auth Gateway</text>
+      <text x="15" y="50" fill="#94a3b8" font-size="11">• JWT &amp; Refresh Token Rotation</text>
+      <text x="15" y="70" fill="#94a3b8" font-size="11">• RBAC (User / Premium / Admin)</text>
+      <text x="15" y="90" fill="#94a3b8" font-size="11">• Rate Limiter &amp; Audit Logging</text>
+    </g>
+
+    <!-- Submodule 2.2 -->
+    <g transform="translate(285, 50)">
+      <rect width="245" height="105" rx="8" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+      <text x="122" y="25" text-anchor="middle" fill="#f1f5f9" font-size="13" font-weight="600">Simulation Controller</text>
+      <text x="15" y="50" fill="#94a3b8" font-size="11">• Tiếp nhận vector 5 chỉ số</text>
+      <text x="15" y="70" fill="#94a3b8" font-size="11">• Phối hợp truy xuất RAG đa kênh</text>
+      <text x="15" y="90" fill="#94a3b8" font-size="11">• Bóc tách JSON 3 kịch bản</text>
+    </g>
+
+    <!-- Submodule 2.3 -->
+    <g transform="translate(550, 50)">
+      <rect width="245" height="105" rx="8" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+      <text x="122" y="25" text-anchor="middle" fill="#f1f5f9" font-size="13" font-weight="600">Strategic Pivot Engine</text>
+      <text x="15" y="50" fill="#94a3b8" font-size="11">• Kiểm soát Milestone 90 ngày</text>
+      <text x="15" y="70" fill="#94a3b8" font-size="11">• Phát hiện Pivot Points (If/Then)</text>
+      <text x="15" y="90" fill="#94a3b8" font-size="11">• Tái phân bổ quỹ thời gian/tài chính</text>
+    </g>
+
+    <!-- Submodule 2.4 -->
+    <g transform="translate(815, 50)">
+      <rect width="240" height="105" rx="8" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+      <text x="120" y="25" text-anchor="middle" fill="#f1f5f9" font-size="13" font-weight="600">Payment &amp; Community</text>
+      <text x="15" y="50" fill="#94a3b8" font-size="11">• MoMo &amp; VNPay Webhook IPN</text>
+      <text x="15" y="70" fill="#94a3b8" font-size="11">• Xác thực chữ ký HMAC-SHA256</text>
+      <text x="15" y="90" fill="#94a3b8" font-size="11">• Thảo luận, kiểm duyệt bài viết</text>
+    </g>
+  </g>
+
+  <!-- Connections from Server to Lower Tiers -->
+  <!-- Left path: to Database -->
+  <path d="M 240,475 L 240,535" stroke="#f59e0b" stroke-width="2.5" marker-end="url(#arrowAmber)"/>
+  <rect x="145" y="492" width="190" height="22" rx="10" fill="#0f172a" stroke="#f59e0b" stroke-width="1"/>
+  <text x="240" y="507" text-anchor="middle" fill="#f59e0b" font-size="10.5" font-weight="600">Mongoose ODM / TCP 27017</text>
+
+  <!-- Right path: to AI Tier -->
+  <path d="M 750,475 L 750,535" stroke="#a855f7" stroke-width="2.5" marker-end="url(#arrowPurple)"/>
+  <rect x="635" y="492" width="230" height="22" rx="10" fill="#0f172a" stroke="#a855f7" stroke-width="1"/>
+  <text x="750" y="507" text-anchor="middle" fill="#a855f7" font-size="10.5" font-weight="600">Async HTTP / JSON-RPC / Port 11434</text>
+
+  <!-- ================= TIER 3A: PERSISTENCE LAYER ================= -->
+  <g transform="translate(60, 545)">
+    <rect width="420" height="240" rx="12" fill="url(#gradDB)" stroke="#f59e0b" stroke-width="2" filter="url(#cardShadow)"/>
+    <rect x="0" y="0" width="420" height="34" rx="12" fill="#d97706" fill-opacity="0.25"/>
+    <text x="20" y="22" fill="#fbbf24" font-size="13" font-weight="700">
+      3A. TẦNG LƯU TRỮ DỮ LIỆU (PERSISTENCE LAYER)
+    </text>
+    <text x="405" y="22" text-anchor="end" fill="#94a3b8" font-size="11">MongoDB</text>
+
+    <g transform="translate(20, 48)">
+      <rect width="180" height="80" rx="6" fill="#1e293b" stroke="#44403c"/>
+      <text x="90" y="22" text-anchor="middle" fill="#fef3c7" font-size="12" font-weight="600">Users &amp; Auth</text>
+      <text x="12" y="44" fill="#a8a29e" font-size="10.5">• User, Roles (RBAC)</text>
+      <text x="12" y="60" fill="#a8a29e" font-size="10.5">• Tokens, OTP, AuditLog</text>
+    </g>
+
+    <g transform="translate(220, 48)">
+      <rect width="180" height="80" rx="6" fill="#1e293b" stroke="#44403c"/>
+      <text x="90" y="22" text-anchor="middle" fill="#fef3c7" font-size="12" font-weight="600">Simulations Store</text>
+      <text x="12" y="44" fill="#a8a29e" font-size="10.5">• Simulations (5 metrics)</text>
+      <text x="12" y="60" fill="#a8a29e" font-size="10.5">• 3 Scenarios (JSON)</text>
+    </g>
+
+    <g transform="translate(20, 140)">
+      <rect width="180" height="80" rx="6" fill="#1e293b" stroke="#44403c"/>
+      <text x="90" y="22" text-anchor="middle" fill="#fef3c7" font-size="12" font-weight="600">Premium &amp; Pivot</text>
+      <text x="12" y="44" fill="#a8a29e" font-size="10.5">• SWOT &amp; 90-Day Sprint</text>
+      <text x="12" y="60" fill="#a8a29e" font-size="10.5">• PivotPoints &amp; History</text>
+    </g>
+
+    <g transform="translate(220, 140)">
+      <rect width="180" height="80" rx="6" fill="#1e293b" stroke="#44403c"/>
+      <text x="90" y="22" text-anchor="middle" fill="#fef3c7" font-size="12" font-weight="600">Finance &amp; Community</text>
+      <text x="12" y="44" fill="#a8a29e" font-size="10.5">• MoMo / VNPay Trans</text>
+      <text x="12" y="60" fill="#a8a29e" font-size="10.5">• Posts, Comments, Likes</text>
+    </g>
+  </g>
+
+  <!-- ================= TIER 3B: AI ENGINE & RAG TIER ================= -->
+  <g transform="translate(500, 545)">
+    <rect width="640" height="240" rx="12" fill="url(#gradAI)" stroke="#a855f7" stroke-width="2" filter="url(#cardShadow)"/>
+    <rect x="0" y="0" width="640" height="34" rx="12" fill="#7e22ce" fill-opacity="0.25"/>
+    <text x="20" y="22" fill="#c084fc" font-size="13" font-weight="700">
+      3B. TẦNG TRÍ TUỆ NHÂN TẠO &amp; RAG (AI ENGINE &amp; KNOWLEDGE TIER)
+    </text>
+    <text x="620" y="22" text-anchor="end" fill="#94a3b8" font-size="11">Ollama • Qwen2.5-7B • Gemini</text>
+
+    <!-- Sub-box: Multi-channel RAG -->
+    <g transform="translate(20, 48)">
+      <rect width="330" height="175" rx="8" fill="#1e293b" stroke="#4c1d95" stroke-width="1"/>
+      <text x="165" y="22" text-anchor="middle" fill="#e9d5ff" font-size="12" font-weight="600">Multi-Channel RAG Knowledge Service</text>
+      <text x="15" y="44" fill="#cbd5e1" font-size="10.5">1. Điểm chuẩn ĐH VN (Admissions Benchmark)</text>
+      <text x="15" y="64" fill="#cbd5e1" font-size="10.5">2. Dữ liệu việc làm thực tế (606k Job Postings)</text>
+      <text x="15" y="84" fill="#cbd5e1" font-size="10.5">3. Khung lương chuẩn VNWorks (6,220 Chức danh)</text>
+      <text x="15" y="104" fill="#cbd5e1" font-size="10.5">4. Chi phí sinh hoạt Numbeo (HN, HCM, ĐN)</text>
+      <text x="15" y="124" fill="#cbd5e1" font-size="10.5">5. Kỹ năng 14 nhóm ngành vĩ mô (Domain Map)</text>
+      <rect x="15" y="138" width="300" height="24" rx="4" fill="#0f172a" stroke="#6b21a8"/>
+      <text x="165" y="154" text-anchor="middle" fill="#c084fc" font-size="10" font-weight="600">Sparse Inverted Index &amp; Entity Matcher (&lt;100ms)</text>
+    </g>
+
+    <!-- Sub-box: Inference Engines -->
+    <g transform="translate(370, 48)">
+      <!-- Local LLM -->
+      <rect width="250" height="85" rx="8" fill="#1e293b" stroke="#10b981" stroke-width="1.5"/>
+      <text x="125" y="22" text-anchor="middle" fill="#a7f3d0" font-size="12" font-weight="600">Local LLM Server (Primary)</text>
+      <text x="15" y="42" fill="#94a3b8" font-size="10.5">• Ollama Runtime (Port 11434)</text>
+      <text x="15" y="58" fill="#94a3b8" font-size="10.5">• Model: Qwen2.5-7B-Instruct</text>
+      <text x="15" y="74" fill="#34d399" font-size="10.5">• Quantization: GGUF Q4_K_M</text>
+
+      <!-- Cloud Failover -->
+      <g transform="translate(0, 95)">
+        <rect width="250" height="77" rx="8" fill="#1e293b" stroke="#f43f5e" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <text x="125" y="20" text-anchor="middle" fill="#fecdd3" font-size="11.5" font-weight="600">Cloud LLM Fallback (Failover)</text>
+        <text x="15" y="40" fill="#94a3b8" font-size="10.5">• Google Gemini Flash Engine</text>
+        <text x="15" y="58" fill="#fb7185" font-size="10.5">• Tự động chuyển mạch khi Local bận</text>
+      </g>
+    </g>
+  </g>
+</svg>

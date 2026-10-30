@@ -1,3 +1,4 @@
+import { storeSession, clearSession } from './authSession';
 const API_BASE_URL = (import.meta as any).env.VITE_API_BASE_URL || 'https://futuretrace-server.onrender.com';
 
 const normalizeUser = (user: any) => {
@@ -29,7 +30,7 @@ export const login = async (email: string, password: string) => {
 
   const data = await response.json();
   const user = normalizeUser(data.user);
-  localStorage.setItem('token', data.accessToken);
+  storeSession(data.accessToken, data.refreshToken);
   localStorage.setItem('user', JSON.stringify(user));
   // Removed futuretrace_auth as we now use token as source of truth
   return { ...data, user };
@@ -55,7 +56,7 @@ export const register = async (userData: any) => {
 
   const data = await response.json();
   const user = normalizeUser(data.user);
-  localStorage.setItem('token', data.accessToken);
+  storeSession(data.accessToken, data.refreshToken);
   localStorage.setItem('user', JSON.stringify(user));
   return { ...data, user };
 };
@@ -95,13 +96,13 @@ export const verifyRegisterOtp = async (email: string, otp: string) => {
 
   const data = await response.json();
   const user = normalizeUser(data.user);
-  localStorage.setItem('token', data.accessToken);
+  storeSession(data.accessToken, data.refreshToken);
   localStorage.setItem('user', JSON.stringify(user));
   return { ...data, user };
 };
 
 export const logout = () => {
-  localStorage.removeItem('token');
+  clearSession();
   localStorage.removeItem('user');
   localStorage.removeItem('futuretrace_auth');
 };
@@ -206,54 +207,4 @@ export const redeemInviteCode = async (codeInvite: string) => {
   const user = normalizeUser(data.user);
   localStorage.setItem('user', JSON.stringify(user));
   return { ...data, user };
-};
-
-export const sendForgotPasswordOtp = async (email: string) => {
-  const response = await fetch(`${API_BASE_URL}/api/auth/forgot-password/send-otp`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email }),
-  });
-
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.message || 'Không thể gửi mã OTP đặt lại mật khẩu');
-  }
-
-  return data;
-};
-
-export const verifyForgotPasswordOtp = async (email: string, otp: string) => {
-  const response = await fetch(`${API_BASE_URL}/api/auth/forgot-password/verify-otp`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, otp }),
-  });
-
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.message || 'Mã xác thực không chính xác hoặc đã hết hạn');
-  }
-
-  return data;
-};
-
-export const resetForgotPassword = async (params: {
-  email: string;
-  otp: string;
-  newPassword: string;
-  confirmPassword: string;
-}) => {
-  const response = await fetch(`${API_BASE_URL}/api/auth/forgot-password/reset`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(params),
-  });
-
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.message || 'Đặt lại mật khẩu thất bại');
-  }
-
-  return data;
 };

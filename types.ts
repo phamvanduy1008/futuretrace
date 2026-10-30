@@ -37,18 +37,25 @@ export interface SimulationData {
   tier: UserTier;
   mood?: "Lạc quan" | "Bình thường" | "Lo lắng" | "Kiệt sức";
   educationLevel?: "Cấp 3" | "Đại học năm 1-2" | "Đại học năm 3-4" | "Mới ra trường";
-  location?: "Thành phố lớn" | "Tỉnh lẻ";
+  location?: string;
   coreValues?: "Ổn định" | "Thu nhập cao" | "Đam mê/Cống hiến";
+  // Đầu vào có cấu trúc (autocomplete trường/ngành): chính xác hơn suy luận từ câu tự do
+  programId?: string;
+  programLabel?: string;
+  expectedScore?: number;
+  budgetPerYearMillion?: number;
 }
 
-export interface RoiDetails {
-  annualizedRoi: number; // Tỷ suất sinh lời bình quân hàng năm (%/năm), vd: 24.5
-  cumulativeRoi: number; // Tổng tỷ suất tích lũy cả kỳ (%), vd: 200
-  estimatedCost: string; // Chi phí đầu tư dự kiến (vd: "45 - 65 triệu VNĐ")
-  estimatedAnnualGain: string; // Mức thu nhập tăng thêm dự kiến (vd: "15 - 22 triệu VNĐ/tháng")
-  paybackPeriodYears: number; // Thời gian hoàn vốn dự kiến (năm), vd: 1.8
-  breakdownExplanation: string; // Giải trình cơ sở tính toán
-  riskFactor?: string; // Yếu tố rủi ro
+/** Một sự kiện có nguồn trong Fact Sheet (Knowledge Layer v2) */
+export interface Fact {
+  id: string;
+  label: string;
+  value: number | null;
+  unit: string | null;
+  range?: number[];
+  year?: number;
+  kind: string;
+  source?: { publisher?: string; url?: string | null; tier?: string; years?: number[]; verified?: boolean };
 }
 
 export interface ScenarioResult {
@@ -58,13 +65,6 @@ export interface ScenarioResult {
   careerGrowth: number;
   happiness: number;
   roi: number;
-  cumulativeRoi?: number;
-  roiDetails?: RoiDetails;
-  metrics?: {
-    career?: number;
-    happiness?: number;
-    roi?: number;
-  };
   type: "Positive" | "Neutral" | "Risk";
   deepAnalysis?: {
     swot: {
@@ -88,6 +88,48 @@ export interface ScenarioResult {
     score: number;
     analysis: string;
   };
+  probability?: number;
+  quant?: ScenarioQuant;
+}
+
+/** Bằng chứng định lượng từ FT-Salary + Career ROI Engine (backend) */
+export interface ScenarioQuant {
+  model: string;
+  confidence: "high" | "medium" | "low";
+  market: {
+    segments: string[];
+    period: number[];
+    demandMomentumPercentPerYear: number;
+    salaryGrowthPercentPerYear: number;
+    postingsAnalyzed: number;
+  } | null;
+  assumptions: {
+    discountRate: number;
+    lensYears: number;
+    tuitionPerYearMillion: number;
+    tuitionSource?: string;
+    studentLivingMonthlyMillion: number;
+  };
+  roi: {
+    ratio: number;
+    pvCostMillion: number;
+    pvBenefitMillion: number;
+    paybackYearFromNow: number | null;
+    lensYears: number;
+  };
+  salary: {
+    quantile: string;
+    startMonthlyMillion: number;
+    year5MonthlyMillion: number;
+    counterfactualStartMillion: number;
+  };
+  affordability: {
+    cashNeedPerYearMillion: number;
+    familyCapacityPerYearMillion: number;
+    gapPerYearMillion: number;
+    affordable: boolean;
+  };
+  metricSources: { careerGrowth: string; roi: string; happiness: string };
 }
 
 export interface MilestoneStep {
@@ -148,6 +190,10 @@ export interface HistoryItem extends ScenarioResult {
 }
 
 export interface PredictionResult {
+  simulationId?: string;
+  facts?: Fact[];
+  program?: { schoolName?: string; majorName?: string; cutoff?: number; year?: number } | null;
+  quality?: { provider?: string; groundedness?: number | null; aiCoverage?: number } | null;
   isEnterprise?: boolean;
   summary: string;
   scenarios: ScenarioResult[];

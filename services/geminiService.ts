@@ -6,7 +6,32 @@ import {
 
 const API_BASE_URL = (import.meta as any).env.VITE_API_BASE_URL || 'https://futuretrace-server.onrender.com';
 
-const getAuthToken = () => localStorage.getItem('token');
+// Tác vụ AI có thể mất 1-2 phút khi server vừa "thức dậy" (Render free) hoặc GPU đang khởi động
+const AI_TIMEOUT_MS = 150_000;
+
+export type ApiErrorType = 'AUTH' | 'NETWORK' | 'GENERAL' | 'OVERLOADED' | 'RATE_LIMIT' | 'TIMEOUT' | 'CANCELLED';
+
+export class ApiError extends Error {
+  type: ApiErrorType;
+  code?: string;
+  status?: number;
+  requiredToken?: number;
+  currentToken?: number;
+
+  constructor(message: string, type: ApiErrorType, extra: Partial<ApiError> = {}) {
+    super(message);
+    this.type = type;
+    Object.assign(this, extra);
+  }
+}
+
+const getAuthHeaders = (): Record<string, string> => {
+  const token = localStorage.getItem('token');
+  return {
+    'Content-Type': 'application/json',
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+};
 
 const syncRemainingToken = (remainingToken?: number) => {
   if (typeof remainingToken !== 'number') return;
@@ -23,120 +48,67 @@ const syncRemainingToken = (remainingToken?: number) => {
   }
 };
 
-const throwApiError = (errorData: any, fallback: string) => {
-  const error: any = new Error(errorData.message || fallback);
-  error.code = errorData.code;
-  error.requiredToken = errorData.requiredToken;
-  error.currentToken = errorData.currentToken;
-  error.type = errorData.type;
-  throw error;
+const typeFromStatus = (status: number, serverType?: string): ApiErrorType => {
+  if (serverType === 'OVERLOADED' || serverType === 'RATE_LIMIT') return serverType;
+  if (status === 401 || status === 402 || status === 403) return 'AUTH';
+  if (status === 429) return 'RATE_LIMIT';
+  if (status === 502 || status === 503 || status === 504) return 'OVERLOADED';
+  return 'GENERAL';
 };
 
-export const generateSimulationStream = async (
-  data: SimulationData,
-  onChunk: (chunk: any) => void
-): Promise<PredictionResult> => {
-  const token = getAuthToken();
-  const response = await fetch(`${API_BASE_URL}/api/simulations/stream`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
-    body: JSON.stringify({
-      ...data,
-      tier: 'FREE'
-    })
-  });
+/**
+ * Gọi API JSON: kiểm tra mã HTTP trước khi parse (trang lỗi HTML 502 của gateway không còn
+ * hiện ra thành "Unexpected token '<'"), có timeout và có thể hủy bằng AbortSignal.
+ */
+const requestJson = async (
+  path: string,
+  init: RequestInit,
+  fallbackMessage: string,
+  signal?: AbortSignal,
+): Promise<any> => {
+  const timeout = AbortSignal.timeout(AI_TIMEOUT_MS);
+  const combined = signal && 'any' in AbortSignal ? (AbortSignal as any).any([signal, timeout]) : timeout;
+
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE_URL}${path}`, { ...init, headers: getAuthHeaders(), signal: combined });
+  } catch (e: any) {
+    if (signal?.aborted) throw new ApiError('Bạn đã hủy yêu cầu.', 'CANCELLED');
+    if (timeout.aborted) {
+      throw new ApiError('Máy chủ AI phản hồi quá lâu. Vui lòng thử lại sau ít phút.', 'TIMEOUT');
+    }
+    throw new ApiError('Không kết nối được máy chủ. Kiểm tra mạng và thử lại.', 'NETWORK');
+  }
+
+  const isJson = (response.headers.get('content-type') || '').includes('application/json');
+  const body = isJson ? await response.json().catch(() => ({})) : {};
 
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throwApiError(errorData, 'Lỗi kết nối server AI.');
+    throw new ApiError(body.message || fallbackMessage, typeFromStatus(response.status, body.type), {
+      status: response.status,
+      code: body.code,
+      requiredToken: body.requiredToken,
+      currentToken: body.currentToken,
+    });
   }
-
-  const reader = response.body?.getReader();
-  if (!reader) throw new Error("Không thể đọc luồng dữ liệu");
-  
-  const decoder = new TextDecoder('utf-8');
-  let result: PredictionResult | null = null;
-  let buffer = '';
-
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    
-    buffer += decoder.decode(value, { stream: true });
-    const lines = buffer.split('\n\n');
-    buffer = lines.pop() || '';
-    
-    for (const line of lines) {
-      if (line.startsWith('data: ')) {
-        try {
-          const dataStr = line.substring(6).trim();
-          if (!dataStr) continue;
-          
-          const parsed = JSON.parse(dataStr);
-          if (parsed.event === 'result') {
-            result = parsed.data;
-          } else if (parsed.event === 'error') {
-            throw new Error(parsed.message);
-          } else {
-            onChunk(parsed);
-          }
-        } catch (e) {
-          // Bỏ qua JSON lỗi trong chunk
-        }
-      }
-    }
-  }
-
-  if (!result) throw new Error("Không nhận được dữ liệu kết quả từ luồng.");
-  return result;
+  return body;
 };
 
-// Vẫn giữ API cũ cho tương thích (nếu cần)
 export const generateSimulation = async (
   data: SimulationData,
+  signal?: AbortSignal,
 ): Promise<PredictionResult> => {
-  const token = getAuthToken();
-  const response = await fetch(`${API_BASE_URL}/api/simulations`, {
+  return requestJson('/api/simulations', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
-    body: JSON.stringify({
-      ...data,
-      tier: 'FREE'
-    })
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throwApiError(errorData, 'Lỗi kết nối server AI.');
-  }
-
-  const result = await response.json();
-  return result;
+    body: JSON.stringify(data),
+  }, 'Lỗi kết nối server AI.', signal);
 };
 
-export const analyzeInputReadiness = async (decision: string): Promise<any> => {
-  const token = getAuthToken();
-  const response = await fetch(`${API_BASE_URL}/api/simulations/pre-check`, {
+export const analyzeInputReadiness = async (decision: string, signal?: AbortSignal): Promise<any> => {
+  return requestJson('/api/simulations/pre-check', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
-    body: JSON.stringify({ decision })
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throwApiError(errorData, 'Lỗi kết nối server AI.');
-  }
-
-  return response.json();
+    body: JSON.stringify({ decision }),
+  }, 'Lỗi kết nối server AI.', signal);
 };
 
 export const generatePremiumAnalysis = async (
@@ -146,26 +118,14 @@ export const generatePremiumAnalysis = async (
   context?: SimulationData,
   timeframe?: number,
 ): Promise<any> => {
-  const token = getAuthToken();
-  const response = await fetch(`${API_BASE_URL}/api/premium/analyze`, {
+  const data = await requestJson('/api/premium/analyze', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
     body: JSON.stringify({
       scenario: { title, description, id: scenarioId },
       context,
       timeframe
     })
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throwApiError(errorData, 'Lỗi tạo lộ trình chuyên sâu.');
-  }
-
-  const data = await response.json();
+  }, 'Lỗi tạo lộ trình chuyên sâu.');
   syncRemainingToken(data.remainingToken);
   return data;
 };
@@ -176,29 +136,15 @@ export const pivotPremiumAnalysis = async (
   feedback: string,
   context?: SimulationData,
   timeframe?: number,
+  progressId?: string,
 ): Promise<PremiumAnalysisReport> => {
-  const token = getAuthToken();
-  const response = await fetch(`${API_BASE_URL}/api/premium/pivot`, {
+  // Khi có progressId, server tự nạp báo cáo từ DB; không cần gửi lại cả báo cáo (~30KB)
+  const data = await requestJson('/api/premium/pivot', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
-    body: JSON.stringify({
-      currentReport,
-      completedMilestones,
-      feedback,
-      context,
-      timeframe
-    })
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throwApiError(errorData, 'Lỗi điều chỉnh lộ trình.');
-  }
-
-  const data = await response.json();
+    body: JSON.stringify(progressId
+      ? { progressId, feedback, context, timeframe }
+      : { currentReport, completedMilestones, feedback, context, timeframe })
+  }, 'Lỗi điều chỉnh lộ trình.');
   syncRemainingToken(data.remainingToken);
   return data.report;
 };
@@ -207,20 +153,8 @@ export const expandStepDetail = async (
   scenarioId: string,
   stepId: string
 ): Promise<{ step: any; report: any }> => {
-  const token = getAuthToken();
-  const response = await fetch(`${API_BASE_URL}/api/premium/expand-step`, {
+  return requestJson('/api/premium/expand-step', {
     method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
     body: JSON.stringify({ scenarioId, stepId })
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throwApiError(errorData, 'Không thể tối ưu chi tiết nhiệm vụ.');
-  }
-
-  return response.json();
+  }, 'Không thể tối ưu chi tiết nhiệm vụ.');
 };
